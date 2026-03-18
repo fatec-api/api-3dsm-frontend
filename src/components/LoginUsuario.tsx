@@ -45,7 +45,7 @@ export default function LoginUsuario() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-200">
+    <div className="flex justify-center items-center min-h-screen bg-base-200">
 
       <div className="w-80">
 
