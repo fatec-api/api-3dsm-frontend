@@ -1,12 +1,23 @@
 import { useState } from 'react'
-import Login from './components/LoginUsuario'
-import './App.css'
+import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+import LoginUsuario from './components/LoginUsuario'
+import Header from './shared/components/Header'
+import Home from './components/Home'
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Header />}>
+      <Route index element={<Home />}/>
+      <Route path='login' element={<LoginUsuario />}/>
+    </Route>
+  )
+)
 
 function App() {
 
   return (
     <>
-      <Login />
+      <RouterProvider router={router} />
     </>
   )
 }
