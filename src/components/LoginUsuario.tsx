@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import Botao from "./Botao";
 
 type LoginDados = {
   email: string;
@@ -112,12 +113,11 @@ export default function LoginUsuario() {
             </p>
           )}
 
-          <button
+          <Botao
             type="submit"
-            className="border-2 border-black rounded-xl h-10 mt-2 bg-white hover:bg-gray-100"
           >
             Logar
-          </button>
+          </Botao>
 
         </form>
 
