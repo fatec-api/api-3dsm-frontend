@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
-import Input from './components/Input'
+import Input from './shared/components/Input'
 import Header from './shared/components/Header'
 import Home from './pages/Home'
 
