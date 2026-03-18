@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import LoginUsuario from './components/LoginUsuario'
 import Header from './shared/components/Header'
-import Home from './components/Home'
+import Home from './pages/Home'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
