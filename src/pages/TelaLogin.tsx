@@ -11,39 +11,66 @@ export default function TelaLogin() {
  const [mostrarSenha, setMostrarSenha] = useState(false);
 
 
- const handleLogin = (e: React.FormEvent) => {
-   e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
+  setErro("");
 
-   setErro("");
+  if (!email || !senha) {
+    setErro("Preencha todos os campos.");
+    return;
+  }
 
+  if (!email.includes("@")) {
+    setErro("E-mail inválido.");
+    return;
+  }
 
-   if (!email || !senha) {
-     setErro("Preencha todos os campos.");
-     return;
-   }
+  const senhaValida =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
+  if (!senhaValida.test(senha)) {
+    setErro(
+      "A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial."
+    );
+    return;
+  }
 
-   if (!email.includes("@")) {
-     setErro("E-mail inválido.");
-     return;
-   }
+  try {
+    // aplicação fetch para quando o backend estiver pronto
+    /*
+    const response = await fetch("http://localhost:8080/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, senha }),
+    });
 
+    if (!response.ok) {
+      throw new Error();
+    }
 
-   if (senha.length < 8) {
-       setErro("A senha deve ter no mínimo 8 caracteres.");
-       return;
-   }  
+    const data = await response.json();
+    console.log(data);
+    */
 
+    // dado mockado para simular o login
+    if (email === "admin@gsw.com" && senha === "Admin@123") {
+      alert("Login realizado com sucesso!");
+      
+      setTimeout(() => {
+        setEmail("");
+        setSenha("");
+      }, 500);
+    } else {
+      throw new Error();
+    }
 
-   alert("Login realizado com sucesso!");
-
-
-   setTimeout(() => {
-   setEmail("");
-   setSenha("");
-   },500);
- };
+  } catch {
+    setErro("Email ou senha inválidos.");
+  }
+};
 
 
  return (
@@ -115,12 +142,12 @@ export default function TelaLogin() {
      </div>
 
 
-       <div className="w-1/2 flex items-center justify-center relative bg-[#FFFFFF] overflow-hidden">
-           <div className="absolute bottom-[5px] right-[350px] w-[500px] h-[800px] bg-[#F0F0F0] rounded-t-[250px]" />
+       <div className="w-1/2 flex items-center justify-center relative bg-[#FFFFF] overflow-hidden">
+           <div className="absolute bottom-[5px] right-[350px] w-[500px] h-[800px] bg-[#F2F2F2] rounded-t-[250px]" />
                <img
-               src=" "
+               src="src/assets/."
                alt="logo gsw"
-               className="relative w-80 z-10"
+               className="relative w-80 z-10 right-30"
                />
        </div>
    </div>
