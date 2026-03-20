@@ -112,129 +112,136 @@ export default function FormularioCadastro() {
 
 
  return (
-   <>
-     <form
-       onSubmit={handleSubmit}
-       className="bg-white shadow-md rounded-xl p-6 max-w-[600px] w-full flex flex-col gap-6"
-     >
-       <h1 className="text-2xl font-bold text-gray-800 text-center">
-         Cadastro de Usuário
-       </h1>
+  <>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-[700px] flex flex-col gap-10"
+    >
+      <h1 className="text-2xl font-semibold text-gray-800 text-center">
+        Cadastro de Usuário
+      </h1>
 
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-         <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-6">
 
-           <Input
-             label="Nome"
-             placeholder="Exemplo de Nome"
-             value={nome}
-             onChange={(e: any) => setNome(e.target.value)}
-             icon={<FiUser size={18} />}
-           />
+          <Input
+            label="Nome"
+            placeholder="Exemplo de Nome"
+            value={nome}
+            onChange={(e: any) => setNome(e.target.value)}
+            icon={<FiUser size={18} />}
+            widthPx={300}
+          />
 
-           <Input
-             label="E-mail"
-             type="email"
-             placeholder="exemplo@gmail.com"
-             value={email}
-             onChange={(e: any) => setEmail(e.target.value)}
-             icon={<FiMail size={18} />}
-           />
+          <Input
+            label="E-mail"
+            type="email"
+            placeholder="exemplo@gmail.com"
+            value={email}
+            onChange={(e: any) => setEmail(e.target.value)}
+            icon={<FiMail size={18} />}
+            widthPx={300}
+          />
 
-           <Dropdown
-             label="Nível de experiência"
-             value={nivelExperiencia}
-             onChange={(e: any) => setNivelExperiencia(e.target.value)}
-             options={["", "Júnior", "Pleno", "Sênior"]}
-           />
+          <Dropdown
+            label="Nível de experiência"
+            value={nivelExperiencia}
+            onChange={(e: any) => setNivelExperiencia(e.target.value)}
+            options={["", "Júnior", "Pleno", "Sênior"]}
+            widthPx={300}
+          />
 
+        </div>
 
-         </div>
+        <div className="flex flex-col gap-6">
 
-         <div className="flex flex-col gap-5">
+          <Input
+            label="Senha"
+            type={mostrarSenha ? "text" : "password"}
+            value={senha}
+            onChange={(e: any) => setSenha(e.target.value)}
+            icon={<FiLock size={18} />}
+            widthPx={300}
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setMostrarSenha(!mostrarSenha)}
+                className="cursor-pointer flex items-center justify-center translate-x-[-15px]"
+              >
+                {mostrarSenha ? <FiEye size={22} /> : <FiEyeOff size={22} />}
+              </button>
+            }
+          />
 
-           <Input
-             label="Senha"
-             type={mostrarSenha ? "text" : "password"}
-             value={senha}
-             onChange={(e: any) => setSenha(e.target.value)}
-             icon={<FiLock size={18} />}
-             rightElement={
-               <button
-                 type="button"
-                 onClick={() => setMostrarSenha(!mostrarSenha)}
-               >
-                 {mostrarSenha ? <FiEye /> : <FiEyeOff />}
-               </button>
-             }
-           />
+          <Input
+            label="Confirme Senha"
+            type={mostrarConfirmar ? "text" : "password"}
+            value={confirmeSenha}
+            onChange={(e: any) => setConfirmeSenha(e.target.value)}
+            icon={<FiLock size={18} />}
+            widthPx={300}
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
+                className="cursor-pointer flex items-center justify-center translate-x-[-15px]"
+              >
+                {mostrarSenha ? <FiEye size={22} /> : <FiEyeOff size={22} />}
+              </button>
+            }
+          />
 
-           <Input
-             label="Confirme Senha"
-             type={mostrarConfirmar ? "text" : "password"}
-             value={confirmeSenha}
-             onChange={(e: any) => setConfirmeSenha(e.target.value)}
-             icon={<FiLock size={18} />}
-             rightElement={
-               <button
-                 type="button"
-                 onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
-               >
-                 {mostrarConfirmar ? <FiEye /> : <FiEyeOff />}
-               </button>
-             }
-           />
+          <Input
+            label="Valor por Hora"
+            type="number"
+            placeholder="25.50"
+            value={valorHora}
+            onChange={(e: any) => setValorHora(e.target.value)}
+            icon={<FiDollarSign size={18} />}
+            widthPx={300}
+          />
 
-           <Input
-             label="Valor por Hora"
-             type="number"
-             placeholder="25.50"
-             value={valorHora}
-             onChange={(e: any) => setValorHora(e.target.value)}
-             icon={<FiDollarSign size={18} />}
-           />
+        </div>
+      </div>
 
-         </div>
-       </div>
+      <div className="flex justify-center">
+        <Dropdown
+          label="Cargo"
+          value={cargo}
+          onChange={(e: any) => setCargo(e.target.value)}
+          options={[
+            "Profissional",
+            "Gestor",
+            "Administrativo",
+            "Financeiro",
+          ]}
+          icon={<FiBriefcase size={18} />}
+          widthPx={300}
+        />
+      </div>
 
-       <div className="flex justify-center">
-         <Dropdown
-           label="Cargo"
-           value={cargo}
-           onChange={(e: any) => setCargo(e.target.value)}
-           options={[
-             "Profissional",
-             "Gestor",
-             "Administrativo",
-             "Financeiro",
-           ]}
-           icon={<FiBriefcase size={18} />}
-         />
-       </div>
+      <div className="flex flex-col items-center gap-4">
+        {erro && (
+          <p className="text-red-600 text-sm text-center">
+            {erro}
+          </p>
+        )}
 
-       <div className="flex flex-col items-center gap-3">
+        <Botao type="submit">
+          Cadastrar
+        </Botao>
 
-         {erro && (
-           <p className="text-red-600 text-sm text-center">
-             {erro}
-           </p>
-         )}
+      </div>
+    </form>
 
-         <Botao type="submit">
-           Cadastrar
-         </Botao>
-
-       </div>
-     </form>
-
-     {mostrarPopup && (
-       <div className="toast toast-top toast-end">
-         <div className="alert alert-success">
-           <span>Profissional cadastrado com sucesso!</span>
-         </div>
-       </div>
-     )}
-   </>
- );
+    {mostrarPopup && (
+      <div className="toast toast-top toast-end">
+        <div className="alert alert-success">
+          <span>Profissional cadastrado com sucesso!</span>
+        </div>
+      </div>
+    )}
+  </>
+);
 }
