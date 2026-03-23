@@ -25,7 +25,7 @@ export default function Input({
   rightElement,
   widthPx = 320,
   heightPx = 48,
-  required = true
+  required = false
 
 }: InputProps) {
   return (

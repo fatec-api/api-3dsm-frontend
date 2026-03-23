@@ -6,8 +6,7 @@ import { GoProject } from "react-icons/go";
 import Dropdown from "../shared/components/Dropdown";
 
 export default function CadastroProjeto() {
-    const [erro, setErro] = useState("");
-    const [sucesso, setSucesso] = useState("");
+    const [alerta, setAlerta] = useState("");
     const [nomeProjeto, setNomeProjeto] = useState("");
     const [tipoProjeto, setTipoProjeto] = useState("");
     const [cliente, setCliente] = useState("");
@@ -18,29 +17,35 @@ export default function CadastroProjeto() {
     const [profissionalAlocado, setProfissionalAlocado] = useState("");
     const [gestorResponsavel, setGestorResponsavel] = useState("");
 
+    const regex = /^[A-Z]{3}\d{4}$/;
+
     const handleCadastro = async (e: React.FormEvent) => {
 
         e.preventDefault();
-        setErro("");
+        setAlerta("");
 
         if (!nomeProjeto || !tipoProjeto || !valorOrcamento || !dataInicio || !dataFim || !statusProjeto || !gestorResponsavel) {
-            setErro("Preencha todos os campos obrigatórios.");
+            setAlerta("Preencha todos os campos obrigatórios.");
+            return;
+        }
+
+        if (!regex.test(nomeProjeto)) {
+            setAlerta("O nome do projeto deve seguir o formato AAA9999 (3 letras maiúsculas seguidas de 4 números).");
             return;
         }
 
         if (dataFim < dataInicio) {
-            setErro("A data de fim não pode ser anterior à data de início.");
+            setAlerta("A data de fim não pode ser anterior à data de início.");
             return;
         }
 
-        if (isNaN(Number(valorOrcamento)) || Number(valorOrcamento) <= 0) {
-            setErro("O valor do orçamento deve ser um número válido.");
+        if (isNaN(Number(valorOrcamento)) || Number(valorOrcamento) < 0) {
+            setAlerta("O valor do orçamento deve ser um número válido.");
             return;
         }
-        // Simulação de cadastro bem-sucedido
+
         else {
-            setErro("");
-            setSucesso("Projeto cadastrado com sucesso!");
+            setAlerta("Projeto cadastrado com sucesso!");
             setNomeProjeto("");
             setTipoProjeto("");
             setCliente("");
@@ -64,9 +69,9 @@ export default function CadastroProjeto() {
                             <label className="block ms-3 mb-1 font-medium">Nome do Projeto</label>
                             <Input
                                 type="text"
-                                placeholder="Ex: Meu Projeto"
+                                placeholder="Ex: ABC1234"
                                 value={nomeProjeto}
-                                onChange={(e) => setNomeProjeto(e.target.value)}
+                                onChange={(e) => setNomeProjeto(e.target.value.toUpperCase())}
                                 icon={<GoProject size={20} />}
                                 required
                             />
@@ -126,7 +131,7 @@ export default function CadastroProjeto() {
                             <Dropdown
                                 value={statusProjeto}
                                 onChange={(e) => setStatusProjeto(e.target.value)}
-                                options={['Planejamento', 'Em Andamento', 'Concluído']}
+                                options={['Planejamento', 'Andamento', 'Concluído']}
                                 required
                             />
                         </div>
@@ -149,17 +154,7 @@ export default function CadastroProjeto() {
                         required
                     />
                 </div>
-                {erro && (
-                    <p className="alert alert-outline alert-error text-sm bg-red-100">
-                        {erro}
-                    </p>
-                )}
-
-                {sucesso && (
-                    <p className="alert alert-outline alert-success text-sm bg-green-100">
-                        {sucesso}
-                    </p>
-                )}
+                {alerta && <p className={`mb-4 text-center ${alerta.includes("sucesso") ? "alert alert-outline alert-success text-sm bg-green-100" : "alert alert-outline alert-error text-sm bg-red-100"}`}>{alerta}</p>}
 
                 <button type="submit" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 p-3 m-2">
                     Cadastrar
