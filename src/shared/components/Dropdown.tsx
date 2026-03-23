@@ -9,6 +9,7 @@ type SelectProps = {
   icon?: React.ReactNode;
   widthPx?: number;
   heightPx?: number;
+  required?: boolean;
 };
 
 export default function Dropdown({
@@ -20,6 +21,7 @@ export default function Dropdown({
   icon,
   widthPx = 320,
   heightPx = 48,
+  required = true
 }: SelectProps) {
   return (
     <div className="flex justify-center w-full">
@@ -47,6 +49,7 @@ export default function Dropdown({
             value={value}
             onChange={onChange}
             className="flex-1 outline-none bg-transparent text-gray-700 appearance-none cursor-pointer"
+            required={required}
           >
             <option value="">Selecione</option>
             {options.map((op, index) => (
