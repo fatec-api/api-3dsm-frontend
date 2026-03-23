@@ -27,8 +27,9 @@ export default function FormularioCadastro() {
  const [cargo, setCargo] = useState("");
  const [nivelExperiencia, setNivelExperiencia] = useState("");
 
- const [erro, setErro] = useState("");
+ const [erro, setErro] = useState("");;
  const [mostrarPopup, setMostrarPopup] = useState(false);
+ const [loading, setLoading] = useState(false);
 
 
  const validar = () => {
@@ -90,16 +91,53 @@ export default function FormularioCadastro() {
   };
 
   try {
-    console.log("Enviando:", payload);
+    setLoading(true);
+
+    const response = await cadastrarUsuario(payload);
+
+    console.log("Resposta do back:", response);
 
     limpar();
+    setMostrarPopup(true);
 
-    alert("Usuário cadastrado com sucesso!"); 
-  } catch {
+    setTimeout(() => {
+      setMostrarPopup(false);
+    }, 3000);
+
+  } catch (error) {
+    console.error(error);
     setErro("Erro ao cadastrar usuário");
+  } finally {
+    setLoading(false);
   }
 };
 
+// simução do backend
+async function cadastrarUsuario(payload: any) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log("Mock enviado para o back:", payload);
+      resolve({ sucesso: true });
+    }, 1000);
+  });
+
+  // aplicação da integração para quando o backend estiver finalizado
+  /*
+  const response = await fetch("http://localhost:3000/usuarios", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Erro ao cadastrar usuário");
+  }
+
+  return await response.json();
+  */
+}
 
  return (
   <>
@@ -207,18 +245,17 @@ export default function FormularioCadastro() {
           </p>
         )}
 
-        <Botao type="submit">
-          Cadastrar
+        <Botao type="submit" disabled={loading}>
+          {loading ? "Cadastrando..." : "Cadastrar"}
         </Botao>
 
+        {mostrarPopup && (
+          <div className="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-[9999]">
+             Usuário cadastrado com sucesso!
+          </div>
+        )}
       </div>
     </form>
-
-    {mostrarPopup && (
-     <div className="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-[9999]">
-        Usuário cadastrado com sucesso!
-   </div>
-    )}
   </>
 );
 }
