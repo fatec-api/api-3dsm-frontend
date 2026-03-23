@@ -1,57 +1,106 @@
 import { useState } from "react";
 import Header from "../shared/components/Header";
 import Input from "../shared/components/Input";
-import Botao from "../shared/components/Botao";
+import { PiHandCoins } from "react-icons/pi";
+import { GoProject } from "react-icons/go";
+import Dropdown from "../shared/components/Dropdown";
 
 export default function CadastroProjeto() {
+    const [erro, setErro] = useState("");
+    const [sucesso, setSucesso] = useState("");
     const [nomeProjeto, setNomeProjeto] = useState("");
+    const [tipoProjeto, setTipoProjeto] = useState("");
+    const [cliente, setCliente] = useState("");
+    const [valorOrcamento, setValorOrcamento] = useState("");
     const [dataInicio, setDataInicio] = useState("");
     const [dataFim, setDataFim] = useState("");
+    const [statusProjeto, setStatusProjeto] = useState("");
+    const [profissionalAlocado, setProfissionalAlocado] = useState("");
+    const [gestorResponsavel, setGestorResponsavel] = useState("");
+
+    const handleCadastro = async (e: React.FormEvent) => {
+
+        e.preventDefault();
+        setErro("");
+
+        if (!nomeProjeto || !tipoProjeto || !valorOrcamento || !dataInicio || !dataFim || !statusProjeto || !gestorResponsavel) {
+            setErro("Preencha todos os campos obrigatórios.");
+            return;
+        }
+
+        if (dataFim < dataInicio) {
+            setErro("A data de fim não pode ser anterior à data de início.");
+            return;
+        }
+
+        if (isNaN(Number(valorOrcamento)) || Number(valorOrcamento) <= 0) {
+            setErro("O valor do orçamento deve ser um número válido.");
+            return;
+        }
+        // Simulação de cadastro bem-sucedido
+        else {
+            setErro("");
+            setSucesso("Projeto cadastrado com sucesso!");
+            setNomeProjeto("");
+            setTipoProjeto("");
+            setCliente("");
+            setValorOrcamento("");
+            setDataInicio("");
+            setDataFim("");
+            setStatusProjeto("");
+            setProfissionalAlocado("");
+            setGestorResponsavel("");
+        }
+    }
+
     return (
         <div className="flex h-screen bg-[#FFFFFF]">
             <Header />
-            <form className="flex flex-col items-center w-full mt-40">
-                <h1 className="form-title text-2xl font-bold mb-2">Cadastro de Projeto</h1>
+            <form className="flex flex-col items-center w-full mt-40" onSubmit={handleCadastro}>
+                <h1 className="form-title text-2xl font-bold mb-5">Cadastro de Projeto</h1>
                 <div className="join join-vertical lg:join-horizontal">
-                    <div className="join join-vertical p-8">
+                    <div className="join join-vertical px-8">
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Nome do Projeto</label>
                             <Input
                                 type="text"
-                                placeholder="meu projeto"
+                                placeholder="Ex: Meu Projeto"
                                 value={nomeProjeto}
                                 onChange={(e) => setNomeProjeto(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block ms-3 mb-1 font-medium">Cliente</label>
-                            <Input
-                                type="text"
-                                placeholder="meu projeto"
-                                value={nomeProjeto}
-                                onChange={(e) => setNomeProjeto(e.target.value)}
+                                icon={<GoProject size={20} />}
+                                required
                             />
                         </div>
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Tipo de Projeto</label>
-                            <Input
-                                type="text"
-                                placeholder="meu projeto"
-                                value={nomeProjeto}
-                                onChange={(e) => setNomeProjeto(e.target.value)}
+                            <Dropdown
+                                value={tipoProjeto}
+                                onChange={(e) => setTipoProjeto(e.target.value)}
+                                options={['Alocação', 'Hora Fechada']}
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block ms-3 mb-1 font-medium">Cliente</label>
+                            <Dropdown
+                                value={cliente}
+                                onChange={(e) => setCliente(e.target.value)}
+                                options={['Cliente 1', 'Cliente 2', 'Cliente 3']}
                             />
                         </div>
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Valor do Orçamento</label>
                             <Input
-                                type="text"
-                                placeholder="meu projeto"
-                                value={nomeProjeto}
-                                onChange={(e) => setNomeProjeto(e.target.value)}
+                                type="double"
+                                placeholder="R$00,00"
+                                value={valorOrcamento}
+                                onChange={(e) => setValorOrcamento(e.target.value)}
+                                icon={<PiHandCoins size={20} />}
+                                required
                             />
                         </div>
                     </div>
-                    <div className="join join-vertical p-8">
+                    <div className="join join-vertical px-8">
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Data de Início</label>
                             <Input
@@ -59,6 +108,7 @@ export default function CadastroProjeto() {
                                 placeholder="dd/mm/aaaa"
                                 value={dataInicio}
                                 onChange={(e) => setDataInicio(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="mb-4">
@@ -68,40 +118,52 @@ export default function CadastroProjeto() {
                                 placeholder="dd/mm/aaaa"
                                 value={dataFim}
                                 onChange={(e) => setDataFim(e.target.value)}
+                                required
                             />
                         </div>
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Status do Projeto</label>
-                            <Input
-                                type="text"
-                                placeholder="meu projeto"
-                                value={nomeProjeto}
-                                onChange={(e) => setNomeProjeto(e.target.value)}
+                            <Dropdown
+                                value={statusProjeto}
+                                onChange={(e) => setStatusProjeto(e.target.value)}
+                                options={['Planejamento', 'Em Andamento', 'Concluído']}
+                                required
                             />
                         </div>
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Profissionais</label>
-                            <Input
-                                type="text"
-                                placeholder="meu projeto"
-                                value={nomeProjeto}
-                                onChange={(e) => setNomeProjeto(e.target.value)}
+                            <Dropdown
+                                value={profissionalAlocado}
+                                onChange={(e) => setProfissionalAlocado(e.target.value)}
+                                options={['Profissional 1', 'Profissional 2', 'Profissional 3']}
                             />
                         </div>
                     </div>
                 </div>
-                <div className="mb-4">
+                <div className="mb-5">
                     <label className="block ms-3 mb-1 font-medium">Gestor Responsável</label>
-                    <Input
-                        type="text"
-                        placeholder="meu projeto"
-                        value={nomeProjeto}
-                        onChange={(e) => setNomeProjeto(e.target.value)}
+                    <Dropdown
+                        value={gestorResponsavel}
+                        onChange={(e) => setGestorResponsavel(e.target.value)}
+                        options={['Gestor 1', 'Gestor 2', 'Gestor 3']}
+                        required
                     />
                 </div>
-                <Botao type="submit">
+                {erro && (
+                    <p className="alert alert-outline alert-error text-sm bg-red-100">
+                        {erro}
+                    </p>
+                )}
+
+                {sucesso && (
+                    <p className="alert alert-outline alert-success text-sm bg-green-100">
+                        {sucesso}
+                    </p>
+                )}
+
+                <button type="submit" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 p-3 m-2">
                     Cadastrar
-                </Botao>
+                </button>
             </form>
         </div>
     );
