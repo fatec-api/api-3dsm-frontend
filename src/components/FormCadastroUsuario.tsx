@@ -43,7 +43,7 @@ export default function FormularioCadastro() {
 
 
    if (!/(?=.*[A-Z])(?=.*\d).{8,}/.test(senha)) {
-     return "Senha deve ter 8 caracteres, 1 número e 1 maiúscula";
+     return "A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial.";
    }
 
 
@@ -53,7 +53,7 @@ export default function FormularioCadastro() {
 
 
    if (Number(valorHora) <= 0) {
-     return "Valor por hora deve ser maior que 0";
+     return "O valor por hora deve ser maior que 0";
    }
 
 
@@ -71,44 +71,34 @@ export default function FormularioCadastro() {
  };
 
  const handleSubmit = async (e: any) => {
-   e.preventDefault();
-   setErro("");
+  e.preventDefault();
+  setErro("");
 
+  const erroValidacao = validar();
+  if (erroValidacao) {
+    setErro(erroValidacao);
+    return;
+  }
 
-   const erroValidacao = validar();
-   if (erroValidacao) {
-     setErro(erroValidacao);
-     return;
-   }
+  const payload = {
+    nome: nome.trim(),
+    email: email.trim(),
+    senha,
+    valorHora: Number(valorHora),
+    cargo,
+    nivelExperiencia,
+  };
 
+  try {
+    console.log("Enviando:", payload);
 
-   const payload = {
-     nome: nome.trim(),
-     email: email.trim(),
-     senha,
-     valorHora: Number(valorHora),
-     cargo,
-     nivelExperiencia,
-   };
+    limpar();
 
-
-   try {
-     // simuação de envio para backend
-
-     console.log("Enviando:", payload);
-
-     limpar();
-     setMostrarPopup(true);
-
-     setTimeout(() => {
-       setMostrarPopup(false);
-     }, 3000);
-
-
-   } catch {
-     setErro("Erro ao cadastrar usuário");
-   }
- };
+    alert("Usuário cadastrado com sucesso!"); 
+  } catch {
+    setErro("Erro ao cadastrar usuário");
+  }
+};
 
 
  return (
@@ -144,14 +134,19 @@ export default function FormularioCadastro() {
             widthPx={300}
           />
 
-          <Dropdown
-            label="Nível de experiência"
-            value={nivelExperiencia}
-            onChange={(e: any) => setNivelExperiencia(e.target.value)}
-            options={["", "Júnior", "Pleno", "Sênior"]}
+           <Dropdown
+            label="Cargo"
+            value={cargo}
+            onChange={(e: any) => setCargo(e.target.value)}
+            options={[
+            "Profissional",
+            "Gestor",
+            "Administrativo",
+            "Financeiro",
+            ]}
+            icon={<FiBriefcase size={18} />}
             widthPx={300}
-          />
-
+        />
         </div>
 
         <div className="flex flex-col gap-6">
@@ -169,7 +164,7 @@ export default function FormularioCadastro() {
                 onClick={() => setMostrarSenha(!mostrarSenha)}
                 className="cursor-pointer flex items-center justify-center translate-x-[-15px]"
               >
-                {mostrarSenha ? <FiEye size={22} /> : <FiEyeOff size={22} />}
+                {mostrarSenha ? <FiEye size={18} /> : <FiEyeOff size={18} />}
               </button>
             }
           />
@@ -187,7 +182,7 @@ export default function FormularioCadastro() {
                 onClick={() => setMostrarConfirmar(!mostrarConfirmar)}
                 className="cursor-pointer flex items-center justify-center translate-x-[-15px]"
               >
-                {mostrarSenha ? <FiEye size={22} /> : <FiEyeOff size={22} />}
+                {mostrarConfirmar ? <FiEye size={18} /> : <FiEyeOff size={18} />}
               </button>
             }
           />
@@ -205,22 +200,6 @@ export default function FormularioCadastro() {
         </div>
       </div>
 
-      <div className="flex justify-center">
-        <Dropdown
-          label="Cargo"
-          value={cargo}
-          onChange={(e: any) => setCargo(e.target.value)}
-          options={[
-            "Profissional",
-            "Gestor",
-            "Administrativo",
-            "Financeiro",
-          ]}
-          icon={<FiBriefcase size={18} />}
-          widthPx={300}
-        />
-      </div>
-
       <div className="flex flex-col items-center gap-4">
         {erro && (
           <p className="text-red-600 text-sm text-center">
@@ -236,12 +215,11 @@ export default function FormularioCadastro() {
     </form>
 
     {mostrarPopup && (
-      <div className="toast toast-top toast-end">
-        <div className="alert alert-success">
-          <span>Profissional cadastrado com sucesso!</span>
-        </div>
-      </div>
+     <div className="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-[9999]">
+        Usuário cadastrado com sucesso!
+   </div>
     )}
   </>
 );
 }
+
