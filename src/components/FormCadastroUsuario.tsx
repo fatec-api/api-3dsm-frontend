@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Input from "./Input";
-import Dropdown from "./Dropdown";
-import Botao from "./Botao";
+import Input from "../shared/components/Input";
+import Dropdown from "../shared/components/Dropdown";
+import Botao from "../shared/components/Botao";
 
 
 import {

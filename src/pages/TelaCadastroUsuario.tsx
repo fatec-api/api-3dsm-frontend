@@ -1,6 +1,6 @@
 import Navbar from "../shared/components/Navbar";
 import Header from "../shared/components/Header";
-import FormularioCadastro from "../shared/components/FormCadastroUsuario";
+import FormularioCadastro from "../components/FormCadastroUsuario";
 
 
 export default function CadastroUsuario() {
