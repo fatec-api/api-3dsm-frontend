@@ -5,6 +5,7 @@ import Header from './shared/components/Header'
 import Home from './pages/Home'
 import TelaLogin from './pages/TelaLogin'
 import Dropdown from './shared/components/Dropdown'
+import TelaFuncionarios from './pages/TelaFuncionarios'
 
 
 const router = createBrowserRouter(
@@ -12,10 +13,11 @@ const router = createBrowserRouter(
    <>
      <Route path="/" element={<Header />}>
        <Route index element={<Home />}/>
-       <Route path='/input' element={<Input/>}/>
-       <Route path='/dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/>
+       {/* <Route path='input' element={<Input/>}/>
+       <Route path='dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/> */}
+       <Route path='telalogin' element={<TelaLogin/>}/>
+       <Route path='telafuncionarios' element={<TelaFuncionarios/>}/>
      </Route>
-     <Route path='/telalogin' element={<TelaLogin/>}/>
    </>
  )
 )
