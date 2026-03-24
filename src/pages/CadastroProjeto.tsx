@@ -19,30 +19,6 @@ export default function CadastroProjeto() {
 
     const regex = /^[A-Z]{3}\d{4}$/;
 
-    const profissionais = [
-        {
-            nomeProfissional: "São Francisco",
-            cargo: "PO"
-        },
-        {
-            nomeProfissional: "São Paulo",
-            cargo: "Desenvolvedor Front-end"
-        },
-        {
-            nomeProfissional: "São Bernardo",
-            cargo: "Desenvolvedor back-end"
-        },
-        {
-            nomeProfissional: "São Carlos",
-            cargo: "PO"
-        },
-        {
-            nomeProfissional: "São Vincente",
-            cargo: "Master"
-        },
-    ]
-
-
     const handleCadastro = async (e: React.FormEvent) => {
 
         e.preventDefault();
