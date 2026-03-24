@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, type JSXElementConstructor, type ReactElement, type ReactNode, type ReactPortal } from "react";
 import Header from "../shared/components/Header";
 import Input from "../shared/components/Input";
 import { PiHandCoins } from "react-icons/pi";
 import { GoProject } from "react-icons/go";
 import Dropdown from "../shared/components/Dropdown";
+import { listarProfissionais } from "../services/projectService";
 
 export default function CadastroProjeto() {
     const [alerta, setAlerta] = useState("");
@@ -164,7 +165,7 @@ export default function CadastroProjeto() {
                     <form action="">
                         <h3 className="text-lg font-bold pb-3">Selecione os profissionais para o projeto:</h3>
                         <ul className="list bg-base-100 rounded-box shadow-md">
-                            {profissionais.map((profissional) => (
+                            {listarProfissionais().map((profissional: { nomeProfissional: string, cargo: string; }) => (
                                 <li className="list-row">
                                     <div><input type="checkbox" className="checkbox" /></div>
                                     <div className="flex justify-between">

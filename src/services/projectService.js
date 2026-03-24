@@ -1,11 +1,11 @@
-import api from "../api";
+import api from "./api";
 
-export async function criarProjeto(projeto) {
-    const response = await api.post("/projetos", projeto);
-    return response.data;
-}
+// CRIAR PROJETO
+export const criarProjeto = async (projeto) => {
+    return Promise.resolve({ id: Date.now(), ...projeto });
+};
 
-export async function getProfissionais(profissional) {
+export async function listarProfissionais(profissional) {
     return Promise.resolve([
         {
             nomeProfissional: "São Francisco",
@@ -38,7 +38,7 @@ export async function getProfissionais(profissional) {
     ]);
 }
 
-export async function getClientes(cliente) {
+export async function listarClientes(cliente) {
     return Promise.resolve([
         {
             nomeCliente: "Caio"
@@ -56,4 +56,6 @@ export async function getClientes(cliente) {
             nomeCliente: "Claudio"
         }
     ]);
-}
+
+
+};
