@@ -1,19 +1,31 @@
 import Card from "../shared/components/Card";
 
 export default function TelaFuncionarios() {
+
+    const handleClick = () => {
+
+    }
+
     return (
         <>
-            <div className="flex flex-row flex-wrap gap-5 bg-amber-200 p-3">
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
-                <Card title="Projeto X" description="xxxxxxxxxx" buttonText="associar projeto" onClick={console.log("test")}></Card>
+            {/* ajustar gap */}
+            <div className="flex flex-row flex-wrap justify-center gap-x-10 gap-y-4 bg-gray-400 p-3">
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} onClick={handleClick} />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} onClick={handleClick} />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} onClick={handleClick} />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} onClick={handleClick} />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" />
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" buttonText="Excluir" onClick={handleClick}/>
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" buttonText="Excluir" onClick={handleClick}/>
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" buttonText="Excluir" onClick={handleClick}/>
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" buttonText="Excluir" onClick={handleClick}/>
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} buttonText="Excluir" onClick={handleClick}/>
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} buttonText="Excluir" onClick={handleClick}/>
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} buttonText="Excluir" onClick={handleClick}/>
+                <Card title="Projeto X" type="xxxxxxxxxx" status="-----" isGestor={true} buttonText="Excluir" onClick={handleClick}/>
             </div>
         </>
     )
