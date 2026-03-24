@@ -19,6 +19,30 @@ export default function CadastroProjeto() {
 
     const regex = /^[A-Z]{3}\d{4}$/;
 
+    const profissionais = [
+        {
+            nomeProfissional: "São Francisco",
+            cargo: "PO"
+        },
+        {
+            nomeProfissional: "São Paulo",
+            cargo: "Desenvolvedor Front-end"
+        },
+        {
+            nomeProfissional: "São Bernardo",
+            cargo: "Desenvolvedor back-end"
+        },
+        {
+            nomeProfissional: "São Carlos",
+            cargo: "PO"
+        },
+        {
+            nomeProfissional: "São Vincente",
+            cargo: "Master"
+        },
+    ]
+
+
     const handleCadastro = async (e: React.FormEvent) => {
 
         e.preventDefault();
@@ -137,12 +161,11 @@ export default function CadastroProjeto() {
                         </div>
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Profissionais</label>
-                            <Dropdown
-                                value={profissionalAlocado}
-                                onChange={(e) => setProfissionalAlocado(e.target.value)}
-                                options={['Profissional 1', 'Profissional 2', 'Profissional 3']}
-                            />
+                            <div className="flex items-center border-2 border-gray-300 rounded-xl px-3 bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition duration-200">
+                            <a href="#modal-profissional" className="flex-1 outline-none bg-transparent text-gray-700 appearance-none cursor-pointer py-2.5">Selecione</a>
                         </div>
+                        </div>
+                        
                     </div>
                 </div>
                 <div className="mb-5">
@@ -160,6 +183,34 @@ export default function CadastroProjeto() {
                     Cadastrar
                 </button>
             </form>
-        </div>
+            <div className="modal" role="dialog" id="modal-profissional">
+                <div className="modal-box">
+                    <form action="">
+                        <h3 className="text-lg font-bold pb-3">Selecione os profissionais para o projeto:</h3>
+                        <ul className="list bg-base-100 rounded-box shadow-md">
+                            {profissionais.map((profissional) => (
+                                <li className="list-row">
+                                    <div><input type="checkbox" className="checkbox" /></div>
+                                    <div className="flex justify-between">
+                                        <h2 className="font-bold">{profissional.nomeProfissional}</h2>
+                                        <p>{profissional.cargo}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <div className="modal-action">
+                            <button type="submit" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 cursor-pointer p-3 m-2">
+                                Cadastrar
+                            </button>
+                            <a href="#" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 p-3 m-2">
+                                Fechar
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div >
     );
 }
