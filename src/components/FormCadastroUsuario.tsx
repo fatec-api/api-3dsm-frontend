@@ -245,6 +245,13 @@ async function cadastrarUsuario(payload: any) {
           </p>
         )}
 
+        <Dropdown
+          label="Nível de experiência"
+          value={nivelExperiencia}
+          onChange={(e: any) => setNivelExperiencia(e.target.value)}
+          options={["", "Júnior", "Pleno", "Sênior"]}
+        />
+
         <Botao type="submit" disabled={loading}>
           {loading ? "Cadastrando..." : "Cadastrar"}
         </Botao>
