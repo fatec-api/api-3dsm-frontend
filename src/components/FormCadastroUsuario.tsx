@@ -95,8 +95,6 @@ export default function FormularioCadastro() {
 
     const response = await cadastrarUsuario(payload);
 
-    console.log("Resposta do back:", response);
-
     limpar();
     setMostrarPopup(true);
 
@@ -112,17 +110,8 @@ export default function FormularioCadastro() {
   }
 };
 
-// simução do backend
 async function cadastrarUsuario(payload: any) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log("Mock enviado para o back:", payload);
-      resolve({ sucesso: true });
-    }, 1000);
-  });
-
-  // aplicação da integração para quando o backend estiver finalizado
-  /*
+  // integração real com backend
   const response = await fetch("http://localhost:3000/usuarios", {
     method: "POST",
     headers: {
@@ -136,7 +125,6 @@ async function cadastrarUsuario(payload: any) {
   }
 
   return await response.json();
-  */
 }
 
  return (
