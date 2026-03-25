@@ -149,9 +149,9 @@ async function cadastrarUsuario(payload: any) {
         Cadastro de Usuário
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
 
           <Input
             label="Nome"
@@ -160,6 +160,7 @@ async function cadastrarUsuario(payload: any) {
             onChange={(e: any) => setNome(e.target.value)}
             icon={<FiUser size={18} />}
             widthPx={300}
+            maxLength={100}
           />
 
           <Input
@@ -170,6 +171,7 @@ async function cadastrarUsuario(payload: any) {
             onChange={(e: any) => setEmail(e.target.value)}
             icon={<FiMail size={18} />}
             widthPx={300}
+            maxLength={100}
           />
 
            <Dropdown
@@ -187,7 +189,7 @@ async function cadastrarUsuario(payload: any) {
         />
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
 
           <Input
             label="Senha"
@@ -196,6 +198,7 @@ async function cadastrarUsuario(payload: any) {
             onChange={(e: any) => setSenha(e.target.value)}
             icon={<FiLock size={18} />}
             widthPx={300}
+            maxLength={100}
             rightElement={
               <button
                 type="button"
@@ -214,6 +217,7 @@ async function cadastrarUsuario(payload: any) {
             onChange={(e: any) => setConfirmeSenha(e.target.value)}
             icon={<FiLock size={18} />}
             widthPx={300}
+            maxLength={100}
             rightElement={
               <button
                 type="button"
@@ -233,12 +237,13 @@ async function cadastrarUsuario(payload: any) {
             onChange={(e: any) => setValorHora(e.target.value)}
             icon={<FiDollarSign size={18} />}
             widthPx={300}
+            maxLength={100}
           />
 
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-6">
         {erro && (
           <p className="text-red-600 text-sm text-center">
             {erro}
@@ -250,6 +255,7 @@ async function cadastrarUsuario(payload: any) {
           value={nivelExperiencia}
           onChange={(e: any) => setNivelExperiencia(e.target.value)}
           options={["", "Júnior", "Pleno", "Sênior"]}
+          widthPx={300}
         />
 
         <Botao type="submit" disabled={loading}>

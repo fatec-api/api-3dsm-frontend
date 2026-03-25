@@ -11,6 +11,7 @@ type InputProps = {
   rightElement?: React.ReactNode;
   widthPx?: number;
   heightPx?: number;
+  maxLength?: number;
 };
 
 export default function Input({
@@ -24,6 +25,7 @@ export default function Input({
   rightElement,
   widthPx = 320,
   heightPx = 48,
+  maxLength,
 }: InputProps) {
   return (
     <div className="flex justify-center w-full">
@@ -52,6 +54,7 @@ export default function Input({
             placeholder={placeholder}
             value={value}
             onChange={onChange}
+            maxLength={maxLength}
             className="flex-1 outline-none bg-transparent placeholder-gray-400"
           />
           
