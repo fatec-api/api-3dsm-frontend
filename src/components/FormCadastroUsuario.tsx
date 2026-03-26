@@ -3,15 +3,14 @@ import Input from "../shared/components/Input";
 import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
 
-
 import {
- FiUser,
- FiMail,
- FiLock,
- FiDollarSign,
- FiEye,
- FiEyeOff,
- FiBriefcase,
+  FiUser,
+  FiMail,
+  FiLock,
+  FiDollarSign,
+  FiEye,
+  FiEyeOff,
+  FiBriefcase,
 } from "react-icons/fi";
 
 
@@ -27,132 +26,129 @@ export default function FormularioCadastro() {
  const [cargo, setCargo] = useState("");
  const [nivelExperiencia, setNivelExperiencia] = useState("");
 
- const [erro, setErro] = useState("");;
+ const [erro, setErro] = useState("");
  const [mostrarPopup, setMostrarPopup] = useState(false);
  const [loading, setLoading] = useState(false);
 
 
- const validar = () => {
-   if (!nome || !email || !senha || !confirmeSenha || !valorHora || !cargo) {
-     return "Preencha todos os campos obrigatórios: nome, e-mail, senha, confirme senha, valor/hora e cargo";
-   }
+  const validar = () => {
+    if (!nome || !email || !senha || !confirmeSenha || !valorHora || !cargo) {
+      return "Preencha todos os campos obrigatórios: nome, e-mail, senha, confirme senha, valor/hora e cargo";
+    }
 
-
-   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-     return "E-mail informado é inválido";
-   }
-
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return "E-mail informado é inválido";
+    }
 
     if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}/.test(senha)) {
       return "A senha deve ter no mínimo 8 caracteres, incluindo ao menos 1 letra maiúscula, 1 minúscula, 1 número e 1 caracter especial.";
     }
-   if (senha !== confirmeSenha) {
-     return "As senhas estão diferentes";
-   }
 
+    if (senha !== confirmeSenha) {
+      return "As senhas estão diferentes";
+    }
 
-   if (Number(valorHora) <= 0) {
-     return "O valor/hora deve ser maior que zero.";
-   }
+    if (Number(valorHora) <= 0) {
+      return "O valor/hora deve ser maior que zero.";
+    }
 
-
-   return "";
- };
-
- const limpar = () => {
-   setNome("");
-   setEmail("");
-   setSenha("");
-   setConfirmeSenha("");
-   setValorHora("");
-   setCargo("");
-   setNivelExperiencia("");
- };
-
- const handleSubmit = async (e: any) => {
-  e.preventDefault();
-  setErro("");
-
-  const erroValidacao = validar();
-  if (erroValidacao) {
-    setErro(erroValidacao);
-    return;
-  }
-  const payload = {
-    nomeUsuario: nome.trim(),
-    email: email.trim(),
-    senha,
-    valorHora: Number(valorHora),
-    cargo,
-    nivelExperiencia,
+    return "";
   };
 
-  try {
-    setLoading(true);
+  const limpar = () => {
+    setNome("");
+    setEmail("");
+    setSenha("");
+    setConfirmeSenha("");
+    setValorHora("");
+    setCargo("");
+    setNivelExperiencia("");
+  };
 
-    const data = await cadastrarUsuario(payload);
-
-    if (!data) {
-      throw { code: "NO_DATA", message: "Resposta inválida do servidor" };
-    }
-
-    if (data.code && data.code !== "SUCCESS") {
-      throw data;
-    }
-
-    if (data.status && !["success", "ok"].includes(String(data.status).toLowerCase())) {
-      throw {
-        code: data.code || "UNKNOWN",
-        message: data.message || data.error || "Erro ao cadastrar usuário",
-      };
-    }
-
-    limpar();
-    setMostrarPopup(true);
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
     setErro("");
 
-    setTimeout(() => {
-      setMostrarPopup(false);
-    }, 3000);
-  } catch (err: any) {
-    const backendMessage = err?.message || err?.error || "Erro ao cadastrar usuário";
-    switch (err?.code) {
-      case "EMAIL_ALREADY_REGISTERED":
-      case "EMAIL_EXISTS":
-        setErro("E-mail informado já está em uso");
-        break;
-      case "INVALID_DATA":
-      case "VALIDATION_ERROR":
-        setErro(backendMessage || "Dados inválidos");
-        break;
-      default:
-        setErro(backendMessage);
-        break;
+    const erroValidacao = validar();
+    if (erroValidacao) {
+      setErro(erroValidacao);
+      return;
     }
-  } finally {
-    setLoading(false);
-  }
-};
+
+    const payload = {
+      nomeUsuario: nome.trim(),
+      email: email.trim(),
+      senha,
+      valorHora: Number(valorHora),
+      cargo,
+      nivelExperiencia,
+    };
+
+    try {
+      setLoading(true);
+
+      const data = await cadastrarUsuario(payload);
+
+      if (!data) {
+        throw { code: "NO_DATA", message: "Resposta inválida do servidor" };
+      }
+
+      if (data.code && data.code !== "SUCCESS") {
+        throw data;
+      }
+
+      if (data.status && !["success", "ok"].includes(String(data.status).toLowerCase())) {
+        throw {
+          code: data.code || "UNKNOWN",
+          message: data.message || data.error || "Erro ao cadastrar usuário",
+        };
+      }
+
+      limpar();
+      setMostrarPopup(true);
+      setErro("");
+
+      setTimeout(() => {
+        setMostrarPopup(false);
+      }, 3000);
+    } catch (err: any) {
+      const backendMessage = err?.message || err?.error || "Erro ao cadastrar usuário";
+      switch (err?.code) {
+        case "EMAIL_ALREADY_REGISTERED":
+        case "EMAIL_EXISTS":
+          setErro("E-mail informado já está em uso");
+          break;
+        case "INVALID_DATA":
+        case "VALIDATION_ERROR":
+          setErro(backendMessage || "Dados inválidos");
+          break;
+        default:
+          setErro(backendMessage);
+          break;
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   async function cadastrarUsuario(payload: any) {
-  // integração real com backend
-  const response = await fetch("http://localhost:3000/cadastrar/usuario", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+    const response = await fetch("http://localhost:3000/cadastrar/usuario", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-  const data = await response.json().catch(() => null);
+    const data = await response.json().catch(() => null);
 
-  if (!response.ok) {
-    const message = data?.message || data?.error || "Erro ao cadastrar usuário";
-    const code = data?.code || "HTTP_ERROR";
-    throw { code, message };
+    if (!response.ok) {
+      const message = data?.message || data?.error || "Erro ao cadastrar usuário";
+      const code = data?.code || "HTTP_ERROR";
+      throw { code, message };
+    }
+
+    return data;
   }
-
-  return data;
-}
 
  return (
   <>
