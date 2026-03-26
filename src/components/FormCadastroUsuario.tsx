@@ -33,23 +33,23 @@ export default function FormularioCadastro() {
 
   const validar = () => {
     if (!nome || !email || !senha || !confirmeSenha || !valorHora || !cargo) {
-      return "Preencha todos os campos obrigatórios: nome, e-mail, senha, confirme senha, valor/hora e cargo";
+      return "Preencha todos os campos obrigatórios: nome, e-mail, senha, confirme senha, valor/hora e cargo.";
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      return "E-mail informado é inválido";
+      return "E-mail informado é inválido.";
     }
 
     if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}/.test(senha)) {
-      return "A senha deve ter no mínimo 8 caracteres, incluindo ao menos 1 letra maiúscula, 1 minúscula, 1 número e 1 caracter especial.";
+      return "Senha inválida, ela deve ter ao menos 8 caracteres, incluindo ao menos 1 letra maiúscula, minúscula, número e caracter especial.";
     }
 
     if (senha !== confirmeSenha) {
-      return "As senhas estão diferentes";
+      return "As senhas não coincidem";
     }
 
     if (Number(valorHora) <= 0) {
-      return "O valor/hora deve ser maior que zero.";
+      return "O valor por hora deve ser maior que zero.";
     }
 
     return "";
@@ -90,7 +90,7 @@ export default function FormularioCadastro() {
       const data = await cadastrarUsuario(payload);
 
       if (!data) {
-        throw { code: "NO_DATA", message: "Resposta inválida do servidor" };
+        throw { code: "NO_DATA", message: "Erro ao processar resposta do servidor." };
       }
 
       if (data.code && data.code !== "SUCCESS") {
@@ -112,7 +112,7 @@ export default function FormularioCadastro() {
         setMostrarPopup(false);
       }, 3000);
     } catch (err: any) {
-      const backendMessage = err?.message || err?.error || "Erro ao cadastrar usuário";
+      const backendMessage = err?.message || err?.error || "Erro ao cadastrar o usuário. Tente novamente.";;
       switch (err?.code) {
         case "EMAIL_ALREADY_REGISTERED":
         case "EMAIL_EXISTS":
@@ -120,7 +120,7 @@ export default function FormularioCadastro() {
           break;
         case "INVALID_DATA":
         case "VALIDATION_ERROR":
-          setErro(backendMessage || "Dados inválidos");
+          setErro(backendMessage || "Dados inválidos. Verifique os campos e tente novamente.");
           break;
         default:
           setErro(backendMessage);
