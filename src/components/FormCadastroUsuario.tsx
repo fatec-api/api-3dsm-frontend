@@ -34,27 +34,25 @@ export default function FormularioCadastro() {
 
  const validar = () => {
    if (!nome || !email || !senha || !confirmeSenha || !valorHora || !cargo) {
-     return "Preencha todos os campos obrigatórios";
+     return "Preencha todos os campos obrigatórios: nome, e-mail, senha, confirme senha, valor/hora e cargo";
    }
 
 
    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-     return "E-mail inválido";
+     return "E-mail informado é inválido";
    }
 
 
-   if (!/(?=.*[A-Z])(?=.*\d).{8,}/.test(senha)) {
-     return "A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e caractere especial.";
-   }
-
-
+    if (!/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}/.test(senha)) {
+      return "A senha deve ter no mínimo 8 caracteres, incluindo ao menos 1 letra maiúscula, 1 minúscula, 1 número e 1 caracter especial.";
+    }
    if (senha !== confirmeSenha) {
-     return "As senhas não coincidem";
+     return "As senhas estão diferentes";
    }
 
 
    if (Number(valorHora) <= 0) {
-     return "O valor por hora deve ser maior que 0";
+     return "O valor/hora deve ser maior que zero.";
    }
 
 
@@ -80,63 +78,64 @@ export default function FormularioCadastro() {
     setErro(erroValidacao);
     return;
   }
-      const data = await cadastrarUsuario(payload);
-
-      if (!data || data === null) {
-        throw { code: "NO_DATA", message: "Resposta inválida do servidor" };
-      }
-
-      if (data.code && data.code !== "SUCCESS") {
-        throw data;
-      }
-
-      if (data.status && !["success", "ok"].includes(data.status)) {
-        throw { code: data.code || "UNKNOWN", message: data.message || data.error || "Erro ao cadastrar usuário" };
-      }
-
-      limpar();
-      setMostrarPopup(true);
-      setErro("");
-
-      setTimeout(() => {
-        setMostrarPopup(false);
-      }, 3000);
+  const payload = {
+    nomeUsuario: nome.trim(),
+    email: email.trim(),
+    senha,
+    valorHora: Number(valorHora),
+    cargo,
+    nivelExperiencia,
+  };
 
   try {
-      const backendMessage = error?.message || error?.error || "Erro ao cadastrar usuário";
-      switch (error?.code) {
-        case "EMAIL_ALREADY_REGISTERED":
-        case "EMAIL_EXISTS":
-          setErro("Este e-mail já foi cadastrado");
-          break;
-        case "INVALID_DATA":
-        case "VALIDATION_ERROR":
-          setErro(backendMessage || "Dados inválidos");
-          break;
-        default:
-          setErro(backendMessage);
-          break;
-      }
-    const response = await cadastrarUsuario(payload);
+    setLoading(true);
+
+    const data = await cadastrarUsuario(payload);
+
+    if (!data) {
+      throw { code: "NO_DATA", message: "Resposta inválida do servidor" };
+    }
+
+    if (data.code && data.code !== "SUCCESS") {
+      throw data;
+    }
+
+    if (data.status && !["success", "ok"].includes(String(data.status).toLowerCase())) {
+      throw {
+        code: data.code || "UNKNOWN",
+        message: data.message || data.error || "Erro ao cadastrar usuário",
+      };
+    }
 
     limpar();
     setMostrarPopup(true);
+    setErro("");
 
     setTimeout(() => {
       setMostrarPopup(false);
     }, 3000);
-
-  } catch (error) {
-    console.error(error);
-    setErro("Erro ao cadastrar usuário");
+  } catch (err: any) {
+    const backendMessage = err?.message || err?.error || "Erro ao cadastrar usuário";
+    switch (err?.code) {
+      case "EMAIL_ALREADY_REGISTERED":
+      case "EMAIL_EXISTS":
+        setErro("E-mail informado já está em uso");
+        break;
+      case "INVALID_DATA":
+      case "VALIDATION_ERROR":
+        setErro(backendMessage || "Dados inválidos");
+        break;
+      default:
+        setErro(backendMessage);
+        break;
+    }
   } finally {
     setLoading(false);
   }
 };
-
-async function cadastrarUsuario(payload: any) {
+  async function cadastrarUsuario(payload: any) {
   // integração real com backend
-  const response = await fetch("http://localhost:3000/usuarios", {
+  const response = await fetch("http://localhost:3000/cadastrar/usuario", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -198,7 +197,6 @@ async function cadastrarUsuario(payload: any) {
             "Profissional",
             "Gestor",
             "Administrativo",
-            "Financeiro",
             ]}
             icon={<FiBriefcase size={18} />}
             widthPx={300}
