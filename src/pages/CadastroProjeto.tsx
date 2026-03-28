@@ -1,10 +1,10 @@
-import { useState, type JSXElementConstructor, type ReactElement, type ReactNode, type ReactPortal } from "react";
+import { useEffect, useState } from "react";
 import Header from "../shared/components/Header";
 import Input from "../shared/components/Input";
 import { PiHandCoins } from "react-icons/pi";
 import { GoProject } from "react-icons/go";
 import Dropdown from "../shared/components/Dropdown";
-import { listarProfissionais } from "../services/projectService";
+import { listarProfissionais, listarClientes } from "../services/projectService";
 
 export default function CadastroProjeto() {
     const [alerta, setAlerta] = useState("");
@@ -15,10 +15,34 @@ export default function CadastroProjeto() {
     const [dataInicio, setDataInicio] = useState("");
     const [dataFim, setDataFim] = useState("");
     const [statusProjeto, setStatusProjeto] = useState("");
-    const [profissionalAlocado, setProfissionalAlocado] = useState("");
+    const [profissionalAlocado, setProfissionalAlocado] = useState<string[]>([]);
     const [gestorResponsavel, setGestorResponsavel] = useState("");
+    const [profissionais, setProfissionais] = useState<{ nomeProfissional: string; cargo: string }[]>([]);
+    const [clientes, setClientes] = useState<string[]>([]);
+    const [gestores, setGestores] = useState<string[]>([]);
 
     const regex = /^[A-Z]{3}\d{4}$/;
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const listaProfissionais = await listarProfissionais();
+                setProfissionais(listaProfissionais);
+                setGestores(listaProfissionais.filter(p => p.cargo == "Gestor").map(p => p.nomeProfissional));
+                const listaClientes = await listarClientes();
+                setClientes(listaClientes.map(c => c.nomeCliente));
+            } catch (error) {
+                console.error("Erro ao carregar dados", error);
+            }
+        };
+        loadData();
+    }, []);
+
+    const toggleProfissional = (nome: string) => {
+        setProfissionalAlocado(prev =>
+            prev.includes(nome) ? prev.filter(item => item !== nome) : [...prev, nome]
+        );
+    };
 
     const handleCadastro = async (e: React.FormEvent) => {
 
@@ -54,7 +78,7 @@ export default function CadastroProjeto() {
             setDataInicio("");
             setDataFim("");
             setStatusProjeto("");
-            setProfissionalAlocado("");
+            setProfissionalAlocado([]);
             setGestorResponsavel("");
         }
     }
@@ -91,7 +115,7 @@ export default function CadastroProjeto() {
                             <Dropdown
                                 value={cliente}
                                 onChange={(e) => setCliente(e.target.value)}
-                                options={['Cliente 1', 'Cliente 2', 'Cliente 3']}
+                                options={clientes}
                             />
                         </div>
                         <div className="mb-4">
@@ -139,7 +163,9 @@ export default function CadastroProjeto() {
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Profissionais</label>
                             <div className="flex items-center border-2 border-gray-300 rounded-xl px-3 bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition duration-200">
-                            <a href="#modal-profissional" className="flex-1 outline-none bg-transparent text-gray-700 appearance-none cursor-pointer py-2.5">Selecione</a>
+                            <a href="#modal-profissional" className="flex-1 outline-none bg-transparent text-gray-700 appearance-none cursor-pointer py-2.5">
+                                {profissionalAlocado.length > 0 ? `${profissionalAlocado.length} selecionado(s)` : "Selecione"}
+                            </a>
                         </div>
                         </div>
                         
@@ -150,7 +176,7 @@ export default function CadastroProjeto() {
                     <Dropdown
                         value={gestorResponsavel}
                         onChange={(e) => setGestorResponsavel(e.target.value)}
-                        options={['Gestor 1', 'Gestor 2', 'Gestor 3']}
+                        options={gestores}
                         required
                     />
                 </div>
@@ -160,28 +186,35 @@ export default function CadastroProjeto() {
                     Cadastrar
                 </button>
             </form>
+
             <div className="modal" role="dialog" id="modal-profissional">
                 <div className="modal-box">
                     <form action="">
-                        <h3 className="text-lg font-bold pb-3">Selecione os profissionais para o projeto:</h3>
+                        <h3 className="text-xl font-bold pb-3">Selecione os profissionais para o projeto:</h3>
                         <ul className="list bg-base-100 rounded-box shadow-md">
-                            {listarProfissionais().map((profissional: { nomeProfissional: string, cargo: string; }) => (
-                                <li className="list-row">
-                                    <div><input type="checkbox" className="checkbox" /></div>
-                                    <div className="flex justify-between">
+                            {profissionais.length === 0 ? (
+                                <li className="alert alert-soft alert-info text-lg p-2">Sem profissionais para alocação.</li>
+                            ) : (
+                                profissionais.map((profissional) => (
+                                <li key={profissional.nomeProfissional} className="list-row flex items-center gap-3 p-2">
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox"
+                                        checked={profissionalAlocado.includes(profissional.nomeProfissional)}
+                                        onChange={() => toggleProfissional(profissional.nomeProfissional)}
+                                    />
+                                    <div className="flex-1">
                                         <h2 className="font-bold">{profissional.nomeProfissional}</h2>
-                                        <p>{profissional.cargo}</p>
+                                        <p className="text-sm text-gray-600">{profissional.cargo}</p>
                                     </div>
                                 </li>
-                            ))}
+                                ))
+                            )}
                         </ul>
 
                         <div className="modal-action">
-                            <button type="submit" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 cursor-pointer p-3 m-2">
+                            <a href="#" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 cursor-pointer p-3 m-2">
                                 Cadastrar
-                            </button>
-                            <a href="#" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 p-3 m-2">
-                                Fechar
                             </a>
                         </div>
                     </form>
