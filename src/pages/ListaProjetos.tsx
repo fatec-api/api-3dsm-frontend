@@ -42,19 +42,31 @@ export default function ListaProjetos() {
             status: "Concluído"
         },
     ]
+
+    function renderizarProjetos() {
+        if (projetos.length === 0) {
+            return (
+                <div role="alert" className="alert alert-info alert-soft h-15">
+                    <p className="text-lg">Nenhum projeto encontrado.</p>
+                </div>
+            )
+        } else {
+            return projetos.map((projeto, index) => (
+                <div key={index} className="flex flex-col justify-between border hover:shadow-lg hover:transform hover:scale-105 hover:transition hover:duration-300 p-6 rounded-lg h-50 w-64">
+                    <h2 className="text-center text-xl font-bold mb-2">{projeto.nomeProjeto}</h2>
+                    <div>
+                        <p className="text-gray-600">Tipo: {projeto.tipoProjeto}</p>
+                        <p className="text-gray-600">Status: {projeto.status}</p>
+                    </div>
+                </div>
+            ))
+        }
+    }
     return (
         <div className="flex h-screen bg-[#FFFFFF]">
             <Header />
             <div className="flex mt-40 gap-6 w-full justify-center flex-wrap">
-                {projetos.map((projeto) => (
-                    <div className="card hover:shadow-lg rounded-xl border bg-base-100 card-md shadow-sm w-60 h-40">
-                        <div className="card-body">
-                            <h1 className="text-lg font-bold text-center pb-5">{projeto.nomeProjeto}</h1>
-                            <h3 className="text-sm">{projeto.tipoProjeto}</h3>
-                            <h3 className="text-sm">{projeto.status}</h3>
-                        </div>
-                    </div>
-                ))}
+                {renderizarProjetos()}
             </div>
         </div>
     );
