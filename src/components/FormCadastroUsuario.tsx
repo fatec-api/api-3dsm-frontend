@@ -81,28 +81,13 @@ export default function FormularioCadastro() {
       senha,
       valorHora: Number(valorHora),
       cargo,
-      nivelExperiencia,
+      nivelExperiencia: nivelExperiencia.trim()
     };
 
     try {
       setLoading(true);
 
-      const data = await cadastrarUsuario(payload);
-
-      if (!data) {
-        throw { code: "NO_DATA", message: "Erro ao processar resposta do servidor." };
-      }
-
-      if (data.code && data.code !== "SUCCESS") {
-        throw data;
-      }
-
-      if (data.status && !["success", "ok"].includes(String(data.status).toLowerCase())) {
-        throw {
-          code: data.code || "UNKNOWN",
-          message: data.message || data.error || "Erro ao cadastrar usuário",
-        };
-      }
+      await cadastrarUsuario(payload);
 
       limpar();
       setMostrarPopup(true);
@@ -111,19 +96,13 @@ export default function FormularioCadastro() {
       setTimeout(() => {
         setMostrarPopup(false);
       }, 3000);
-    } catch (err: any) {
-      const backendMessage = err?.message || err?.error || "Erro ao cadastrar o usuário. Tente novamente.";;
-      switch (err?.code) {
-        case "EMAIL_ALREADY_REGISTERED":
-        case "EMAIL_EXISTS":
+    } catch (error: any) {
+      switch (error?.code) {
+        case "EMAIL_JA_EXISTE":
           setErro("E-mail informado já está em uso");
           break;
-        case "INVALID_DATA":
-        case "VALIDATION_ERROR":
-          setErro(backendMessage || "Dados inválidos. Verifique os campos e tente novamente.");
-          break;
         default:
-          setErro(backendMessage);
+          setErro("Erro ao cadastrar o usuário");
           break;
       }
     } finally {
@@ -131,7 +110,7 @@ export default function FormularioCadastro() {
     }
   };
   async function cadastrarUsuario(payload: any) {
-    const response = await fetch("http://localhost:3000/cadastrar/usuario", {
+    const response = await fetch("http://localhost:8080/cadastrar/usuario", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -145,6 +124,21 @@ export default function FormularioCadastro() {
       const message = data?.message || data?.error || "Erro ao cadastrar usuário";
       const code = data?.code || "HTTP_ERROR";
       throw { code, message };
+    }
+
+    if (!data) {
+      throw { code: "NO_DATA", message: "Erro ao processar resposta do servidor." };
+    }
+
+    if (data.code && data.code !== "SUCCESS") {
+      throw data;
+    }
+
+    if (data.status && !["success", "ok"].includes(String(data.status).toLowerCase())) {
+      throw {
+        code: data.code || "UNKNOWN",
+        message: data.message || data.error || "Erro ao cadastrar usuário",
+      }
     }
 
     return data;
@@ -260,12 +254,14 @@ export default function FormularioCadastro() {
           </p>
         )}
 
-        <Dropdown
+        <Input
           label="Nível de experiência"
+          placeholder="Programador .NET Sênior"
           value={nivelExperiencia}
           onChange={(e: any) => setNivelExperiencia(e.target.value)}
-          options={["", "Júnior", "Pleno", "Sênior"]}
+          icon={<FiUser size={18} />}
           widthPx={300}
+          maxLength={100}
         />
 
         <Botao type="submit" disabled={loading}>
