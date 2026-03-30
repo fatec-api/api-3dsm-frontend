@@ -26,8 +26,7 @@ export default function Input({
   rightElement,
   widthPx = 320,
   heightPx = 48,
-  maxLength,
-  required = false
+  required = true
 
 }: InputProps) {
   return (
@@ -57,7 +56,6 @@ export default function Input({
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            maxLength={maxLength}
             className="flex-1 outline-none bg-transparent placeholder-gray-400"
             required={required}
           />

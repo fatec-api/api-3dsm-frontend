@@ -21,7 +21,7 @@ export default function Dropdown({
   icon,
   widthPx = 320,
   heightPx = 48,
-  required = false
+  required = true
 }: SelectProps) {
   return (
     <div className="flex justify-center w-full">
