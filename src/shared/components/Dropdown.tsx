@@ -9,6 +9,7 @@ type SelectProps = {
   icon?: React.ReactNode;
   widthPx?: number;
   heightPx?: number;
+  required?: boolean;
 };
 
 export default function Dropdown({
@@ -20,11 +21,13 @@ export default function Dropdown({
   icon,
   widthPx = 320,
   heightPx = 48,
+  required = false
 }: SelectProps) {
   return (
     <div className="flex justify-center w-full">
+      
       <div style={{ width: `${widthPx}px` }} className="flex flex-col">
-        
+
         {label && (
           <label className="block mb-2 text-sm font-medium text-gray-700">
             {label}
@@ -46,22 +49,24 @@ export default function Dropdown({
             value={value}
             onChange={onChange}
             className="flex-1 outline-none bg-transparent text-gray-700 appearance-none cursor-pointer py-2"
+            required={required}
           >
             <option value="" disabled hidden>
               Selecione
             </option>
-
             {options.map((op, index) => (
               <option key={index} value={op}>
                 {op}
               </option>
             ))}
           </select>
-
+          
           <div className="ml-2 text-gray-500 pointer-events-none">
             ▼
           </div>
+
         </div>
+
       </div>
     </div>
   );

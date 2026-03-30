@@ -6,12 +6,13 @@ type InputProps = {
   placeholder?: string;
   value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type?: "text" | "email" | "password" | "number";
+  type?: "text" | "email" | "password" | "number" | "date" | "double";
   icon?: React.ReactNode;
   rightElement?: React.ReactNode;
   widthPx?: number;
   heightPx?: number;
   maxLength?: number;
+  required?: boolean;
 };
 
 export default function Input({
@@ -26,6 +27,8 @@ export default function Input({
   widthPx = 320,
   heightPx = 48,
   maxLength,
+  required = false
+
 }: InputProps) {
   return (
     <div className="flex justify-center w-full">
@@ -56,6 +59,7 @@ export default function Input({
             onChange={onChange}
             maxLength={maxLength}
             className="flex-1 outline-none bg-transparent placeholder-gray-400"
+            required={required}
           />
           
           {rightElement && (

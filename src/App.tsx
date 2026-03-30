@@ -6,6 +6,8 @@ import Home from './pages/Home'
 import TelaLogin from './pages/TelaLogin'
 import Dropdown from './shared/components/Dropdown'
 import CadastroUsuario from "./pages/TelaCadastroUsuario";
+import CadastroProjeto from './pages/CadastroProjeto'
+
 
 const router = createBrowserRouter(
  createRoutesFromElements(
@@ -17,6 +19,7 @@ const router = createBrowserRouter(
      </Route>
      <Route path='/telalogin' element={<TelaLogin/>}/>
      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
+     <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
    </>
  )
 )
