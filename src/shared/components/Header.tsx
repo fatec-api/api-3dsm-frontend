@@ -42,7 +42,7 @@ export default function Header() {
             </div>
 
             {/* pode ser necessário para o bom funcionamento correto da navbar */}
-            <div className="pt-32 min-h-screen flex flex-col">
+            <div className="pt-32 flex flex-col">
             <Outlet />
             </div>
 
