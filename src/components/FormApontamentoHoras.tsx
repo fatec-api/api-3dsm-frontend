@@ -12,6 +12,19 @@ export default function FormularioApontamento() {
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFim, setHoraFim] = useState("");
 
+  const [usarPausa, setUsarPausa] = useState(false);
+  const [pausaInicio, setPausaInicio] = useState("");
+  const [pausaFim, setPausaFim] = useState("");
+
+  const projetos = ["Projeto A", "Projeto B"];
+
+  const itensPorProjeto: any = {
+    "Projeto A": ["Item 1", "Item 2"],
+    "Projeto B": ["Item 3"],
+  };
+
+  const itens = projeto ? itensPorProjeto[projeto] || [] : [];
+
   return (
     <form className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-[700px] flex flex-col gap-10">
       
@@ -24,14 +37,14 @@ export default function FormularioApontamento() {
           label="Projeto"
           value={projeto}
           onChange={(e: any) => setProjeto(e.target.value)}
-          options={[]}
+          options={projetos}
         />
 
         <Dropdown
           label="Item"
           value={item}
           onChange={(e: any) => setItem(e.target.value)}
-          options={[]}
+          options={itens}
         />
       </div>
 
@@ -66,12 +79,34 @@ export default function FormularioApontamento() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <p className="text-sm font-medium">Pausa (opcional)</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Input label="Início da Pausa" type="time" />
-          <Input label="Fim da Pausa" type="time" />
-        </div>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={usarPausa}
+            onChange={(e) => setUsarPausa(e.target.checked)}
+          />
+          Adicionar pausa
+        </label>
+
+        {usarPausa && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Input
+              label="Início da Pausa"
+              type="time"
+              value={pausaInicio}
+              onChange={(e: any) => setPausaInicio(e.target.value)}
+            />
+
+            <Input
+              label="Fim da Pausa"
+              type="time"
+              value={pausaFim}
+              onChange={(e: any) => setPausaFim(e.target.value)}
+            />
+          </div>
+        )}
+
       </div>
 
       <div className="flex justify-center">
