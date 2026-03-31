@@ -8,6 +8,7 @@ import Dropdown from './shared/components/Dropdown'
 import CadastroUsuario from "./pages/TelaCadastroUsuario";
 import CadastroProjeto from './pages/CadastroProjeto'
 import ListaProjetos from './pages/ListaProjetos'
+import Logs from './pages/TelaLogProfissional'
 
 
 const router = createBrowserRouter(
@@ -22,6 +23,7 @@ const router = createBrowserRouter(
      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
      <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
      <Route path='/listaprojetos' element={<ListaProjetos/>}/>
+     <Route path='/logprofissional' element={<Logs/>}/>
    </>
  )
 )
