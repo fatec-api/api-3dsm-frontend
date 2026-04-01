@@ -1,43 +1,35 @@
 import api from "./api";
 
-// CRIAR PROJETO
-// export const criarProjeto = async () => {
-//     return Promise.resolve({ id: Date.now(),});
-// };
-
-export function listarProfissionais() {
-    return Promise.resolve([
-        {
-            nomeProfissional: "São Francisco",
-            cargo: "PO"
-        },
-        {
-            nomeProfissional: "São Paulo",
-            cargo: "Desenvolvedor Front-end"
-        },
-        {
-            nomeProfissional: "São Bernardo",
-            cargo: "Desenvolvedor back-end"
-        },
-        {
-            nomeProfissional: "São Carlos",
-            cargo: "Gestor"
-        },
-        {
-            nomeProfissional: "São Vincente",
-            cargo: "Master"
-        },
-        {
-            nomeProfissional: "São Longinho",
-            cargo: "Gestor"
-        },
-        {
-            nomeProfissional: "São Caetano",
-            cargo: "Gestor"
-        },
-    ]);
+export interface ProjetoPayload {
+    nomeProjeto: string;
+    tipoProjeto: string;
+    cliente: string;
+    valorOrcamento: number;
+    dataInicio: string;
+    dataFim: string;
+    statusProjeto: string;
+    profissionalAlocado: string[];
+    gestorResponsavel: string;
 }
 
+// CRIAR PROJETO
+export const criarProjeto = async (dados: ProjetoPayload) => {
+    try {
+        const response = await api.post("/cadastrar/projeto", dados);
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao criar projeto", error);
+        throw error;
+    }
+};
+
+// LISTAR PROFISSIONAIS
+export async function listarProfissionais() {
+    const response = await api.get("/listar/profissionais");
+    return response.data;
+}
+
+// LISTAR CLIENTES
 export function listarClientes() {
     return Promise.resolve([
         {
