@@ -1,63 +1,56 @@
-type Log = {
-  projeto: string;
-  item: string;
-  nivel: string;
-  data: string;
-  inicio: string;
-  fim: string;
+type Column = {
+  header: string;
+  accessor: string;
 };
 
-export default function Tabela() {
-  const logs: Log[] = [
-    {
-      projeto: "Projeto A",
-      item: "Item 1",
-      nivel: "Alto",
-      data: "30/03/2026",
-      inicio: "08:00",
-      fim: "12:00",
-    },
-    {
-      projeto: "Projeto B",
-      item: "Item 2",
-      nivel: "Médio",
-      data: "29/03/2026",
-      inicio: "13:00",
-      fim: "17:00",
-    },
-  ];
+type TabelaProps<T> = {
+  data: T[];
+  columns: Column[];
+  emptyMessage?: string;
+};
 
+export default function Tabela<T>({
+  data,
+  columns,
+  emptyMessage = "Nenhum registro encontrado",
+}: TabelaProps<T>) {
   return (
-    <div className="border rounded-2xl overflow-hidden">
-      <table className="w-full text-center border-collapse">
+    <div className="overflow-x-auto">
+      {data.length === 0 ? (
+        <div role="alert" className="alert alert-info">
+          <span>{emptyMessage}</span>
+        </div>
+      ) : (
+        <div className="border rounded-2xl overflow-hidden">
+          <table className="w-full text-center border-collapse">
+            
+            
+            <thead className="bg-gray-200 text-black">
+              <tr>
+                {columns.map((col, index) => (
+                  <th key={index} className="border p-3">
+                    {col.header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
 
-        {/* Cabeçalho */}
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="border p-3">Projeto</th>
-            <th className="border p-3">Item</th>
-            <th className="border p-3">Nível da atividade</th>
-            <th className="border p-3">Data do Apontamento</th>
-            <th className="border p-3">Hora início</th>
-            <th className="border p-3">Hora fim</th>
-          </tr>
-        </thead>
+            
+            <tbody>
+              {data.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {columns.map((col, colIndex) => (
+                    <td key={colIndex} className="border p-3">
+                      {String(row[col.accessor as keyof T])}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
 
-        {/* Corpo */}
-        <tbody>
-          {logs.map((log, index) => (
-            <tr key={index}>
-              <td className="border p-3">{log.projeto}</td>
-              <td className="border p-3">{log.item}</td>
-              <td className="border p-3">{log.nivel}</td>
-              <td className="border p-3">{log.data}</td>
-              <td className="border p-3">{log.inicio}</td>
-              <td className="border p-3">{log.fim}</td>
-            </tr>
-          ))}
-        </tbody>
-
-      </table>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
