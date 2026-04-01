@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import Input from './shared/components/Input'
 import Header from './shared/components/Header'
@@ -8,6 +7,7 @@ import Dropdown from './shared/components/Dropdown'
 import CadastroUsuario from "./pages/TelaCadastroUsuario";
 import CadastroProjeto from './pages/CadastroProjeto'
 import ListaProjetos from './pages/ListaProjetos'
+import DevAllocationTest from './pages/DevAllocationTest';
 
 
 const router = createBrowserRouter(
@@ -22,6 +22,7 @@ const router = createBrowserRouter(
      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
      <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
      <Route path='/listaprojetos' element={<ListaProjetos/>}/>
+     <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
    </>
  )
 )
