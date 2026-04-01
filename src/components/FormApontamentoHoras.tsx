@@ -40,6 +40,12 @@ export default function FormularioApontamento() {
        "Projeto B": ["Item 3"],
    };
 
+   const nivelPorItem: any = {
+       "Item 1": "Análise",
+       "Item 2": "Desenvolvimento",
+       "Item 3": "Teste",
+   };
+
 
    const itens = projeto ? itensPorProjeto[projeto] || [] : [];
 
@@ -59,7 +65,7 @@ export default function FormularioApontamento() {
        }
 
 
-       if (!data || !nivel || !horaInicio || !horaFim) {
+       if (!data || !horaInicio || !horaFim) {
            return "Preencha todos os campos obrigatórios.";
        }
 
@@ -209,7 +215,11 @@ export default function FormularioApontamento() {
                        <Dropdown
                            label="Item"
                            value={item}
-                           onChange={(e: any) => setItem(e.target.value)}
+                           onChange={(e: any) => {
+                               const itemSelecionado = e.target.value;
+                               setItem(itemSelecionado);
+                               setNivel(nivelPorItem[itemSelecionado] || "");
+                           }}
                            options={itens}
                            widthPx={300}
                        />
@@ -229,13 +239,11 @@ export default function FormularioApontamento() {
                    <div className="flex flex-col gap-8">
 
 
-                       <Dropdown
-                           label="Nível da Atividade"
-                           value={nivel}
-                           onChange={(e: any) => setNivel(e.target.value)}
-                           options={["Análise", "Desenvolvimento", "Teste"]}
-                           widthPx={300}
-                       />
+                       {item && nivel && (
+                           <p className="text-sm text-gray-600">
+                               Item selecionado: <strong>{item} - {nivel}</strong>
+                           </p>
+                       )}
 
 
                        <Input
