@@ -4,7 +4,7 @@ import Input from "../shared/components/Input";
 import { PiHandCoins } from "react-icons/pi";
 import { GoProject } from "react-icons/go";
 import Dropdown from "../shared/components/Dropdown";
-import { listarProfissionais, listarClientes } from "../services/projectService";
+import { listarProfissionais, listarClientes, criarProjeto } from "../services/projectService";
 
 export default function CadastroProjeto() {
     const [alerta, setAlerta] = useState("");
@@ -28,9 +28,9 @@ export default function CadastroProjeto() {
             try {
                 const listaProfissionais = await listarProfissionais();
                 setProfissionais(listaProfissionais);
-                setGestores(listaProfissionais.filter(p => p.cargo == "Gestor").map(p => p.nomeProfissional));
+                setGestores(listaProfissionais.filter((p: { cargo: string; }) => p.cargo == "Gestor").map((p: { nomeProfissional: string; }) => p.nomeProfissional));
                 const listaClientes = await listarClientes();
-                setClientes(listaClientes.map(c => c.nomeCliente));
+                setClientes(listaClientes.map((c: { nomeCliente: string; }) => c.nomeCliente));
             } catch (error) {
                 console.error("Erro ao carregar dados", error);
             }
@@ -70,18 +70,34 @@ export default function CadastroProjeto() {
         }
 
         else {
-            setAlerta("Projeto cadastrado com sucesso!");
-            setNomeProjeto("");
-            setTipoProjeto("");
-            setCliente("");
-            setValorOrcamento("");
-            setDataInicio("");
-            setDataFim("");
-            setStatusProjeto("");
-            setProfissionalAlocado([]);
-            setGestorResponsavel("");
+            try {
+                const payload = {
+                    nomeProjeto,
+                    tipoProjeto,
+                    cliente,
+                    valorOrcamento: Number(valorOrcamento),
+                    dataInicio,
+                    dataFim,
+                    statusProjeto,
+                    profissionalAlocado,
+                    gestorResponsavel,
+                };
+
+                await criarProjeto(payload);
+                setAlerta("Projeto cadastrado com sucesso!");
+                setNomeProjeto("");
+                setTipoProjeto("");
+                setCliente("");
+                setValorOrcamento("");
+                setDataInicio("");
+                setDataFim("");
+                setStatusProjeto("");
+                setProfissionalAlocado([]);
+                setGestorResponsavel("");
+            } catch (error) {
+                setAlerta("Erro ao cadastrar projeto.");
+            }
         }
-    }
 
     return (
         <div className="flex h-screen bg-[#FFFFFF]">
