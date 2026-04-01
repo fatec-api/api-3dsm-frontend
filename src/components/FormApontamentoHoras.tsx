@@ -9,7 +9,6 @@ import { FiClock, FiCalendar } from "react-icons/fi";
 export default function FormularioApontamento() {
    const [projeto, setProjeto] = useState("");
    const [item, setItem] = useState("");
-   const [nivel, setNivel] = useState("");
 
 
    const [data, setData] = useState("");
@@ -36,14 +35,8 @@ export default function FormularioApontamento() {
    // mock de dados
    const projetos = ["Projeto A", "Projeto B"];
    const itensPorProjeto: any = {
-       "Projeto A": ["Item 1", "Item 2"],
-       "Projeto B": ["Item 3"],
-   };
-
-   const nivelPorItem: any = {
-       "Item 1": "Análise",
-       "Item 2": "Desenvolvimento",
-       "Item 3": "Teste",
+       "Projeto A": ["Item 1 - Análise", "Item 2 - Desenvolvimento"],
+       "Projeto B": ["Item 3 - Teste"],
    };
 
 
@@ -65,7 +58,7 @@ export default function FormularioApontamento() {
        }
 
 
-       if (!data || !horaInicio || !horaFim) {
+       if (!data || !item || !horaInicio || !horaFim) {
            return "Preencha todos os campos obrigatórios.";
        }
 
@@ -132,7 +125,6 @@ export default function FormularioApontamento() {
    const limpar = () => {
        setProjeto("");
        setItem("");
-       setNivel("");
        setData("");
        setHoraInicio("");
        setHoraFim("");
@@ -158,7 +150,7 @@ export default function FormularioApontamento() {
        const payload = {
            projeto,
            item,
-           nivel,
+         nivel: item.includes(" - ") ? item.split(" - ")[1].trim() : "",
            data,
            horaInicio,
            horaFim,
@@ -215,11 +207,7 @@ export default function FormularioApontamento() {
                        <Dropdown
                            label="Item"
                            value={item}
-                           onChange={(e: any) => {
-                               const itemSelecionado = e.target.value;
-                               setItem(itemSelecionado);
-                               setNivel(nivelPorItem[itemSelecionado] || "");
-                           }}
+                           onChange={(e: any) => setItem(e.target.value)}
                            options={itens}
                            widthPx={300}
                        />
@@ -238,12 +226,6 @@ export default function FormularioApontamento() {
 
                    <div className="flex flex-col gap-8">
 
-
-                       {item && nivel && (
-                           <p className="text-sm text-gray-600">
-                               Item selecionado: <strong>{item} - {nivel}</strong>
-                           </p>
-                       )}
 
 
                        <Input
