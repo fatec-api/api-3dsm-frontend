@@ -11,7 +11,7 @@ type Log = {
   fim: string;
 };
 
-export default function Logs() {
+export default function TelaLogProfissional() {
   const [logs, setLogs] = useState<Log[]>([]);
 
   useEffect(() => {
