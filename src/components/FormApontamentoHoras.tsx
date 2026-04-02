@@ -181,6 +181,7 @@ export default function FormularioApontamento() {
            setLoading(true);
 
 
+           await apontarHora(payload);
            console.log("ENVIAR:", payload);
 
 
@@ -197,6 +198,32 @@ export default function FormularioApontamento() {
            setLoading(false);
        }
    };
+
+   async function apontarHora(payload: any) {
+       const response = await fetch("http://localhost:8080/apontamentos", {
+           method: "POST",
+           headers: {
+               "Content-Type": "application/json",
+           },
+           body: JSON.stringify(payload),
+       });
+
+       const data = await response.json().catch(() => null);
+
+       if (!response.ok) {
+           const message = data?.message || data?.error || "Erro ao apontar horas";
+           throw { message };
+       }
+
+       if (data?.status && !["success", "ok"].includes(String(data.status).toLowerCase())) {
+           throw {
+               code: data.code || "UNKNOWN",
+               message: data.message || data.error || "Erro ao cadastrar usuário",
+           };
+       }
+
+       return data;
+   }
 
 
    return (
