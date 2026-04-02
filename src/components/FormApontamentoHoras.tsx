@@ -4,17 +4,16 @@ import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
 
 import { FiClock, FiCalendar } from "react-icons/fi";
-
+import { listarProjetos } from "../services/listService";
 
 export default function FormularioApontamento() {
    const [projeto, setProjeto] = useState("");
    const [item, setItem] = useState("");
-
+   const [itemSelecionado, setItemSelecionado] = useState<any>(null);
 
    const [data, setData] = useState("");
    const [horaInicio, setHoraInicio] = useState("");
    const [horaFim, setHoraFim] = useState("");
-
 
    const [usarPausa, setUsarPausa] = useState(false);
    const [pausaInicio, setPausaInicio] = useState("");
@@ -31,20 +30,42 @@ export default function FormularioApontamento() {
 
    const [horasLiquidas, setHorasLiquidas] = useState<number | null>(null);
 
+   // const [projetos, setProjetos] = useState<{ nomeProjeto: string }[]>([]);
+   const [itens, setItens] = useState<string[]>([]);
 
-   // mock de dados
+   // useEffect(() => {
+   //     const loadData = async () => {
+   //         try {
+   //             const listaProjetos = await listarProjetos();
+   //             setProjetos(listaProjetos);
+   //         } catch (error) {
+   //             console.error("Erro ao carregar dados", error);
+   //         }
+   //     };
+   //     loadData();
+   // }, []);
+
+   // mock de dados (remover após integração com backend)
    const projetos = ["Projeto A", "Projeto B"];
    const itensPorProjeto: any = {
        "Projeto A": ["Item 1 - Análise", "Item 2 - Desenvolvimento"],
        "Projeto B": ["Item 3 - Teste"],
    };
 
-
-   const itens = projeto ? itensPorProjeto[projeto] || [] : [];
+   // Temporário: usar mock até backend estar pronto
+   useEffect(() => {
+       if (projeto && itensPorProjeto[projeto]) {
+           setItens(itensPorProjeto[projeto]);
+       } else {
+           setItens([]);
+           setItem("");
+       }
+   }, [projeto]);
 
 
    function parseHora(h: string) {
-       const [hh, mm] = h.split(":").map(Number);
+       const parte = h.includes("T") ? h.split("T")[1] : h;
+       const [hh, mm] = parte.split(":").map(Number);
        return hh * 60 + mm;
    }
 
@@ -67,12 +88,10 @@ export default function FormularioApontamento() {
            return "Data não pode ser futura.";
        }
 
+       const dataHoraInicio = new Date(horaInicio);
+       const dataHoraFim = new Date(horaFim);
 
-       const inicio = parseHora(horaInicio);
-       const fim = parseHora(horaFim);
-
-
-       if (fim <= inicio) {
+       if (dataHoraFim <= dataHoraInicio) {
            return "Hora fim deve ser maior que início.";
        }
 
@@ -82,17 +101,14 @@ export default function FormularioApontamento() {
                return "Preencha a pausa completa.";
            }
 
+           const dataHoraPausaInicio = new Date(pausaInicio);
+           const dataHoraPausaFim = new Date(pausaFim);
 
-           const pInicio = parseHora(pausaInicio);
-           const pFim = parseHora(pausaFim);
-
-
-           if (pFim <= pInicio) {
+           if (dataHoraPausaFim <= dataHoraPausaInicio) {
                return "Pausa inválida.";
            }
 
-
-           if (pInicio < inicio || pFim > fim) {
+           if (dataHoraPausaInicio < dataHoraInicio || dataHoraPausaFim > dataHoraFim) {
                return "Pausa fora do horário de trabalho.";
            }
        }
@@ -215,7 +231,7 @@ export default function FormularioApontamento() {
 
                        <Input
                            label="Data"
-                           type="date"
+                           type="datetime-local"
                            value={data}
                            onChange={(e: any) => setData(e.target.value)}
                            icon={<FiCalendar size={18} />}
@@ -230,7 +246,7 @@ export default function FormularioApontamento() {
 
                        <Input
                            label="Hora Início"
-                           type="time"
+                           type="datetime-local"
                            value={horaInicio}
                            onChange={(e: any) => setHoraInicio(e.target.value)}
                            icon={<FiClock size={18} />}
@@ -240,7 +256,7 @@ export default function FormularioApontamento() {
 
                        <Input
                            label="Hora Fim"
-                           type="time"
+                           type="datetime-local"
                            value={horaFim}
                            onChange={(e: any) => setHoraFim(e.target.value)}
                            icon={<FiClock size={18} />}
@@ -265,7 +281,7 @@ export default function FormularioApontamento() {
                        <div className="flex gap-8">
                            <Input
                                label="Início Pausa"
-                               type="time"
+                               type="datetime-local"
                                value={pausaInicio}
                                onChange={(e: any) => setPausaInicio(e.target.value)}
                                widthPx={300}
@@ -274,7 +290,7 @@ export default function FormularioApontamento() {
 
                            <Input
                                label="Fim Pausa"
-                               type="time"
+                               type="datetime-local"
                                value={pausaFim}
                                onChange={(e: any) => setPausaFim(e.target.value)}
                                widthPx={300}
