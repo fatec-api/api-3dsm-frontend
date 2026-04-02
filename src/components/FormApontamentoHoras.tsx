@@ -64,8 +64,8 @@ export default function FormularioApontamento() {
 
 
    function parseHora(h: string) {
-       const parte = h.includes("T") ? h.split("T")[1] : h;
-       const [hh, mm] = parte.split(":").map(Number);
+       const apenasHora = h.includes("T") ? h.split("T")[1] : h;
+       const [hh, mm] = apenasHora.split(":").map(Number);
        return hh * 60 + mm;
    }
 
@@ -165,13 +165,14 @@ export default function FormularioApontamento() {
 
        const payload = {
            projeto,
-           item,
-         nivel: item.includes(" - ") ? item.split(" - ")[1].trim() : "",
-           data,
+           itemId: itemSelecionado?.id,
+           nivel: item.includes(" - ") ? item.split(" - ")[1].trim() : "",
+           dataApontamento: data,
            horaInicio,
            horaFim,
            pausaInicio: usarPausa ? pausaInicio : null,
            pausaFim: usarPausa ? pausaFim : null,
+           usuarioId: "550e8400-e29b-41d4-a716-446655440010",
            observacao,
        };
 
@@ -223,7 +224,10 @@ export default function FormularioApontamento() {
                        <Dropdown
                            label="Item"
                            value={item}
-                           onChange={(e: any) => setItem(e.target.value)}
+                          onChange={(e: any) => {
+                              setItem(e.target.value);
+                              setItemSelecionado({ id: e.target.value, nome: e.target.value });
+                          }}
                            options={itens}
                            widthPx={300}
                        />
