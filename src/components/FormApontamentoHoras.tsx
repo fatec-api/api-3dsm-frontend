@@ -84,7 +84,11 @@ export default function FormularioApontamento() {
        }
 
 
-       if (data > hoje) {
+       // Permite apenas datas até o dia atual (não aceita datas futuras)
+       const hojeDate = new Date();
+       const dataSelecionada = new Date(data);
+       hojeDate.setHours(23,59,59,999);
+       if (dataSelecionada > hojeDate) {
            return "Data não pode ser futura.";
        }
 
@@ -293,6 +297,16 @@ export default function FormularioApontamento() {
                            icon={<FiClock size={18} />}
                            widthPx={300}
                        />
+
+                        <Input
+                            label="Observação"
+                            type="text"
+                            value={observacao}
+                            onChange={(e: any) => setObservacao(e.target.value)}
+                            widthPx={300}
+                            placeholder="Digite uma observação (opcional)"
+                            required={false}
+                        />
                    </div>
                </div>
 
@@ -350,7 +364,6 @@ export default function FormularioApontamento() {
                        {loading ? "Salvando..." : "Apontar"}
                    </Botao>
                </div>
-
 
                {mostrarPopup && (
                    <div className="fixed top-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-[9999]">
