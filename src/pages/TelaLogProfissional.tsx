@@ -30,6 +30,18 @@ export default function TelaLogProfissional() {
         ];
 
         setLogs(data);
+
+        // const response = await fetch("http://localhost:8080/", {
+        //   method: "GET",
+        //   headers: {
+        //     "Content-Type": "application/json"
+        //   }
+        // })
+        // if(!response.ok){
+        //   throw new Error()
+        // }
+        // const data: Log[] = await response.json()
+        // console.log(data)
       } catch (error) {
         console.error("Erro ao buscar logs", error);
       }
