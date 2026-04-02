@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarProjetos } from "../services/listService";
 import Card from "../shared/components/Card";
 
 export default function ListaProjetos() {
     const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string }[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadData = async () => {
@@ -28,15 +30,20 @@ export default function ListaProjetos() {
                     </div>
                 ) : (
                     projetos.map((projeto, index) => (
-                        <Card
+                        <div
                             key={index}
-                            title={projeto.nomeProjeto}
-                            type={projeto.tipoProjeto}
-                            status={projeto.status}
-                        />
+                            className="cursor-pointer"
+                            onClick={() => navigate("/descricao-projeto", { state: { projeto } })}
+                        >
+                            <Card
+                                title={projeto.nomeProjeto}
+                                type={projeto.tipoProjeto}
+                                status={projeto.status}
+                            />
+                        </div>
                     ))
                 )}
             </div>
         </div>
-    )
+    );
 }
