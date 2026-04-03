@@ -8,6 +8,7 @@ import CadastroUsuario from "./pages/TelaCadastroUsuario";
 import CadastroProjeto from './pages/CadastroProjeto'
 import ListaProjetos from './pages/ListaProjetos'
 import DevAllocationTest from './pages/DevAllocationTest';
+import ApontamentoHoras from './pages/TelaApontamentoHoras'
 
 
 const router = createBrowserRouter(
@@ -23,6 +24,7 @@ const router = createBrowserRouter(
      <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
      <Route path='/listaprojetos' element={<ListaProjetos/>}/>
      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
+     <Route path='/apontamentohoras' element={<ApontamentoHoras/>}/>
    </>
  )
 )
