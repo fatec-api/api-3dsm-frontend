@@ -4,39 +4,32 @@ import Header from './shared/components/Header'
 import Home from './pages/Home'
 import TelaLogin from './pages/TelaLogin'
 import Dropdown from './shared/components/Dropdown'
-import CadastroUsuario from "./pages/TelaCadastroUsuario";
+import CadastroUsuario from "./pages/TelaCadastroUsuario"
 import CadastroProjeto from './pages/CadastroProjeto'
 import ListaProjetos from './pages/ListaProjetos'
-import DevAllocationTest from './pages/DevAllocationTest';
-
+import DevAllocationTest from './pages/DevAllocationTest'
+import CadastroItem from './pages/CadastroItem' 
 
 const router = createBrowserRouter(
- createRoutesFromElements(
-   <>
-     <Route path="/" element={<Header />}>
-       <Route index element={<Home />}/>
-       <Route path='/input' element={<Input/>}/>
-       <Route path='/dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/>
-     </Route>
-     <Route path='/telalogin' element={<TelaLogin/>}/>
-     <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
-     <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
-     <Route path='/listaprojetos' element={<ListaProjetos/>}/>
-     <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
-   </>
- )
+  createRoutesFromElements(
+    <>
+      <Route path="/" element={<Header />}>
+        <Route index element={<Home />} />
+        <Route path='/input' element={<Input />} />
+        <Route path='/dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />} />
+      </Route>
+      <Route path='/telalogin' element={<TelaLogin />} />
+      <Route path='/cadastro-usuario' element={<CadastroUsuario />} />
+      <Route path='/cadastroprojeto' element={<CadastroProjeto />} />
+      <Route path='/listaprojetos' element={<ListaProjetos />} />
+      <Route path='/teste-alocacao' element={<DevAllocationTest />} />
+      <Route path='/cadastro-item' element={<CadastroItem />} /> {}
+    </>
+  )
 )
 
-
 function App() {
-
-
- return (
-   <>
-     <RouterProvider router={router} />
-   </>
- )
+  return <RouterProvider router={router} />
 }
-
 
 export default App
