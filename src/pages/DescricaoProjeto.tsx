@@ -5,13 +5,16 @@ import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade } from "../services/ItemService";
 import Botao from "../shared/components/Botao";
 import PaginaAlocacao from "./DevAllocationTest";
+import ModalAlocarFuncionarioItem from "../components/ModalAlocarFuncionarioItem";
 
 export default function DescricaoProjeto() {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const projeto = state?.projeto as { nomeProjeto: string; tipoProjeto: string; status: string ;id: number} | undefined;
+    const projeto = state?.projeto as { nomeProjeto: string; tipoProjeto: string; status: string; id: number } | undefined;
 
     const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade }[]>([]);
+    const [popupItem, setPopupItem] = useState<string | null>(null);
+    const [selectedProfId, setSelectedProfId] = useState("");
 
     useEffect(() => {
         // If accessed directly without state, redirect back
@@ -129,7 +132,7 @@ export default function DescricaoProjeto() {
                                     type={item.descricao}
                                     status={item.nivelAtividade}
                                     isGestor={isGestor}
-                                    onClick={isGestor ? () => console.log("Alocar item", item.codigo) : undefined}
+                                    onClick={isGestor ? () => setPopupItem(item.codigo) : undefined}
                                 />
                             ))
                         )}
@@ -137,6 +140,17 @@ export default function DescricaoProjeto() {
                 </div>
 
             </div>
+            <ModalAlocarFuncionarioItem
+                isOpen={!!popupItem}
+                onClose={() => { setPopupItem(null); setSelectedProfId(""); }}
+                itemName={popupItem ?? ""}
+                profissionais={[]}
+                selectedId={selectedProfId}
+                onSelect={setSelectedProfId}
+                onSave={() => console.log("Atribuir", selectedProfId, "ao item", popupItem)}
+                isLoading={false}
+                message={null}
+            />
         </div>
     );
 }
