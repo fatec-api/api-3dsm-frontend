@@ -1,8 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
 import { PopupAlocacao, type Professional } from '../shared/components/PopupAlocacao';
 import { allocationService } from '../api/AllocationService';
+import Botao from "../shared/components/Botao";
 
-const PaginaAlocacao = () => {
+interface Props {
+  projetoId: number;
+  projetoNome: string;
+}
+
+export const PaginaAlocacao = ({ projetoId, projetoNome }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [dbProfessionals, setDbProfessionals] = useState<Professional[]>([]);
@@ -11,14 +17,12 @@ const PaginaAlocacao = () => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
 
-  const PROJECT_ID = 1; 
-  const ITEM_ID = 101; 
-  const PROJECT_NAME_FIXED = "projeto";
+  // const ITEM_ID = 101;
 
- 
+
   useEffect(() => {
     if (isModalOpen) {
-      allocationService.getProfessionalsByProject(PROJECT_ID)
+      allocationService.getProfessionalsByProject()
         .then(setDbProfessionals)
         .catch(() => setMessage({ type: 'error', text: 'Erro ao carregar lista de profissionais.' }));
     }
@@ -37,13 +41,13 @@ const PaginaAlocacao = () => {
     if (selectedList.length === 0) return;
     setIsLoading(true);
     try {
-      await allocationService.assignToItem(PROJECT_ID, ITEM_ID, selectedList.map(p => p.id));
+      await allocationService.assignToItem(projetoId, selectedList.map(p => p.id));
       setMessage({ type: 'success', text: 'Alocação realizada com sucesso!' });
-      
-      setTimeout(() => { 
-        setIsModalOpen(false); 
-        setSelectedList([]); 
-        setMessage(null); 
+
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setSelectedList([]);
+        setMessage(null);
       }, 1500);
     } catch (error: any) {
       setMessage({ type: 'error', text: 'Erro ao salvar alocação no banco.' });
@@ -53,19 +57,22 @@ const PaginaAlocacao = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center  bg-gray-50">
       {/* Botão limpo e centralizado */}
-      <button 
-        className="btn btn-primary px-12 py-4 shadow-2xl rounded-2xl font-bold text-lg transition-all hover:scale-105 active:scale-95" 
+      {/* <button
+        className="btn btn-primary px-12 py-4 shadow-2xl rounded-2xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
         onClick={() => setIsModalOpen(true)}
       >
         Alocar Profissionais
-      </button>
+      </button> */}
+      <Botao type="button"  onClick={() => setIsModalOpen(true)}>
+        Alocar Funcionarios
+      </Botao>
 
       <PopupAlocacao
         isOpen={isModalOpen}
         onClose={() => { setIsModalOpen(false); setMessage(null); }}
-        projectName={PROJECT_NAME_FIXED} // <-- Nome fixo, sem fetch, sem erro 500
+        projectName={projetoNome}
         message={message}
         professionals={filteredProfessionals}
         searchTerm={searchTerm}
@@ -80,4 +87,4 @@ const PaginaAlocacao = () => {
   );
 };
 
-export default PaginaAlocacao;
+export default PaginaAlocacao

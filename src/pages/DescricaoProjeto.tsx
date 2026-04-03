@@ -4,11 +4,12 @@ import Card from "../shared/components/Card";
 import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade } from "../services/ItemService";
 import Botao from "../shared/components/Botao";
+import PaginaAlocacao from "./DevAllocationTest";
 
 export default function DescricaoProjeto() {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const projeto = state?.projeto as { nomeProjeto: string; tipoProjeto: string; status: string } | undefined;
+    const projeto = state?.projeto as { nomeProjeto: string; tipoProjeto: string; status: string ;id: number} | undefined;
 
     const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade }[]>([]);
 
@@ -58,9 +59,13 @@ export default function DescricaoProjeto() {
                     <div className="flex flex-row justify-between items-center">
                         <h2 className="text-lg font-semibold">Profissionais Alocados</h2>
                         {isGestor && (
-                            <Botao type="button">
-                                Alocar Funcionarios
-                            </Botao>
+                            // <Botao type="button">
+                            //     Alocar Funcionarios
+                            // </Botao>
+                            <PaginaAlocacao
+                                projetoId={projeto.id}
+                                projetoNome={projeto.nomeProjeto}
+                            />
                         )}
                     </div>
                     <div className="overflow-x-auto rounded-box border border-base-content/10 bg-base-100">

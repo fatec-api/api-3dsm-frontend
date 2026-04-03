@@ -5,7 +5,8 @@ import { listarProjetos } from "../services/listService";
 import Card from "../shared/components/Card";
 
 export default function ListaProjetos() {
-    const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string }[]>([]);
+    // const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string }[]>([]);
+    const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string,id: number }[]>([]);
     const navigate = useNavigate();
 
     useEffect(() => {
