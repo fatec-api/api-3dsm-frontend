@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import Header from "../shared/components/Header"
-import { listarProjetos } from "../services/listService";
+import { useNavigate } from "react-router-dom";
+import Header from "../shared/components/Header";
+import { listarProjetos } from "../services/projectService";
+import Card from "../shared/components/Card";
 
 export default function ListaProjetos() {
+    // const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string }[]>([]);
+    const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string,id: number }[]>([]);
+    const navigate = useNavigate();
 
-    const [projetos, setProjetos] = useState<{nomeProjeto: string, tipoProjeto: string, status: string}[]>([]);
-
-      useEffect(() => {
+    useEffect(() => {
         const loadData = async () => {
             try {
                 const listaProjetos = await listarProjetos();
@@ -28,12 +31,16 @@ export default function ListaProjetos() {
                     </div>
                 ) : (
                     projetos.map((projeto, index) => (
-                        <div key={index} className="flex flex-col justify-between border hover:shadow-lg hover:transform hover:scale-105 hover:transition hover:duration-300 p-6 rounded-lg h-50 w-64">
-                            <h2 className="text-center text-xl font-bold mb-2">{projeto.nomeProjeto}</h2>
-                            <div>
-                                <p className="text-gray-600">Tipo: {projeto.tipoProjeto}</p>
-                                <p className="text-gray-600">Status: {projeto.status}</p>
-                            </div>
+                        <div
+                            key={index}
+                            className="cursor-pointer"
+                            onClick={() => navigate("/descricao-projeto", { state: { projeto } })}
+                        >
+                            <Card
+                                title={projeto.nomeProjeto}
+                                type={projeto.tipoProjeto}
+                                status={projeto.status}
+                            />
                         </div>
                     ))
                 )}

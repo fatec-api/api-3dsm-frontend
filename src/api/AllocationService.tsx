@@ -1,21 +1,23 @@
 import type { Professional } from '../shared/components/PopupAlocacao';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:8080';
 
 export const allocationService = {
   
-  getProfessionalsByProject: async (projectId: number): Promise<Professional[]> => {
-    const response = await fetch(`${API_BASE_URL}/alocacoes/projeto/${projectId}/profissionais`);
+  getProfessionalsByProject: async (): Promise<Professional[]> => {
+    const response = await fetch(`${API_BASE_URL}/alocacoes/profissionais/ativos`);
     if (!response.ok) throw new Error('Erro ao carregar profissionais.');
     return response.json();
   },
 
  
-  assignToItem: async (projectId: number, itemId: number, professionalIds: string[]) => {
-    const response = await fetch(`${API_BASE_URL}/alocacoes/vincular`, {
+  assignToItem: async (projectId: number, professionalIds: string[]) => {
+    const response = await fetch(`${API_BASE_URL}/associar-projeto`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ projectId, itemId, professionalIds }),
+      body: JSON.stringify({
+        projetoId: projectId,
+        usuarioId: professionalIds }),
     });
     if (!response.ok) throw new Error('Erro ao salvar alocação.');
   }
