@@ -16,10 +16,6 @@ export const PaginaAlocacao = ({ projetoId, projetoNome }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-
-  // const ITEM_ID = 101;
-
-
   useEffect(() => {
     if (isModalOpen) {
       allocationService.getProfessionalsByProject()

@@ -26,7 +26,7 @@ export default function ModalAlocarFuncionarioItem({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-[999]">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-999">
       <div className="bg-white rounded-[2.5rem] p-10 relative shadow-2xl w-full max-w-lg mx-4">
 
         <button
@@ -46,7 +46,7 @@ export default function ModalAlocarFuncionarioItem({
             <div tabIndex={0} className="select select-bordered w-full cursor-pointer">
               {selectedId || "Selecione"}
             </div>
-            <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
+            <ul className="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-full">
               {profissionais.map(p => (
                 <li key={p.id}>
                   <a onClick={() => onSelect(p.id)}>

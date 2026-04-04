@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
-import { listarProjetos } from "../services/listService";
+import { listarProjetos } from "../services/projectService";
 import Card from "../shared/components/Card";
 
 export default function ListaProjetos() {

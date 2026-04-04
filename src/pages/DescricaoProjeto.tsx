@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../shared/components/Card";
 import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade } from "../services/ItemService";
+import { listarProjetoId, listarEquipeProjeto } from "../services/projectService";
 import Botao from "../shared/components/Botao";
 import PaginaAlocacao from "./DevAllocationTest";
 import ModalAlocarFuncionarioItem from "../components/ModalAlocarFuncionarioItem";
@@ -10,27 +11,36 @@ import ModalAlocarFuncionarioItem from "../components/ModalAlocarFuncionarioItem
 export default function DescricaoProjeto() {
     const { state } = useLocation();
     const navigate = useNavigate();
-    const projeto = state?.projeto as { nomeProjeto: string; tipoProjeto: string; status: string; id: number } | undefined;
+    const projetoState = state?.projeto;
+    const [projeto, setProjeto] = useState<any>(projetoState);
+    const [isModalItemOpen, setIsModalItemOpen] = useState(false);
 
     const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade }[]>([]);
+    const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
     const [popupItem, setPopupItem] = useState<string | null>(null);
     const [selectedProfId, setSelectedProfId] = useState("");
 
     useEffect(() => {
         // If accessed directly without state, redirect back
-        if (!projeto) {
+        if (!projetoState?.id) {
             navigate("/listaprojetos");
             return;
         }
-        const loadData = async () => {
+        const carregarProjeto = async () => {
             try {
-                const listaItens = await listarItens();
+                const projeto = await listarProjetoId(projetoState.id);
+                setProjeto(projeto);
+
+                const listaItens = await listarItens(projetoState.id);
                 setItens(listaItens);
+
+                const listaEquipe = await listarEquipeProjeto(projetoState.id);
+                setListaDeProfissionais(listaEquipe);
             } catch (error) {
                 console.error("Erro ao carregar itens", error);
             }
         };
-        loadData();
+        carregarProjeto();
     }, []);
 
     // trocar para a chamada da api depois
@@ -79,31 +89,30 @@ export default function DescricaoProjeto() {
                                     <th>Nome</th>
                                     <th>E-mail</th>
                                     <th>Nível de Experiência</th>
-                                    <th>Valor/hora</th>
+                                    <th>Cargo</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th>1</th>
-                                    <td>Cy Ganderton</td>
-                                    <td>cy@email.com</td>
-                                    <td>Sênior</td>
-                                    <td>R$ 120,00</td>
-                                </tr>
-                                <tr>
-                                    <th>2</th>
-                                    <td>Hart Hagerty</td>
-                                    <td>hart@email.com</td>
-                                    <td>Pleno</td>
-                                    <td>R$ 90,00</td>
-                                </tr>
-                                <tr>
-                                    <th>3</th>
-                                    <td>Brice Swyre</td>
-                                    <td>brice@email.com</td>
-                                    <td>Júnior</td>
-                                    <td>R$ 60,00</td>
-                                </tr>
+                                {listaDeProfissionais.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} className="text-center py-4">Nenhum profissional alocado.</td>
+                                    </tr>
+                                ) : (
+                                    listaDeProfissionais.map((prof, index) => (
+                                        <tr key={prof.id}>
+                                            <th>{index + 1}</th>
+                                            <td>{prof.nomeUsuario}</td>
+                                            <td>{prof.email}</td>
+                                            <td>{prof.nivelExperiencia}</td>
+                                            <td>{prof.cargo}</td>
+                                            <td>
+                                                {prof.valorHora 
+                                                    ? `R$ ${Number(prof.valorHora).toFixed(2).replace('.', ',')}` 
+                                                    : 'R$ 0,00'}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -114,7 +123,7 @@ export default function DescricaoProjeto() {
                     <div className="flex flex-row justify-between items-center">
                         <h2 className="text-lg font-semibold">Itens</h2>
                         {isGestor && (
-                            <Botao type="button">
+                            <Botao type="button" onClick={() => setIsModalItemOpen(true)}>
                                 Criar Item
                             </Botao>
                         )}
@@ -144,7 +153,7 @@ export default function DescricaoProjeto() {
                 isOpen={!!popupItem}
                 onClose={() => { setPopupItem(null); setSelectedProfId(""); }}
                 itemName={popupItem ?? ""}
-                profissionais={[]}
+                profissionais={listaDeProfissionais}
                 selectedId={selectedProfId}
                 onSelect={setSelectedProfId}
                 onSave={() => console.log("Atribuir", selectedProfId, "ao item", popupItem)}

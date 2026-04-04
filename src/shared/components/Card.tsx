@@ -10,7 +10,7 @@ interface CardProps {
     onClick?: React.MouseEventHandler<HTMLButtonElement>
 }
 
-export default function Card({ title, type, status, responsavel, buttonText, onClick, isGestor }: CardProps) {
+export default function Card({ title, type, status, buttonText, onClick, isGestor }: CardProps) {
     return (
         <div className="flex flex-col justify-between border border-base-content/10 bg-base-100 hover:shadow-lg hover:scale-105 transition duration-300 p-6 rounded-2xl h-50 w-64">
             <div className="flex flex-row justify-between items-start">
@@ -26,10 +26,8 @@ export default function Card({ title, type, status, responsavel, buttonText, onC
             </div>
             <div className="flex flex-col gap-1">
                 <p className="text-gray-600 text-sm">{type}</p>
-                {status && <p className="text-gray-600 text-sm">Nível: {status}</p>}
-                <p className="text-gray-500 text-sm mt-2">
-                    Responsável: {responsavel ?? "—"}
-                </p>
+                {status && <p className="text-gray-600 text-sm">Status: {status}</p>}
+                <br />
             </div>
             {onClick && buttonText && (
                 <button className="btn btn-primary btn-sm mt-3" onClick={onClick}>

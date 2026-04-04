@@ -4,7 +4,7 @@ import Input from "../shared/components/Input";
 import { PiHandCoins } from "react-icons/pi";
 import { GoProject } from "react-icons/go";
 import Dropdown from "../shared/components/Dropdown";
-import { listarProfissionais, listarClientes, criarProjeto } from "../services/projectService";
+import { listarProfissionaisAtivos, listarClientes, criarProjeto } from "../services/projectService";
 
 export default function CadastroProjeto() {
     const [alerta, setAlerta] = useState("");
@@ -26,7 +26,7 @@ export default function CadastroProjeto() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const listaProfissionais = await listarProfissionais();
+                const listaProfissionais = await listarProfissionaisAtivos();
                 setProfissionais(listaProfissionais);
                 setGestores(listaProfissionais.filter((p: { cargo: string; }) => p.cargo == "Gestor").map((p: { nomeProfissional: string; }) => p.nomeProfissional));
                 const listaClientes = await listarClientes();
