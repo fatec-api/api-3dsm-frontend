@@ -98,6 +98,7 @@ export default function CadastroProjeto() {
                 setAlerta("Erro ao cadastrar projeto.");
             }
         }
+    }
 
     return (
         <div className="flex h-screen bg-[#FFFFFF]">
