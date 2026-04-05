@@ -4,12 +4,13 @@ import Header from './shared/components/Header'
 import Home from './pages/Home'
 import TelaLogin from './pages/TelaLogin'
 import Dropdown from './shared/components/Dropdown'
-import CadastroUsuario from "./pages/TelaCadastroUsuario";
+import CadastroUsuario from "./pages/TelaCadastroUsuario"
 import CadastroProjeto from './pages/CadastroProjeto'
 import ListaProjetos from './pages/ListaProjetos'
 import DevAllocationTest from './pages/DevAllocationTest';
 import DescricaoProjeto from './pages/DescricaoProjeto'
 import TelaFuncionarios from './pages/TelaFuncionarios'
+import CadastroItem from './pages/CadastroItem'
 
 
 const router = createBrowserRouter(
@@ -28,20 +29,13 @@ const router = createBrowserRouter(
      <Route path='/listaprojetos' element={<ListaProjetos/>}/>
      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
      <Route path='/descricao-projeto' element={<DescricaoProjeto />}/>
+     <Route path='/cadastro-item' element={<CadastroItem />} />
    </>
  )
 )
 
-
 function App() {
-
-
- return (
-   <>
-     <RouterProvider router={router} />
-   </>
- )
+  return <RouterProvider router={router} />
 }
-
 
 export default App

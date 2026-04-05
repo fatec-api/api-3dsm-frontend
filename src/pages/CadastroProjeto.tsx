@@ -17,9 +17,9 @@ export default function CadastroProjeto() {
     const [statusProjeto, setStatusProjeto] = useState("");
     const [profissionalAlocado, setProfissionalAlocado] = useState<string[]>([]);
     const [gestorResponsavel, setGestorResponsavel] = useState("");
-    const [profissionais, setProfissionais] = useState<{ nomeProfissional: string; cargo: string }[]>([]);
+    const [profissionais, setProfissionais] = useState<{ nomeUsuario: string; cargo: string }[]>([]);
     const [clientes, setClientes] = useState<string[]>([]);
-    const [gestores, setGestores] = useState<string[]>([]);
+    const [gestores, setGestores] = useState<{ label: string; value: string }[]>([]);
 
     const regex = /^[A-Z]{3}\d{4}$/;
 
@@ -28,7 +28,15 @@ export default function CadastroProjeto() {
             try {
                 const listaProfissionais = await listarProfissionaisAtivos();
                 setProfissionais(listaProfissionais);
-                setGestores(listaProfissionais.filter((p: { cargo: string; }) => p.cargo == "Gestor").map((p: { nomeProfissional: string; }) => p.nomeProfissional));
+                const listaUsuarios = await listarUsuariosAtivos();
+                const gestoresMapeados = listaUsuarios
+                    .filter((p: any) => p.cargo === "Gestor")
+                    .map((p: any) => ({
+                        label: p.nomeUsuario,
+                        value: String(p.id)          
+                    }));
+
+                setGestores(gestoresMapeados);
                 const listaClientes = await listarClientes();
                 setClientes(listaClientes.map((c: { nomeCliente: string; }) => c.nomeCliente));
             } catch (error) {
@@ -78,10 +86,11 @@ export default function CadastroProjeto() {
                     valorOrcamento: Number(valorOrcamento),
                     dataInicio,
                     dataFim,
-                    statusProjeto,
+                    status: statusProjeto,
                     profissionalAlocado,
-                    gestorResponsavel,
+                    gestorId: gestorResponsavel,
                 };
+                console.log(payload)
 
                 await criarProjeto(payload);
                 setAlerta("Projeto cadastrado com sucesso!");
@@ -100,22 +109,56 @@ export default function CadastroProjeto() {
         }
     }
     return (
-        <div className="flex h-screen bg-[#FFFFFF]">
+        <div className="h-screen flex flex-col bg-white">
             <Header />
-            <form className="flex flex-col items-center w-full mt-40" onSubmit={handleCadastro}>
-                <h1 className="form-title text-2xl font-bold mb-5">Cadastro de Projeto</h1>
-                <div className="join join-vertical lg:join-horizontal">
-                    <div className="join join-vertical px-8">
-                        <div className="mb-4">
-                            <label className="block ms-3 mb-1 font-medium">Nome do Projeto</label>
-                            <Input
-                                type="text"
-                                placeholder="Ex: ABC1234"
-                                value={nomeProjeto}
-                                onChange={(e) => setNomeProjeto(e.target.value.toUpperCase())}
-                                icon={<GoProject size={20} />}
-                                required
-                            />
+            <div className="flex-1 flex items-center justify-center px-4">
+                <form className="bg-white shadow-lg rounded-2xl p-10 w-fit flex flex-col gap-8" onSubmit={handleCadastro}>
+                    <h1 className="form-title text-2xl font-bold mb-5 text-center">Cadastro de Projeto</h1>
+                    <div className="join join-vertical lg:join-horizontal">
+                        <div className="join join-vertical px-8">
+                            <div className="mb-4">
+                                <label className="block ms-3 mb-1 font-medium">Nome do Projeto</label>
+                                <Input
+                                    type="text"
+                                    placeholder="Ex: ABC1234"
+                                    value={nomeProjeto}
+                                    onChange={(e) => setNomeProjeto(e.target.value.toUpperCase())}
+                                    icon={<GoProject size={20} />}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block ms-3 mb-1 font-medium">Tipo de Projeto</label>
+                                <Dropdown
+                                    value={tipoProjeto}
+                                    onChange={(e) => setTipoProjeto(e.target.value)}
+                                    options={[
+                                        { label: "Alocação", value: "Alocacao" },
+                                        { label: "Hora Fechada", value: "Hora_Fechada" }
+                                    ]}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block ms-3 mb-1 font-medium">Cliente</label>
+                                <Dropdown
+                                    value={cliente}
+                                    onChange={(e) => setCliente(e.target.value)}
+                                    options={clientes}
+                                    required={false}
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block ms-3 mb-1 font-medium">Valor do Orçamento</label>
+                                <Input
+                                    type="double"
+                                    placeholder="R$00,00"
+                                    value={valorOrcamento}
+                                    onChange={(e) => setValorOrcamento(e.target.value)}
+                                    icon={<PiHandCoins size={20} />}
+                                    required
+                                />
+                            </div>
                         </div>
                         <div className="mb-4">
                             <label className="block ms-3 mb-1 font-medium">Tipo de Projeto</label>
@@ -198,10 +241,26 @@ export default function CadastroProjeto() {
                 </div>
                 {alerta && <p className={`mb-4 text-center ${alerta.includes("sucesso") ? "alert alert-outline alert-success text-sm bg-green-100" : "alert alert-outline alert-error text-sm bg-red-100"}`}>{alerta}</p>}
 
-                <button type="submit" className="border-2 border-black rounded-xl bg-white hover:bg-gray-100 p-3 m-2">
-                    Cadastrar
-                </button>
-            </form>
+                        </div>
+                    </div>
+                    <div className="px-8 w-full flex justify-center">
+                        <div className="mb-5 w-full max-w-xs">
+                            <label className="block ms-3 mb-1 font-medium">Gestor Responsável</label>
+                            <Dropdown
+                                value={gestorResponsavel}
+                                onChange={(e) => setGestorResponsavel(e.target.value)}
+                                options={gestores}
+                                required
+                            />
+                        </div>
+                    </div>
+                    {alerta && <p className={`mb-4 text-center ${alerta.includes("sucesso") ? "alert alert-outline alert-success text-sm bg-green-100" : "alert alert-outline alert-error text-sm bg-red-100"}`}>{alerta}</p>}
+
+                    <button type="submit" className="border-2 border-black rounded-xl w-xs bg-white hover:bg-gray-100 p-3 m-2 self-center">
+                        Cadastrar
+                    </button>
+                </form>
+            </div>
 
             <div className="modal" role="dialog" id="modal-profissional">
                 <div className="modal-box">
