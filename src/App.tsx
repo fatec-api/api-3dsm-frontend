@@ -12,6 +12,7 @@ import DevAllocationTest from './pages/DevAllocationTest';
 import DescricaoProjeto from './pages/DescricaoProjeto'
 import TelaFuncionarios from './pages/TelaFuncionarios'
 import CadastroItem from './pages/CadastroItem'
+import TelaLogProfissional from './pages/TelaLogProfissional'
 
 
 const router = createBrowserRouter(
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
      <Route path='/descricao-projeto' element={<DescricaoProjeto />}/>
      <Route path='/cadastro-item' element={<CadastroItem />} />
+     <Route path='/logprofissional/:id' element={<TelaLogProfissional/>}/>
    </>
  )
 )
