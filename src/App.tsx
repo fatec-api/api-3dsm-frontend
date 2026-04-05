@@ -7,6 +7,7 @@ import Dropdown from './shared/components/Dropdown'
 import CadastroUsuario from "./pages/TelaCadastroUsuario"
 import CadastroProjeto from './pages/CadastroProjeto'
 import ListaProjetos from './pages/ListaProjetos'
+import ApontamentoHoras from './pages/TelaApontamentoHoras'
 import DevAllocationTest from './pages/DevAllocationTest';
 import DescricaoProjeto from './pages/DescricaoProjeto'
 import TelaFuncionarios from './pages/TelaFuncionarios'
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
      <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
      <Route path='/listaprojetos' element={<ListaProjetos/>}/>
+     <Route path='/apontamentohoras' element={<ApontamentoHoras/>}/>
      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
      <Route path='/descricao-projeto' element={<DescricaoProjeto />}/>
      <Route path='/cadastro-item' element={<CadastroItem />} />
