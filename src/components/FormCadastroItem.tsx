@@ -4,6 +4,7 @@ import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
 import { GoProject } from "react-icons/go";
 import { FiFileText, FiClock, FiUser } from "react-icons/fi";
+import { useParams } from "react-router-dom";
 
 type Profissional = {
   id: string;
@@ -17,6 +18,7 @@ type Projeto = {
 
 type ItemPayload = {
   descricao: string;
+  titulo: string;
   dataAtribuicao: string;
   previsaoHoras: number | null;
   nivelAtividade: string | null;
@@ -25,11 +27,12 @@ type ItemPayload = {
 };
 
 export default function FormCadastroItem() {
+  const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [usuarioId, setUsuarioId] = useState("");
   const [nivelAtividade, setNivelAtividade] = useState("");
   const [previsaoHoras, setPrevisaoHoras] = useState("");
-  const [projetoId, setProjetoId] = useState("");
+  const [projetoIdEstado, setProjetoId] = useState("");
 
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [projetos, setProjetos] = useState<Projeto[]>([]);
@@ -38,38 +41,65 @@ export default function FormCadastroItem() {
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const { projetoId: idDaUrl } = useParams<{ projetoId: string }>();
+
   useEffect(() => {
-    async function carregarDados() {
+    if (idDaUrl) {
+      setProjetoId(idDaUrl);
+    }
+  }, [idDaUrl]);
+
+  useEffect(() => {
+    async function carregarProjetos() {
       try {
-        const [resProfissionais, resProjetos] = await Promise.all([
-          fetch("http://localhost:8080/api/usuarios"),
-          fetch("http://localhost:8080/listar/projetos"),
-        ]);
-
-        if (!resProfissionais.ok || !resProjetos.ok) {
-          throw new Error("Erro ao buscar dados iniciais.");
-        }
-
-        setProfissionais(await resProfissionais.json());
-        setProjetos(await resProjetos.json());
+        const res = await fetch("http://localhost:8080/listar/projetos");
+        if (!res.ok) throw new Error("Erro ao buscar projetos.");
+        setProjetos(await res.json());
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-        setErro("Não foi possível carregar profissionais ou projetos.");
+        setErro("Não foi possível carregar os projetos.");
+      }
+    }
+    carregarProjetos();
+  }, []);
+
+  useEffect(() => {
+    async function carregarProfissionaisDoProjeto() {
+      if (!projetoIdEstado) {
+        setProfissionais([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:8080/alocacoes/projeto/${projetoIdEstado}`);
+
+        if (!res.ok) throw new Error("Erro ao buscar profissionais do projeto.");
+
+        const dados = await res.json();
+        setProfissionais(dados);
+        setUsuarioId("");
+      } catch (error) {
+        console.error(error);
+        setErro("Erro ao carregar profissionais deste projeto.");
+      } finally {
+        setLoading(false);
       }
     }
 
-    carregarDados();
-  }, []);
+    carregarProfissionaisDoProjeto();
+  }, [projetoIdEstado]);
 
   const validar = (): string => {
-    if (!projetoId) return "Selecione um projeto.";
+    if (!projetoIdEstado) return "Selecione um projeto.";
+    if (!titulo.trim()) return "O título é obrigatória.";
     if (!descricao.trim()) return "A descrição é obrigatória.";
     if (previsaoHoras !== "" && Number(previsaoHoras) < 0)
       return "A previsão de horas não pode ser negativa.";
-    return "";
+    return "";    
   };
 
   const limpar = () => {
+    setTitulo("");
     setDescricao("");
     setUsuarioId("");
     setNivelAtividade("");
@@ -89,13 +119,15 @@ export default function FormCadastroItem() {
     }
 
     const payload: ItemPayload = {
+      titulo: titulo.trim(),
       descricao: descricao.trim(),
       dataAtribuicao: new Date().toISOString().split("T")[0],
       previsaoHoras: previsaoHoras !== "" ? Number(previsaoHoras) : null,
       nivelAtividade: nivelAtividade || null,
       usuarioId: usuarioId || null,
-      projetoId: Number(projetoId),
+      projetoId: Number(projetoIdEstado),
     };
+    console.log(payload)
 
     try {
       setLoading(true);
@@ -111,7 +143,7 @@ export default function FormCadastroItem() {
   };
 
   async function cadastrarItem(payload: ItemPayload): Promise<void> {
-    const response = await fetch("http://localhost:8080/api/itens/cadastro/item", {
+    const response = await fetch("http://localhost:8080/itens/cadastro/item", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -138,7 +170,7 @@ export default function FormCadastroItem() {
       {/* Projeto vem primeiro pois o código é gerado a partir dele */}
       <Dropdown
         label="Projeto *"
-        value={projetoId}
+        value={projetoIdEstado}
         onChange={(e) => setProjetoId(e.target.value)}
         options={projetos.map((p) => ({
           label: p.nomeProjeto,
@@ -146,6 +178,15 @@ export default function FormCadastroItem() {
         }))}
         icon={<GoProject size={18} />}
         required
+      />
+
+      <Input
+        label="Título do Item *"
+        placeholder="Título do item"
+        value={titulo}
+        onChange={(e) => setTitulo(e.target.value)}
+        icon={<FiFileText size={18} />}
+        maxLength={300}
       />
 
       <Input
