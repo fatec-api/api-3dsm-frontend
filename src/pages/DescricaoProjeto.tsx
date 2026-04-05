@@ -4,7 +4,6 @@ import Card from "../shared/components/Card";
 import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade } from "../services/ItemService";
 import { listarProjetoId, listarEquipeProjeto } from "../services/projectService";
-import Botao from "../shared/components/Botao";
 import PaginaAlocacao from "./DevAllocationTest";
 import ModalAlocarFuncionarioItem from "../components/ModalAlocarFuncionarioItem";
 
@@ -15,7 +14,7 @@ export default function DescricaoProjeto() {
     const [projeto, setProjeto] = useState<any>(projetoState);
     const [isModalItemOpen, setIsModalItemOpen] = useState(false);
 
-    const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade }[]>([]);
+    const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNome: string }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
     const [popupItem, setPopupItem] = useState<string | null>(null);
     const [selectedProfId, setSelectedProfId] = useState("");
@@ -122,11 +121,6 @@ export default function DescricaoProjeto() {
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-row justify-between items-center">
                         <h2 className="text-lg font-semibold">Itens</h2>
-                        {isGestor && (
-                            <Botao type="button" onClick={() => setIsModalItemOpen(true)}>
-                                Criar Item
-                            </Botao>
-                        )}
                     </div>
                     <div className="flex flex-row flex-wrap gap-4">
                         {itens.length === 0 ? (
@@ -140,6 +134,8 @@ export default function DescricaoProjeto() {
                                     title={item.codigo}
                                     type={item.descricao}
                                     status={item.nivelAtividade}
+                                    responsavel={item.usuarioNome}
+                                    showResponsavel={true}
                                     isGestor={isGestor}
                                     onClick={isGestor ? () => setPopupItem(item.codigo) : undefined}
                                 />
