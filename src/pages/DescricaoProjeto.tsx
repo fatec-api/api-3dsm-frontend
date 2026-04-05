@@ -5,6 +5,7 @@ import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade, vincularProfissionalItem } from "../services/ItemService";
 import PaginaAlocacao from "./DevAllocationTest";
 import ModalAlocarFuncionarioItem from "../components/ModalAlocarFuncionarioItem";
+import { listarEquipeProjeto, listarProjetoId } from "../services/projectService";
 
 export default function DescricaoProjeto() {
     const { state } = useLocation();
