@@ -8,7 +8,7 @@ export interface ProjetoPayload {
     dataInicio: string;
     dataFim: string;
     statusProjeto: string;
-    profissionalAlocado: string[];
+    profissionaisIds: string[];
     gestorResponsavel: string;
 }
 

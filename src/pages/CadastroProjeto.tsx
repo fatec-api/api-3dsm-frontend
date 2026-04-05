@@ -17,7 +17,7 @@ export default function CadastroProjeto() {
     const [statusProjeto, setStatusProjeto] = useState("");
     const [profissionalAlocado, setProfissionalAlocado] = useState<string[]>([]);
     const [gestorResponsavel, setGestorResponsavel] = useState("");
-    const [profissionais, setProfissionais] = useState<{ nomeUsuario: string; cargo: string }[]>([]);
+    const [profissionais, setProfissionais] = useState<{ id: string; nomeUsuario: string; cargo: string }[]>([]);
     const [clientes, setClientes] = useState<string[]>([]);
     const [gestores, setGestores] = useState<{ label: string; value: string }[]>([]);
 
@@ -33,7 +33,7 @@ export default function CadastroProjeto() {
                     .filter((p: any) => p.cargo === "Gestor")
                     .map((p: any) => ({
                         label: p.nomeUsuario,
-                        value: String(p.id)          
+                        value: String(p.id)
                     }));
 
                 setGestores(gestoresMapeados);
@@ -46,9 +46,9 @@ export default function CadastroProjeto() {
         loadData();
     }, []);
 
-    const toggleProfissional = (nome: string) => {
+    const toggleProfissional = (id: string) => {
         setProfissionalAlocado(prev =>
-            prev.includes(nome) ? prev.filter(item => item !== nome) : [...prev, nome]
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
         );
     };
 
@@ -82,12 +82,11 @@ export default function CadastroProjeto() {
                 const payload = {
                     nomeProjeto,
                     tipoProjeto,
-                    cliente,
                     valorOrcamento: Number(valorOrcamento),
                     dataInicio,
                     dataFim,
                     status: statusProjeto,
-                    profissionalAlocado,
+                    profissionaisIds: profissionalAlocado,
                     gestorId: gestorResponsavel,
                 };
                 console.log(payload)
@@ -233,12 +232,12 @@ export default function CadastroProjeto() {
                                 <li className="alert alert-soft alert-info text-lg p-2">Sem profissionais para alocação.</li>
                             ) : (
                                 profissionais.map((profissional) => (
-                                    <li key={profissional.nomeUsuario} className="list-row flex items-center gap-3 p-2">
+                                    <li key={profissional.id} className="list-row flex items-center gap-3 p-2">
                                         <input
                                             type="checkbox"
                                             className="checkbox"
-                                            checked={profissionalAlocado.includes(profissional.nomeUsuario)}
-                                            onChange={() => toggleProfissional(profissional.nomeUsuario)}
+                                            checked={profissionalAlocado.includes(String(profissional.id))}
+                                            onChange={() => toggleProfissional(String(profissional.id))}
                                         />
                                         <div className="flex-1">
                                             <h2 className="font-bold">{profissional.nomeUsuario}</h2>
