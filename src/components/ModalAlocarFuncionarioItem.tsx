@@ -44,14 +44,22 @@ export default function ModalAlocarFuncionarioItem({
 
           <div className="dropdown w-full">
             <div tabIndex={0} className="select select-bordered w-full cursor-pointer">
-              {selectedId || "Selecione"}
+              {
+                profissionais.find(p => p.id === selectedId)?.nomeUsuario || "Selecione"
+              }
             </div>
             <ul className="dropdown-content z-1 menu p-2 shadow bg-base-100 rounded-box w-full">
               {profissionais.map(p => (
                 <li key={p.id}>
-                  <a onClick={() => onSelect(p.id)}>
+                                    <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelect(p.id);
+                    }}
+                  >
                     {p.nomeUsuario}
-                  </a>
+                    </button>
                 </li>
               ))}
             </ul>
@@ -59,8 +67,8 @@ export default function ModalAlocarFuncionarioItem({
 
           {message && (
             <div className={`alert py-3 rounded-xl border ${message.type === 'success'
-                ? 'bg-green-50 border-green-200 text-green-800'
-                : 'bg-red-50 border-red-200 text-red-800'
+              ? 'bg-green-50 border-green-200 text-green-800'
+              : 'bg-red-50 border-red-200 text-red-800'
               }`}>
               <span className="text-sm font-bold text-center w-full">{message.text}</span>
             </div>

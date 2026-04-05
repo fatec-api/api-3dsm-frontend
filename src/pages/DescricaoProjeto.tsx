@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../shared/components/Card";
 import Header from "../shared/components/Header";
-import { listarItens, type NivelAtividade } from "../services/ItemService";
-import { listarProjetoId, listarEquipeProjeto } from "../services/projectService";
+import { listarItens, type NivelAtividade, vincularProfissionalItem } from "../services/ItemService";
 import PaginaAlocacao from "./DevAllocationTest";
 import ModalAlocarFuncionarioItem from "../components/ModalAlocarFuncionarioItem";
 
@@ -12,35 +11,56 @@ export default function DescricaoProjeto() {
     const navigate = useNavigate();
     const projetoState = state?.projeto;
     const [projeto, setProjeto] = useState<any>(projetoState);
-    const [isModalItemOpen, setIsModalItemOpen] = useState(false);
+    const [popupItem, setPopupItem] = useState<any | null>(null);
+    const [selectedProfId, setSelectedProfId] = useState("");
 
     const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNome: string }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
-    const [popupItem, setPopupItem] = useState<string | null>(null);
-    const [selectedProfId, setSelectedProfId] = useState("");
+
+
+    const carregarDadosProjeto = async () => {
+        if (!projetoState?.id) return;
+        try {
+            const projeto = await listarProjetoId(projetoState.id);
+            setProjeto(projeto);
+
+            const listaItens = await listarItens(projetoState.id);
+            setItens(listaItens);
+
+            const listaEquipe = await listarEquipeProjeto(projetoState.id);
+            setListaDeProfissionais(listaEquipe);
+        } catch (error) {
+            console.error("Erro ao carregar dados do projeto", error);
+        }
+    };
 
     useEffect(() => {
-        // If accessed directly without state, redirect back
         if (!projetoState?.id) {
             navigate("/listaprojetos");
             return;
         }
-        const carregarProjeto = async () => {
-            try {
-                const projeto = await listarProjetoId(projetoState.id);
-                setProjeto(projeto);
+        carregarDadosProjeto();
+    }, [projetoState?.id]);
 
-                const listaItens = await listarItens(projetoState.id);
-                setItens(listaItens);
+    const handleAlocar = async () => {
+        if (!popupItem || !selectedProfId) return;
 
-                const listaEquipe = await listarEquipeProjeto(projetoState.id);
-                setListaDeProfissionais(listaEquipe);
-            } catch (error) {
-                console.error("Erro ao carregar itens", error);
-            }
-        };
-        carregarProjeto();
-    }, []);
+        try {
+            await vincularProfissionalItem({
+                projectId: projeto.id,
+                itemId: popupItem.id,
+                professionalIds: [selectedProfId],
+            });
+
+            setPopupItem(null);
+            setSelectedProfId("");
+
+            await carregarDadosProjeto();
+        } catch (error) {
+            console.error("Erro ao alocar:", error);
+        }
+    };
+
 
     // trocar para a chamada da api depois
     const isGestor = true;
@@ -94,7 +114,7 @@ export default function DescricaoProjeto() {
                             <tbody>
                                 {listaDeProfissionais.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="text-center py-4">Nenhum profissional alocado.</td>
+                                        <td colSpan={6} className="text-center py-4">Nenhum profissional alocado.</td>
                                     </tr>
                                 ) : (
                                     listaDeProfissionais.map((prof, index) => (
@@ -104,11 +124,7 @@ export default function DescricaoProjeto() {
                                             <td>{prof.email}</td>
                                             <td>{prof.nivelExperiencia}</td>
                                             <td>{prof.cargo}</td>
-                                            <td>
-                                                {prof.valorHora 
-                                                    ? `R$ ${Number(prof.valorHora).toFixed(2).replace('.', ',')}` 
-                                                    : 'R$ 0,00'}
-                                            </td>
+                                            <td>{prof.valorHora ? `R$ ${Number(prof.valorHora).toFixed(2).replace('.', ',')}` : 'R$ 0,00'}</td>
                                         </tr>
                                     ))
                                 )}
@@ -137,7 +153,7 @@ export default function DescricaoProjeto() {
                                     responsavel={item.usuarioNome}
                                     showResponsavel={true}
                                     isGestor={isGestor}
-                                    onClick={isGestor ? () => setPopupItem(item.codigo) : undefined}
+                                    onClick={isGestor && !item.usuarioNome ? () => setPopupItem(item) : undefined}
                                 />
                             ))
                         )}
@@ -148,11 +164,11 @@ export default function DescricaoProjeto() {
             <ModalAlocarFuncionarioItem
                 isOpen={!!popupItem}
                 onClose={() => { setPopupItem(null); setSelectedProfId(""); }}
-                itemName={popupItem ?? ""}
+                itemName={popupItem?.titulo ?? ""}
                 profissionais={listaDeProfissionais}
                 selectedId={selectedProfId}
                 onSelect={setSelectedProfId}
-                onSave={() => console.log("Atribuir", selectedProfId, "ao item", popupItem)}
+                onSave={handleAlocar}
                 isLoading={false}
                 message={null}
             />

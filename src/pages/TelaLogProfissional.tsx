@@ -3,6 +3,7 @@ import Header from "../shared/components/Header";
 import Tabela from "../shared/components/Tabela";
 import { useParams } from "react-router-dom";
 import { listarApontamentosUsuarios } from "../services/apontamentoService";
+import { listarItensPorProfissional } from "../services/ItemService"
 
 type Log = {
   projeto: string;
@@ -25,8 +26,23 @@ export default function TelaLogProfissional() {
       try {
         setLoading(true);
 
-        const data: Log[] = await listarApontamentosUsuarios(id);
-        setLogs(data);
+        const apontamentos = await listarApontamentosUsuarios(id);
+        const itens = await listarItensPorProfissional(id);
+
+        const logsCompletos: Log[] = apontamentos.map((a: any) => {
+          const item = itens.find((i: any) => i.id === a.itemId);
+
+          return {
+            projeto: item?.projetoNome || "Sem projeto",
+            item: a.itemDescricao,
+            nivel: item?.nivelAtividade || "UNDEFINED",
+            data: a.dataApontamento,
+            inicio: a.horaInicio,
+            fim: a.horaFim,
+          };
+        });
+
+        setLogs(logsCompletos);
 
       } catch (error) {
         console.error("Erro na requisição:", error);
@@ -39,12 +55,12 @@ export default function TelaLogProfissional() {
   }, [id])
 
   const columns = [
-    { header: "Projeto", accessor: "projetoNome" },
-    { header: "Item", accessor: "itemDescricao" },
-    { header: "Nível da atividade", accessor: "nivelAtividade" },
-    { header: "Data do Apontamento", accessor: "dataApontamento" },
-    { header: "Hora início", accessor: "horaInicio" },
-    { header: "Hora fim", accessor: "horaFim" },
+    { header: "Projeto", accessor: "projeto" },
+    { header: "Item", accessor: "item" },
+    { header: "Nível da atividade", accessor: "nivel" },
+    { header: "Data do Apontamento", accessor: "data" },
+    { header: "Hora início", accessor: "inicio" },
+    { header: "Hora fim", accessor: "fim" },
   ];
 
   return (
