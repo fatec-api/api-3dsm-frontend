@@ -23,7 +23,7 @@ const router = createBrowserRouter(
      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
      <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
      <Route path='/listaprojetos' element={<ListaProjetos/>}/>
-     <Route path='/logprofissional' element={<TelaLogProfissional/>}/>
+     <Route path='/logprofissional/:id' element={<TelaLogProfissional/>}/>
    </>
  )
 )

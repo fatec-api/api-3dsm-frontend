@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Header from "../shared/components/Header";
 import Tabela from "../shared/components/Tabela";
+import { useParams } from "react-router-dom";
 
 type Log = {
   projeto: string;
@@ -13,50 +14,45 @@ type Log = {
 
 export default function TelaLogProfissional() {
   const [logs, setLogs] = useState<Log[]>([]);
+  const [loading, setLoading] = useState(true)
+  const { id } = useParams<{ id: string }>()
 
   useEffect(() => {
     const fetchLogs = async () => {
+      if (!id) return;
+
       try {
-        
-        const data: Log[] = [
-          {
-            projeto: "Projeto A",
-            item: "Item 1",
-            nivel: "Alto",
-            data: "30/03/2026",
-            inicio: "08:00",
-            fim: "12:00",
-          },
-        ];
+        setLoading(true);
+        const response = await fetch(`http://localhost:8080/apontamentos/usuario/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
 
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar dados: ${response.status}`);
+        }
+
+        const data: Log[] = await response.json();
         setLogs(data);
-
-        // const response = await fetch("http://localhost:8080/", {
-        //   method: "GET",
-        //   headers: {
-        //     "Content-Type": "application/json"
-        //   }
-        // })
-        // if(!response.ok){
-        //   throw new Error()
-        // }
-        // const data: Log[] = await response.json()
-        // console.log(data)
       } catch (error) {
-        console.error("Erro ao buscar logs", error);
+        console.error("Erro na requisição:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchLogs();
-  }, []);
+  }, [id])
 
   const columns = [
-    { header: "Projeto", accessor: "projeto" },
-    { header: "Item", accessor: "item" },
-    { header: "Nível da atividade", accessor: "nivel" },
-    { header: "Data do Apontamento", accessor: "data" },
-    { header: "Hora início", accessor: "inicio" },
-    { header: "Hora fim", accessor: "fim" },
+    { header: "Projeto", accessor: "projetoNome" },
+    { header: "Item", accessor: "itemDescricao" },
+    { header: "Nível da atividade", accessor: "nivelAtividade" },
+    { header: "Data do Apontamento", accessor: "dataApontamento" },
+    { header: "Hora início", accessor: "horaInicio" },
+    { header: "Hora fim", accessor: "horaFim" },
   ];
 
   return (
