@@ -31,7 +31,7 @@ export default function FormularioApontamento() {
 
     const [horasLiquidas, setHorasLiquidas] = useState<number | null>(null);
 
-    const [projetos, setProjetos] = useState<{ nomeProjeto: string, id: number, descricao: string }[]>([]);
+    const [projetos, setProjetos] = useState<{ nomeProjeto: string, id: number, titulo: string }[]>([]);
     const [projetoSelecionado, setProjetoSelecionado] = useState<any>(null);
     const { projetoId } = useParams<{ projetoId: string }>();
     const [itens, setItens] = useState<any[]>([]);;
@@ -306,12 +306,12 @@ export default function FormularioApontamento() {
                                 setItem(valorSelecionado);
 
                                 // BUSCA CORRETA: Se você exibiu 'descricao', procure por 'descricao'
-                                const objetoItem = itens.find((i: any) => i.descricao === valorSelecionado);
+                                const objetoItem = itens.find((i: any) => i.titulo === valorSelecionado);
 
                                 console.log("Objeto encontrado:", objetoItem); // Verifique se o ID aparece aqui
                                 setItemSelecionado(objetoItem);
                             }}
-                            options={itens.map((i: any) => (typeof i === 'string' ? i : i.descricao))}
+                            options={itens.map((i: any) => (typeof i === 'string' ? i : i.titulo))}
                             // options={itens}
                             widthPx={300}
                         />
