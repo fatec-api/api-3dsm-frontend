@@ -21,7 +21,7 @@ const router = createBrowserRouter(
        <Route index element={<Home />}/>
        {/* <Route path='input' element={<Input/>}/>
        <Route path='dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/> */}
-       <Route path='telalogin' element={<TelaLogin/>}/>
+       <Route path='login' element={<TelaLogin/>}/>
        <Route path='telafuncionarios' element={<TelaFuncionarios/>}/>
      </Route>
      <Route path='/telalogin' element={<TelaLogin/>}/>

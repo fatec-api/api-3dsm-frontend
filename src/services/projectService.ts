@@ -43,6 +43,11 @@ export async function listarProfissionaisAtivos() {
     return response.data;
 }
 
+export async function listarUsuariosAtivos() {
+    const response = await api.get("/alocacoes/usuarios/ativos");
+    return response.data;
+}
+
 // LISTAR CLIENTES
 export function listarClientes() {
     return Promise.resolve([
@@ -61,5 +66,7 @@ export function listarClientes() {
         {
             nomeCliente: "Claudio"
         }
-    ])
+    ]);
+
+
 };

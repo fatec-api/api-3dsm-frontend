@@ -91,7 +91,7 @@ export default function FormCadastroItem() {
 
   const validar = (): string => {
     if (!projetoIdEstado) return "Selecione um projeto.";
-    if (!titulo.trim()) return "O título é obrigatória.";
+    if (!titulo.trim()) return "O título é obrigatório.";
     if (!descricao.trim()) return "A descrição é obrigatória.";
     if (previsaoHoras !== "" && Number(previsaoHoras) < 0)
       return "A previsão de horas não pode ser negativa.";
@@ -161,7 +161,7 @@ export default function FormCadastroItem() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-[560px] flex flex-col gap-8"
+      className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-140 flex flex-col gap-8"
     >
       <h1 className="text-2xl font-semibold text-gray-800 text-center">
         Cadastro de Item
