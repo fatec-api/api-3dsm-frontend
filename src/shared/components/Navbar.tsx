@@ -20,7 +20,7 @@ export default function Navbar() {
                             <li><Link to="/">Home</Link></li>
                             <li><Link to="/listaprojetos">Projetos</Link></li>
                             <li><Link to="/telafuncionarios">Funcionários</Link></li>
-                            <li><Link to="/apontamentohoras">Apontamento de Horas</Link></li>
+                            <li><Link to="/logprofissional/550e8400-e29b-41d4-a716-446655440010">Apontamento de Horas</Link></li>
 
                             <li>
                                 <a>Criação</a>
@@ -28,6 +28,7 @@ export default function Navbar() {
                                     <li><Link to="/cadastroprojeto">Cadastro de Projeto</Link></li>
                                     <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
                                     <li><Link to="/cadastro-item">Cadastro de Item</Link></li>
+                                    <li><Link to="/apontamentohoras">Apontamento de Horas</Link></li>
                                 </ul>
                             </li>
 
@@ -50,7 +51,7 @@ export default function Navbar() {
                     <ul className="menu menu-horizontal px-1">
                         <li><Link to="/">Home</Link></li>
                         <li><Link to="/listaprojetos">Projetos</Link></li>
-                        <li><Link to="/apontamentohoras">Apontamento</Link></li>
+                        <li><Link to="/logprofissional/550e8400-e29b-41d4-a716-446655440010">Apontamento</Link></li>
 
                         <li>
                             <details>
@@ -59,6 +60,7 @@ export default function Navbar() {
                                     <li><Link to="/cadastroprojeto">Cadastro de Projeto</Link></li>
                                     <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
                                     <li><Link to="/cadastro-item">Cadastro de Item</Link></li>
+                                    <li><Link to="/apontamentohoras">Apontamento de Horas</Link></li>
                                 </ul>
                             </details>
                         </li>

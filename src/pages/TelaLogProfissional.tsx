@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../shared/components/Header";
 import Tabela from "../shared/components/Tabela";
 import { useParams } from "react-router-dom";
+import { listarApontamentosUsuarios } from "../services/apontamentoService";
 
 type Log = {
   projeto: string;
@@ -23,19 +24,10 @@ export default function TelaLogProfissional() {
 
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8080/apontamentos/usuario/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        });
 
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar dados: ${response.status}`);
-        }
-
-        const data: Log[] = await response.json();
+        const data: Log[] = await listarApontamentosUsuarios(id);
         setLogs(data);
+
       } catch (error) {
         console.error("Erro na requisição:", error);
       } finally {
