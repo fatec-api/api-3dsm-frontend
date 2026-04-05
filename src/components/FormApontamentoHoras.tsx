@@ -5,6 +5,7 @@ import Botao from "../shared/components/Botao";
 
 import { FiClock, FiCalendar } from "react-icons/fi";
 import { listarProjetos } from "../services/listService";
+import { useParams } from "react-router-dom";
 
 export default function FormularioApontamento() {
     const [projeto, setProjeto] = useState("");
@@ -30,8 +31,10 @@ export default function FormularioApontamento() {
 
     const [horasLiquidas, setHorasLiquidas] = useState<number | null>(null);
 
-    const [projetos, setProjetos] = useState<{ nomeProjeto: string }[]>([]);
-    const [itens, setItens] = useState<string[]>([]);
+    const [projetos, setProjetos] = useState<{ nomeProjeto: string, id: number, descricao: string }[]>([]);
+    const [projetoSelecionado, setProjetoSelecionado] = useState<any>(null);
+    const { projetoId } = useParams<{ projetoId: string }>();
+    const [itens, setItens] = useState<any[]>([]);;
 
     useEffect(() => {
         const loadData = async () => {
@@ -45,25 +48,53 @@ export default function FormularioApontamento() {
         loadData();
     }, []);
 
-    // mock de dados (remover após integração com backend)
-    //    const projetos = ["Projeto A", "Projeto B"];
-    const itensPorProjeto: any = {
-        "TURING_APP": [
-            { id: 1, nome: "Item 1 - Análise" },
-            { id: 2, nome: "Item 2 - Desenvolvimento" }
-        ],
-        "Projeto B": ["Item 3 - Teste"],
-    };
+    useEffect(() => {
+        async function itensPorProjeto() {
+            const idParaBusca = projetoSelecionado?.id;
+
+            if (!idParaBusca) {
+                setItens([]);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                // Ajuste a URL conforme o seu endpoint de busca por projeto
+                const res = await fetch(`http://localhost:8080/itens/projeto/${idParaBusca}`);
+
+                if (!res.ok) throw new Error("Erro ao buscar profissionais do projeto.");
+
+                const dados = await res.json();
+                setItens(dados);
+                // setUsuarioId(""); // Reseta o profissional selecionado ao mudar o projeto
+            } catch (error) {
+                console.error(error);
+                setErro("Erro ao carregar profissionais deste projeto.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        itensPorProjeto();
+    }, [projetoSelecionado]); // Executa sempre que projetoId mudar
+
+    // const itensPorProjeto: any = {
+    //     "TURING_APP": [
+    //         { id: 1, nome: "Item 1 - Análise" },
+    //         { id: 2, nome: "Item 2 - Desenvolvimento" }
+    //     ],
+    //     "Projeto B": ["Item 3 - Teste"],
+    // };
 
     // Temporário: usar mock até backend estar pronto
-    useEffect(() => {
-        if (projeto && itensPorProjeto[projeto]) {
-            setItens(itensPorProjeto[projeto]);
-        } else {
-            setItens([]);
-            setItem("");
-        }
-    }, [projeto]);
+    // useEffect(() => {
+    //     if (projeto && itensPorProjeto[projeto]) {
+    //         setItens(itensPorProjeto[projeto]);
+    //     } else {
+    //         setItens([]);
+    //         setItem("");
+    //     }
+    // }, [projeto]);
 
 
     function parseHora(h: string) {
@@ -171,6 +202,7 @@ export default function FormularioApontamento() {
 
         const payload = {
             projeto,
+            projetoId: projetoSelecionado?.id,
             itemId: itemSelecionado?.id,
             nivel: item.includes(" - ") ? item.split(" - ")[1].trim() : "",
             dataApontamento: data,
@@ -245,12 +277,17 @@ export default function FormularioApontamento() {
                 </h1>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
                     <div className="flex flex-col gap-8">
-
-
                         <Dropdown
                             label="Projeto"
                             value={projeto}
-                            onChange={(e: any) => setProjeto(e.target.value)}
+                            // onChange={(e: any) => setProjeto(e.target.value)}
+                            onChange={(e: any) => {
+                                const nome = e.target.value;
+                                setProjeto(nome);
+                                // Busca o objeto completo na lista que veio do backend
+                                const projObj = projetos.find(p => p.nomeProjeto === nome);
+                                setProjetoSelecionado(projObj);
+                            }}
                             //    options={projetos}
                             options={projetos.map(p => p.nomeProjeto)}
                             widthPx={300}
@@ -265,14 +302,16 @@ export default function FormularioApontamento() {
                             //     setItemSelecionado({ id: e.target.value, nome: e.target.value });
                             // }}
                             onChange={(e: any) => {
-                                const nomeSelecionado = e.target.value;
-                                setItem(nomeSelecionado);
+                                const valorSelecionado = e.target.value;
+                                setItem(valorSelecionado);
 
-                                // Busca o objeto completo para usar no submit
-                                const objetoItem = itens.find((i: any) => i.nome === nomeSelecionado);
-                                setItemSelecionado(objetoItem); // Você precisará criar esse state
+                                // BUSCA CORRETA: Se você exibiu 'descricao', procure por 'descricao'
+                                const objetoItem = itens.find((i: any) => i.descricao === valorSelecionado);
+
+                                console.log("Objeto encontrado:", objetoItem); // Verifique se o ID aparece aqui
+                                setItemSelecionado(objetoItem);
                             }}
-                            options={itens.map((i: any) => (typeof i === 'string' ? i : i.nome))}
+                            options={itens.map((i: any) => (typeof i === 'string' ? i : i.descricao))}
                             // options={itens}
                             widthPx={300}
                         />
