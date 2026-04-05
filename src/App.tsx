@@ -9,6 +9,7 @@ import CadastroProjeto from './pages/CadastroProjeto'
 import ListaProjetos from './pages/ListaProjetos'
 import DevAllocationTest from './pages/DevAllocationTest';
 import DescricaoProjeto from './pages/DescricaoProjeto'
+import TelaFuncionarios from './pages/TelaFuncionarios'
 
 
 const router = createBrowserRouter(
@@ -16,8 +17,10 @@ const router = createBrowserRouter(
    <>
      <Route path="/" element={<Header />}>
        <Route index element={<Home />}/>
-       <Route path='/input' element={<Input/>}/>
-       <Route path='/dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/>
+       {/* <Route path='input' element={<Input/>}/>
+       <Route path='dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/> */}
+       <Route path='telalogin' element={<TelaLogin/>}/>
+       <Route path='telafuncionarios' element={<TelaFuncionarios/>}/>
      </Route>
      <Route path='/telalogin' element={<TelaLogin/>}/>
      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
