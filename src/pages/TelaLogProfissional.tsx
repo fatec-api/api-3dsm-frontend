@@ -23,6 +23,8 @@ export default function TelaLogProfissional() {
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const itensPorPagina = 15;
 
   /*useEffect(() => {
     const fetchLogs = async () => {
@@ -51,7 +53,11 @@ export default function TelaLogProfissional() {
           };
         });
 
-        setLogs(logsCompletos);
+        const logsOrdenados = logsCompletos.sort(
+        (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
+      );
+
+        setLogs(logsOrdenados);
       } catch (error) {
         console.error("Erro na requisição:", error);
         setErro("Não foi possível carregar seus apontamentos no momento.");
@@ -98,9 +104,178 @@ export default function TelaLogProfissional() {
         status: "REPROVADO",
         justificativa: "Horas inconsistentes",
       },
+      {
+        id: 4,
+        projeto: "GSWProj1",
+        atividade: "Documentação técnica",
+        nivel: "Análise",
+        data: "2026-04-07",
+        inicio: "10:00",
+        fim: "12:00",
+        status: "PENDENTE",
+        justificativa: "-",
+      },
+      {
+        id: 5,
+        projeto: "GSWProj3",
+        atividade: "Implementação Frontend",
+        nivel: "Desenvolvimento",
+        data: "2026-04-06",
+        inicio: "08:00",
+        fim: "12:00",
+        status: "APROVADO",
+        justificativa: "-",
+      },
+      {
+        id: 6,
+        projeto: "GSWProj2",
+        atividade: "Testes unitários",
+        nivel: "Teste",
+        data: "2026-04-05",
+        inicio: "13:00",
+        fim: "16:00",
+        status: "REPROVADO",
+        justificativa: "Cobertura insuficiente",
+      },
+      {
+        id: 7,
+        projeto: "GSWProj1",
+        atividade: "Ajuste de layout",
+        nivel: "Desenvolvimento",
+        data: "2026-04-04",
+        inicio: "09:00",
+        fim: "11:00",
+        status: "PENDENTE",
+        justificativa: "-",
+      },
+      {
+        id: 8,
+        projeto: "GSWProj4",
+        atividade: "Reunião com cliente",
+        nivel: "Análise",
+        data: "2026-04-03",
+        inicio: "14:00",
+        fim: "16:00",
+        status: "APROVADO",
+        justificativa: "-",
+      },
+      {
+        id: 9,
+        projeto: "GSWProj2",
+        atividade: "Correção backend",
+        nivel: "Desenvolvimento",
+        data: "2026-04-02",
+        inicio: "10:00",
+        fim: "13:00",
+        status: "REPROVADO",
+        justificativa: "Erro não reproduzido",
+      },
+      {
+        id: 10,
+        projeto: "GSWProj3",
+        atividade: "Deploy aplicação",
+        nivel: "Teste",
+        data: "2026-04-01",
+        inicio: "15:00",
+        fim: "18:00",
+        status: "PENDENTE",
+        justificativa: "-",
+      },
+      {
+        id: 11,
+        projeto: "GSWProj1",
+        atividade: "Refatoração código",
+        nivel: "Desenvolvimento",
+        data: "2026-03-31",
+        inicio: "08:00",
+        fim: "12:00",
+        status: "APROVADO",
+        justificativa: "-",
+      },
+      {
+        id: 12,
+        projeto: "GSWProj4",
+        atividade: "Análise de requisitos",
+        nivel: "Análise",
+        data: "2026-03-30",
+        inicio: "09:00",
+        fim: "11:00",
+        status: "PENDENTE",
+        justificativa: "-",
+      },
+      {
+        id: 13,
+        projeto: "GSWProj2",
+        atividade: "Criação de testes",
+        nivel: "Teste",
+        data: "2026-03-29",
+        inicio: "13:00",
+        fim: "17:00",
+        status: "REPROVADO",
+        justificativa: "Faltou cenário",
+      },
+      {
+        id: 14,
+        projeto: "GSWProj3",
+        atividade: "Integração API",
+        nivel: "Desenvolvimento",
+        data: "2026-03-28",
+        inicio: "10:00",
+        fim: "12:00",
+        status: "APROVADO",
+        justificativa: "-",
+      },
+      {
+        id: 15,
+        projeto: "GSWProj1",
+        atividade: "Correção UI",
+        nivel: "Desenvolvimento",
+        data: "2026-03-27",
+        inicio: "14:00",
+        fim: "17:00",
+        status: "PENDENTE",
+        justificativa: "-",
+      },
+      {
+        id: 16,
+        projeto: "GSWProj4",
+        atividade: "Planejamento sprint",
+        nivel: "Análise",
+        data: "2026-03-26",
+        inicio: "09:00",
+        fim: "11:00",
+        status: "APROVADO",
+        justificativa: "-",
+      },
+      {
+        id: 17,
+        projeto: "GSWProj2",
+        atividade: "Debug sistema",
+        nivel: "Desenvolvimento",
+        data: "2026-03-25",
+        inicio: "11:00",
+        fim: "15:00",
+        status: "REPROVADO",
+        justificativa: "Erro persistente",
+      },
+      {
+        id: 18,
+        projeto: "GSWProj3",
+        atividade: "Validação final",
+        nivel: "Teste",
+        data: "2026-03-24",
+        inicio: "13:00",
+        fim: "16:00",
+        status: "PENDENTE",
+        justificativa: "-",
+      },
     ];
 
-    setLogs(mockLogs);
+    const logsOrdenados = mockLogs.sort((a, b) => {
+      return new Date(b.data).getTime() - new Date(a.data).getTime();
+    });
+
+    setLogs(logsOrdenados);
     setLoading(false);
   }, []);
 
@@ -108,6 +283,14 @@ export default function TelaLogProfissional() {
     console.log("Editar apontamento:", id);
     // integrar com o modal de edição
   };
+
+  // lógica da paginação da tela
+  const inicio = (paginaAtual - 1) * itensPorPagina;
+  const fim = inicio + itensPorPagina;
+
+  const logsPaginamento = logs.slice(inicio, fim);
+
+  const totalPaginas = Math.ceil(logs.length / itensPorPagina);
 
   return (
     <div className="min-h-screen bg-base-100">
@@ -140,7 +323,7 @@ export default function TelaLogProfissional() {
                 </thead>
 
                 <tbody>
-                  {logs.map((row) => {
+                  {logsPaginamento.map((row) => {
                     const isEditavel = row.status === "PENDENTE";
 
                     const badgeColor =
@@ -178,8 +361,8 @@ export default function TelaLogProfissional() {
                           >
                             <button
                               className={`btn btn-sm btn-circle ${isEditavel
-                                  ? "btn-ghost hover:bg-base-300"
-                                  : "btn-disabled"
+                                ? "btn-ghost hover:bg-base-300"
+                                : "btn-disabled"
                                 }`}
                               onClick={() => handleEditar(row.id)}
                               disabled={!isEditavel}
@@ -216,9 +399,23 @@ export default function TelaLogProfissional() {
 
           <div className="flex justify-center mt-8">
             <div className="join shadow-sm">
-              <button className="join-item btn btn-sm">«</button>
-              <button className="join-item btn btn-sm btn-active">Página 1</button>
-              <button className="join-item btn btn-sm">»</button>
+              <button
+                className="join-item btn btn-sm"
+                onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))}
+              >
+                «
+              </button>
+
+              <button className="join-item btn btn-sm btn-active">
+                Página {paginaAtual}
+              </button>
+
+              <button
+                className="join-item btn btn-sm"
+                onClick={() => setPaginaAtual(p => Math.min(p + 1, totalPaginas))}
+              >
+                »
+              </button>
             </div>
           </div>
         </div>
