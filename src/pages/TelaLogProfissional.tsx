@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import Header from "../shared/components/Header";
-import Navbar from "../shared/components/Navbar";
 import Tabela from "../shared/components/Tabela";
 import { useParams } from "react-router-dom";
-import { listarApontamentosUsuarios } from "../services/apontamentoService";
-import { listarItensPorProfissional } from "../services/ItemService";
+// import { listarApontamentosUsuarios} from "../services/apontamentoService";
+// import { listarItensPorProfissional } from "../services/ItemService";
 import { FaPencilAlt } from "react-icons/fa";
 
 type Log = {
@@ -22,14 +21,17 @@ type Log = {
 export default function TelaLogProfissional() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
+  const [sucesso, setSucesso] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
 
- /* useEffect(() => {
+  /*useEffect(() => {
     const fetchLogs = async () => {
       if (!id) return;
 
       try {
         setLoading(true);
+        setErro(null);
 
         const apontamentos = await listarApontamentosUsuarios(id);
         const itens = await listarItensPorProfissional(id);
@@ -39,20 +41,21 @@ export default function TelaLogProfissional() {
 
           return {
             id: a.id,
-            projeto: item?.projetoNome || "Sem projeto",
-            atividade: a.itemDescricao,
-            nivel: item?.nivelAtividade || "UNDEFINED",
-            data: a.dataApontamento,
-            inicio: a.horaInicio,
-            fim: a.horaFim,
-            status: a.status_apontamento,
-            justificativa: a.justificativa_rejeicao || "-",
+            projeto: item?.projetoNome || item?.projeto?.nomeProjeto || "Sem projeto",
+            atividade: a.itemDescricao || a.atividade || "Sem atividade",
+            nivel: item?.nivelAtividade || String(a.nivel || "UNDEFINED"),
+            data: a.dataApontamento || a.data || "",
+            inicio: a.horaInicio || a.inicio || "",
+            fim: a.horaFim || a.fim || "",
+            status: a.status_apontamento || a.status || "PENDENTE",
+            justificativa: a.justificativa_rejeicao || a.justificativa || "-",
           };
         });
 
         setLogs(logsCompletos);
       } catch (error) {
         console.error("Erro na requisição:", error);
+        setErro("Não foi possível carregar seus apontamentos no momento.");
       } finally {
         setLoading(false);
       }
@@ -61,9 +64,9 @@ export default function TelaLogProfissional() {
     fetchLogs();
   }, [id]); */
 
-  useEffect(() => {
-  const mockLogs: Log[] = [
-    {
+  useEffect(() => { 
+    const mockLogs: Log[] = [
+      {
       id: 1,
       projeto: "GSWProj1",
       atividade: "Implementação API",
@@ -95,29 +98,27 @@ export default function TelaLogProfissional() {
       fim: "11:00",
       status: "REPROVADO",
       justificativa: "Horas inconsistentes",
-    },
-  ];
+     },
+    ];
 
-  setLogs(mockLogs);
-  setLoading(false);
-}, []);
+    setLogs(mockLogs);
+    setLoading(false);
+  }, []);
 
   const handleEditar = (id: number) => {
     console.log("Editar apontamento:", id);
-    // redirecionamento para o modal de edição
+    // integrar com omodal de edição
   };
 
   const columns = [
     { header: "Projeto", accessor: "projeto" },
     { header: "Atividade", accessor: "atividade" },
-    { header: "Nível da atividade", accessor: "nivel" },
-    { header: "Data do Apontamento", accessor: "data" },
-    { header: "Hora início", accessor: "inicio" },
-    { header: "Hora fim", accessor: "fim" },
-
+    { header: "Nível", accessor: "nivel" },
+    { header: "Data", accessor: "data" },
+    { header: "Início", accessor: "inicio" },
+    { header: "Fim", accessor: "fim" },
     {
       header: "Status",
-      accessor: "status",
       render: (row: Log) => {
         const color =
           row.status === "PENDENTE"
@@ -129,34 +130,24 @@ export default function TelaLogProfissional() {
         return <span className={`badge ${color}`}>{row.status}</span>;
       },
     },
-
-    {
-      header: "Justificativa",
-      accessor: "justificativa",
-    },
-
+    { header: "Justificativa", accessor: "justificativa" },
     {
       header: "Editar",
       render: (row: Log) => {
         const isEditavel = row.status === "PENDENTE";
 
         return (
-          <div
-            className="tooltip"
-            data-tip={
-              isEditavel
-                ? "Editar apontamento"
-                : "Este apontamento já foi revisado e não pode mais ser editado"
-            }
-          >
+          <div className="tooltip" data-tip={ 
+            isEditavel
+              ? "Editar apontamento"
+              : "Este apontamento já foi revisado e não pode mais ser editado"
+          }>
             <button
-              className={`btn btn-sm btn-ghost ${
-                !isEditavel && "btn-disabled"
-              }`}
-              onClick={() => handleEditar(row.id)}
+              className={`btn btn-sm btn-circle ${isEditavel ? "btn-ghost hover:bg-base-300" : "btn-disabled"}`}
+              onClick={() => handleEditar(row.id)} //abre o modal de edição
               disabled={!isEditavel}
             >
-              <FaPencilAlt />
+              <FaPencilAlt size={14} />
             </button>
           </div>
         );
@@ -167,28 +158,39 @@ export default function TelaLogProfissional() {
   return (
     <div className="min-h-screen bg-base-100">
       <Header />
-
-      <div className="flex justify-center mt-32 px-6">
-        <div className="w-full max-w-6xl">
-
-          <h1 className="text-center text-2xl font-medium mb-10">
+      <div className="flex justify-center mt-24 px-6 pb-12">
+        <div className="w-full max-w-7xl bg-base-200 rounded-2xl p-8 shadow-md">
+          <h1 className="text-center text-2xl font-semibold mb-8">
             Meus Últimos Apontamentos
           </h1>
 
-          <Tabela
-            data={logs}
-            columns={columns}
-            emptyMessage="Nenhum apontamento realizado"
-          />
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : (
+            <Tabela data={logs} columns={columns} emptyMessage="Nenhum apontamento encontrado" />
+          )}
 
-          <div className="flex justify-center mt-6">
-            <div className="join">
-              <button className="join-item btn">«</button>
-              <button className="join-item btn">Página 1</button>
-              <button className="join-item btn">»</button>
+          {erro && (
+            <div className="alert alert-error mt-6">
+              <span>{erro}</span>
+            </div>
+          )}
+
+          {sucesso && (
+            <div className="alert alert-success mt-6">
+              <span>{sucesso}</span>
+            </div>
+          )}
+
+          <div className="flex justify-center mt-8">
+            <div className="join shadow-sm">
+              <button className="join-item btn btn-sm">«</button>
+              <button className="join-item btn btn-sm btn-active">Página 1</button>
+              <button className="join-item btn btn-sm">»</button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
