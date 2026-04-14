@@ -64,7 +64,7 @@ export function listarClientes() {
             nomeCliente: "Daniel"
         },
         {
-            nomeCliente: "Claudio"
+            nomeCliente: "Emmanuel"
         }
     ]);
 
