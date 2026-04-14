@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Header from "../shared/components/Header";
-import Tabela from "../shared/components/Tabela";
 import { useParams } from "react-router-dom";
 // import { listarApontamentosUsuarios} from "../services/apontamentoService";
 // import { listarItensPorProfissional } from "../services/ItemService";
@@ -110,51 +109,6 @@ export default function TelaLogProfissional() {
     // integrar com omodal de edição
   };
 
-  const columns = [
-    { header: "Projeto", accessor: "projeto" },
-    { header: "Atividade", accessor: "atividade" },
-    { header: "Nível", accessor: "nivel" },
-    { header: "Data", accessor: "data" },
-    { header: "Início", accessor: "inicio" },
-    { header: "Fim", accessor: "fim" },
-    {
-      header: "Status",
-      render: (row: Log) => {
-        const color =
-          row.status === "PENDENTE"
-            ? "badge-warning"
-            : row.status === "APROVADO"
-            ? "badge-success"
-            : "badge-error";
-
-        return <span className={`badge ${color}`}>{row.status}</span>;
-      },
-    },
-    { header: "Justificativa", accessor: "justificativa" },
-    {
-      header: "Editar",
-      render: (row: Log) => {
-        const isEditavel = row.status === "PENDENTE";
-
-        return (
-          <div className="tooltip" data-tip={ 
-            isEditavel
-              ? "Editar apontamento"
-              : "Este apontamento já foi revisado e não pode mais ser editado"
-          }>
-            <button
-              className={`btn btn-sm btn-circle ${isEditavel ? "btn-ghost hover:bg-base-300" : "btn-disabled"}`}
-              onClick={() => handleEditar(row.id)} //abre o modal de edição
-              disabled={!isEditavel}
-            >
-              <FaPencilAlt size={14} />
-            </button>
-          </div>
-        );
-      },
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-base-100">
       <Header />
@@ -163,14 +117,6 @@ export default function TelaLogProfissional() {
           <h1 className="text-center text-2xl font-semibold mb-8">
             Meus Últimos Apontamentos
           </h1>
-
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <span className="loading loading-spinner loading-lg"></span>
-            </div>
-          ) : (
-            <Tabela data={logs} columns={columns} emptyMessage="Nenhum apontamento encontrado" />
-          )}
 
           {erro && (
             <div className="alert alert-error mt-6">
