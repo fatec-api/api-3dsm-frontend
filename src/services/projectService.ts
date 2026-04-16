@@ -24,8 +24,16 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
 };
 // LISTAR PROJETOS
 export async function listarProjetos() {
-    const response = await api.get("/listar/projetos")
-    return response.data
+    // const response = await api.get("/listar/projetos")
+    // return response.data
+    return Promise.resolve([
+        {
+            projeto: "Projeto A",
+        },
+        {
+            projeto: "Projeto B",
+        }
+    ]);
 }
 // LISTAR PROJETO POR ID
 export async function listarProjetoId(id: number) {

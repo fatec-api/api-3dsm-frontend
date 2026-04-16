@@ -10,28 +10,38 @@ export async function listarApontamentosUsuarios(id: string) {
     return response.data
 }
 
-export async function listarApontamentosPorProjeto() {
-    // const response = await api.get(`apontamentos/pendente/projeto/${id}`);
+export function listarApontamentosPorProjeto() {
+    // const response = await api.get(`apontamentos/projeto/${id}`);
     // return response.data
     return Promise.resolve([
         {
             usuario: "João Silva",
             projeto: "Projeto A",
             item: "Desenvolvimento de funcionalidade X",
-            nivel: "Alocação",
+            nivel: "Desenvolvimento",
             data: "2024-06-15",
             inicio: "09:00",
             fim: "17:00",
-            status: "Pendente"
+            status: "Aprovado"
         },
         {
             usuario: "Maria Souza",
             projeto: "Projeto B",
             item: "Correção de bug Y",
-            nivel: "Hora Fechada",
+            nivel: "Desenvolvimento",
             data: "2024-06-14",
             inicio: "10:00",
             fim: "16:00",
+            status: "Pendente"
+        },
+        {
+            usuario: "Calor Oliveira",
+            projeto: "Projeto B",
+            item: "Correção de bug Z",
+            nivel: "Desenvolvimento",
+            data: "2024-06-16",
+            inicio: "13:00",
+            fim: "19:00",
             status: "Pendente"
         }
     ]);

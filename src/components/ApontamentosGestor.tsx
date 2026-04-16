@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { listarApontamentosPorProjeto } from "../services/apontamentoService";
 import Tabela from "../shared/components/Tabela";
 import { listarProjetos } from "../services/listService";
@@ -15,63 +14,64 @@ type Apontamento = {
     status: string;
 };
 
-export default function ApontamentosGestor() {
+type ApontamentosGestorProps = {
+    projetoFiltro?: string;
+};
+
+export default function ApontamentosGestor({ projetoFiltro = "all" }: ApontamentosGestorProps) {
     const [apontamentos, setApontamentos] = useState<Apontamento[]>([]);
-    const { id } = useParams<{ id: string }>()
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchLogs = async () => {
-            if (!id) return;
-
             try {
                 const apontamentos = await listarApontamentosPorProjeto();
-                const listaProjetos = await listarProjetos();
-                
-                setApontamentos(apontamentos);
+                let projetos: any[] = [];
 
+                try {
+                    projetos = await listarProjetos();
+                } catch (error) {
+                    console.error("Erro ao buscar projetos:", error);
+                }
+
+                const apontamentosComProjeto = apontamentos.map((a: any) => {
+                    const projeto = projetos.find(
+                        (p: any) => p.projeto === a.projeto || p.nome === a.projeto || p.nomeProjeto === a.projeto
+                    );
+
+                    return {
+                        usuario: a.usuario,
+                        projeto: a.projeto || projeto?.nome || projeto?.nomeProjeto || "Sem projeto",
+                        item: a.item || a.itemDescricao || "",
+                        nivel: a.nivel || a.nivelAtividade || "UNDEFINED",
+                        data: a.data || a.dataApontamento || "",
+                        inicio: a.inicio || a.horaInicio || "",
+                        fim: a.fim || a.horaFim || "",
+                        status: a.status
+                    };
+                });
+
+                setApontamentos(apontamentosComProjeto);
             } catch (error) {
-                console.error("Erro na requisição:", error);
+                console.error("Erro ao buscar apontamentos:", error);
             }
         };
 
         fetchLogs();
-    }, [id])
+    }, []);
 
-    const columns = [
-        { header: "Usuário", accessor: "usuario" },
-        { header: "Projeto", accessor: "projeto" },
-        { header: "Item", accessor: "item" },
-        { header: "Nível da atividade", accessor: "nivel" },
-        { header: "Data do Apontamento", accessor: "data" },
-        { header: "Hora início", accessor: "inicio" },
-        { header: "Hora fim", accessor: "fim" },
-        { header: "Status", accessor: "status" },
-    ];
+    const filteredApontamentos = useMemo(() => {
+        if (!projetoFiltro || projetoFiltro === "all") {
+            return apontamentos;
+        }
+
+        return apontamentos.filter((apontamento) => apontamento.projeto === projetoFiltro);
+    }, [apontamentos, projetoFiltro]);
+
 
     return (
         <div>
             <div className="overflow-x-auto">
-                {apontamentos.length === 0 ? (
-                    <div role="alert" className="alert alert-info alert-soft h-15">
-                        <p className="text-lg">Nenhum apontamento encontrado.</p>
-                    </div>
-                ) : (
-                    apontamentos.map((apontamento, index) => (
-                        <div
-                            key={index}
-                            className="cursor-pointer"
-                            onClick={() => navigate("/descricao-apontamento", { state: { apontamento } })}
-                        >
-                            <Tabela
-                                data={apontamentos}
-                                columns={columns}
-                                emptyMessage="Nenhum apontamento pendente encontrado."
-                            />
-                        </div>
-                    ))
-                )}
-                {/* <table className="table table-lg p-15">
+                <table className="table table-zebra row- table-lg p-15">
                     <thead>
                         <tr className="text-lg">
                             <th></th>
@@ -86,41 +86,27 @@ export default function ApontamentosGestor() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="text-sm">
-                            <th className="p-1 text-center"><input type="checkbox" className="checkbox" /></th>
-                            <td>Carlos</td>
-                            <td>GSW1234</td>
-                            <td>CRUD</td>
-                            <td>tester</td>
-                            <td>09/04/2026</td>
-                            <td>09:00</td>
-                            <td>11:00</td>
-                            <td>Pendente</td>
-                        </tr>
-                        <tr className="text-sm">
-                            <th className="p-1 text-center"><input type="checkbox" className="checkbox" /></th>
-                            <td>Carlos</td>
-                            <td>GSW1234</td>
-                            <td>CRUD</td>
-                            <td>tester</td>
-                            <td>09/04/2026</td>
-                            <td>09:00</td>
-                            <td>11:00</td>
-                            <td>Pendente</td>
-                        </tr>
-                        <tr className="text-sm">
-                            <th className="p-1 text-center"><input type="checkbox" className="checkbox" /></th>
-                            <td>Carlos</td>
-                            <td>GSW1234</td>
-                            <td>CRUD</td>
-                            <td>tester</td>
-                            <td>09/04/2026</td>
-                            <td>09:00</td>
-                            <td>11:00</td>
-                            <td>Pendente</td>
-                        </tr>
+                        {filteredApontamentos.length === 0 ? (
+                            <div role="alert" className="alert alert-info alert-soft h-15">
+                                <p className="text-lg">Nenhum apontamento encontrado.</p>
+                            </div>
+                        ) : (
+                            filteredApontamentos.map((apontamento, index) => (
+                                <tr key={index} className="text-sm">
+                                    <th className="p-1 text-center"><input type="checkbox" className="checkbox" /></th>
+                                    <td>{apontamento.usuario}</td>
+                                    <td>{apontamento.projeto}</td>
+                                    <td>{apontamento.item}</td>
+                                    <td>{apontamento.nivel}</td>
+                                    <td>{apontamento.data}</td>
+                                    <td>{apontamento.inicio}</td>
+                                    <td>{apontamento.fim}</td>
+                                    <td>{apontamento.status}</td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
-                </table> */}
+                </table>
             </div>
         </div>
     );
