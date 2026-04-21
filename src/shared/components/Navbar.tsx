@@ -64,6 +64,7 @@ export default function Navbar() {
                                 </ul>
                             </details>
                         </li>
+                        <li><Link to="/telahistorico">Historico</Link></li>
                     </ul>
                 </div>
                 <div className="navbar-end"></div>
