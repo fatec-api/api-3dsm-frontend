@@ -82,6 +82,29 @@ export default function ListaProjetos() {
         loadData();
     }, []);
 
+    // regra de cor baseada no percentual
+    const getCor = (projeto: Projeto) => {
+        if (!projeto.horasPrevistasTotal) return "bg-gray-300";
+
+        const percentual =
+            (projeto.horasRealizadasTotal / projeto.horasPrevistasTotal) * 100;
+
+        if (percentual <= 80) return "bg-green-500";
+        if (percentual <= 100) return "bg-yellow-400";
+        return "bg-red-500";
+    };
+
+    if (loading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <p className="text-lg">Carregando projetos...</p>
+            </div>
+        );
+    }
+
+    if (erro) {
+        console.warn("Exibindo dados mockados");
+    }
 
     return (
         <div className="flex h-screen bg-[#FFFFFF]">
