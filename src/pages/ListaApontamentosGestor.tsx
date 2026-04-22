@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import ApontamentosGestor from "../components/ApontamentosGestor";
 import DropdownProjetos from "../components/DropdownProjetos";
 import Header from "../shared/components/Header";
-import { listarProjetos as listarProjetosApi } from "../services/listService";
-import { listarProjetos as listarProjetosMock } from "../services/projectService";
+import { listarProjetosPorGestor } from "../services/projectService";
+import { aprovarApontamentos, reprovarApontamento } from "../services/apontamentoService";
 
 type ProjetoOption = {
     label: string;
@@ -15,27 +15,18 @@ const TODOS_PROJETOS_VALUE = "all";
 export default function ListaApontamentosGestor() {
     const [selectedProjeto, setSelectedProjeto] = useState<string>(TODOS_PROJETOS_VALUE);
     const [projetoOptions, setProjetoOptions] = useState<ProjetoOption[]>([]);
+    const [selectedApontamentos, setSelectedApontamentos] = useState<string[]>([]);
+
+    const gestorIdLogado = "gestor1"; // Valor mockado - substituir pela autenticação real
 
     useEffect(() => {
         const loadProjetos = async () => {
             try {
-                let lista: any = await listarProjetosApi();
+                const lista = await listarProjetosPorGestor(gestorIdLogado);
 
-                if (!Array.isArray(lista)) {
-                    lista = Array.isArray(lista?.data) ? lista.data : [];
-                }
-
-                if (!Array.isArray(lista) || lista.length === 0) {
-                    lista = await listarProjetosMock();
-                }
-
-                const options = (Array.isArray(lista) ? lista : []).map((projeto: any) => {
-                    const label = typeof projeto === "string"
-                        ? projeto
-                        : projeto.nomeProjeto ?? projeto.nome ?? projeto.projeto ?? "Projeto";
-                    const value = typeof projeto === "string"
-                        ? projeto
-                        : projeto.id ?? projeto.nomeProjeto ?? projeto.nome ?? projeto.projeto ?? label;
+                const options = lista.map((projeto: any) => {
+                    const label = projeto.nomeProjeto ?? projeto.nome ?? "Projeto";
+                    const value = projeto.id ?? projeto.nomeProjeto ?? projeto.nome ?? label;
                     return { label, value };
                 });
 
@@ -47,7 +38,46 @@ export default function ListaApontamentosGestor() {
         };
 
         loadProjetos();
-    }, []);
+    }, [gestorIdLogado]);
+
+    const handleAprovar = async () => {
+        if (selectedApontamentos.length === 0) {
+            alert("Selecione pelo menos um apontamento para aprovar.");
+            return;
+        }
+
+        try {
+            await aprovarApontamentos(selectedApontamentos);
+            alert("Apontamentos aprovados com sucesso!");
+            setSelectedApontamentos([]);
+        } catch (error) {
+            console.error("Erro ao aprovar apontamentos:", error);
+            alert("Erro ao aprovar apontamentos.");
+        }
+    };
+
+    const handleReprovar = async () => {
+        if (selectedApontamentos.length === 0) {
+            alert("Selecione um apontamento para reprovar.");
+            return;
+        }
+
+        if (selectedApontamentos.length > 1) {
+            alert("A reprovação deve ser feita um apontamento por vez.");
+            return;
+        }
+
+        try {
+            await reprovarApontamento(selectedApontamentos[0]);
+            alert("Apontamento reprovado com sucesso!");
+            setSelectedApontamentos([]);
+        } catch (error) {
+            console.error("Erro ao reprovar apontamento:", error);
+            alert("Erro ao reprovar apontamento.");
+        }
+    };
+
+    const isReprovarDisabled = selectedApontamentos.length > 1;
 
     return (
         <>
@@ -62,11 +92,26 @@ export default function ListaApontamentosGestor() {
                         heightPx={38}
                         required={false}
                     />
-                    <button type="submit" className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-15">Aprovar</button>
-                    <button type="submit" className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-15">Reprovar</button>
+                    <button 
+                        onClick={handleAprovar}
+                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-15 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={selectedApontamentos.length === 0}
+                    >
+                        Aprovar
+                    </button>
+                    <button 
+                        onClick={handleReprovar}
+                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-15 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={selectedApontamentos.length === 0 || isReprovarDisabled}
+                    >
+                        Reprovar
+                    </button>
                 </div>
             </div>
-            <ApontamentosGestor projetoFiltro={selectedProjeto} />
+            <ApontamentosGestor 
+                projetoFiltro={selectedProjeto} 
+                onSelectionChange={setSelectedApontamentos}
+            />
         </>
     )
 }

@@ -4,7 +4,7 @@ import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
 
 import { FiClock, FiCalendar } from "react-icons/fi";
-import { listarProjetos } from "../services/listService";
+import { listarProjetos } from "../services/projectService";
 import { useParams } from "react-router-dom";
 
 export default function FormularioApontamento() {

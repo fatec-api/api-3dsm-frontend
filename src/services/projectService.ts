@@ -22,19 +22,45 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
         throw error;
     }
 };
+
 // LISTAR PROJETOS
 export async function listarProjetos() {
-    // const response = await api.get("/listar/projetos")
+    const response = await api.get(`/projetos`)
+    return response.data
+}
+
+export async function listarProjetosPorGestor(gestorId?: string) {
+    // const response = await api.get(`/projetos/gestor/${gestorId}`)
     // return response.data
-    return Promise.resolve([
+    const todosProjetos = [
         {
-            projeto: "Projeto A",
+            id: "1",
+            nomeProjeto: "Projeto A",
+            gestorId: "gestor1" 
         },
         {
-            projeto: "Projeto B",
+            id: "2",
+            nomeProjeto: "Projeto B",
+            gestorId: "gestor1"
+        },
+        {
+            id: "3",
+            nomeProjeto: "Projeto C",
+            gestorId: "gestor2"
+        },
+        {
+            id: "4",
+            nomeProjeto: "Projeto D",
+            gestorId: "gestor1"
         }
-    ]);
+    ];
+
+    if (gestorId) {
+        return Promise.resolve(todosProjetos.filter(projeto => projeto.gestorId === gestorId));
+    }
+    return Promise.resolve(todosProjetos);
 }
+
 // LISTAR PROJETO POR ID
 export async function listarProjetoId(id: number) {
     const response = await api.get(`/listar/projetos/${id}`)

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { listarApontamentosPorProjeto } from "../services/apontamentoService";
-import Tabela from "../shared/components/Tabela";
-import { listarProjetos } from "../services/listService";
+import { listarProjetos } from "../services/projectService";
 
 type Apontamento = {
+    id?: string;
     usuario: string;
     projeto: string;
     item: string;
@@ -16,10 +16,13 @@ type Apontamento = {
 
 type ApontamentosGestorProps = {
     projetoFiltro?: string;
+    onSelectionChange?: (selectedIds: string[]) => void;
 };
 
-export default function ApontamentosGestor({ projetoFiltro = "all" }: ApontamentosGestorProps) {
+export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionChange }: ApontamentosGestorProps) {
     const [apontamentos, setApontamentos] = useState<Apontamento[]>([]);
+    const [projetos, setProjetos] = useState<any[]>([]);
+    const [selectedApontamentos, setSelectedApontamentos] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         const fetchLogs = async () => {
@@ -29,16 +32,19 @@ export default function ApontamentosGestor({ projetoFiltro = "all" }: Apontament
 
                 try {
                     projetos = await listarProjetos();
+                    setProjetos(projetos);
                 } catch (error) {
                     console.error("Erro ao buscar projetos:", error);
+                    setProjetos([]);
                 }
 
-                const apontamentosComProjeto = apontamentos.map((a: any) => {
+                const apontamentosComProjeto = apontamentos.map((a: any, index: number) => {
                     const projeto = projetos.find(
                         (p: any) => p.projeto === a.projeto || p.nome === a.projeto || p.nomeProjeto === a.projeto
                     );
 
                     return {
+                        id: `apontamento-${index}`,
                         usuario: a.usuario,
                         projeto: a.projeto || projeto?.nome || projeto?.nomeProjeto || "Sem projeto",
                         item: a.item || a.itemDescricao || "",
@@ -59,13 +65,40 @@ export default function ApontamentosGestor({ projetoFiltro = "all" }: Apontament
         fetchLogs();
     }, []);
 
+    useEffect(() => {
+        if (onSelectionChange) {
+            onSelectionChange(Array.from(selectedApontamentos));
+        }
+    }, [selectedApontamentos, onSelectionChange]);
+
+    const handleCheckboxChange = (apontamentoId: string, checked: boolean) => {
+        setSelectedApontamentos(prev => {
+            const newSet = new Set(prev);
+            if (checked) {
+                newSet.add(apontamentoId);
+            } else {
+                newSet.delete(apontamentoId);
+            }
+            return newSet;
+        });
+    };
+
     const filteredApontamentos = useMemo(() => {
         if (!projetoFiltro || projetoFiltro === "all") {
             return apontamentos;
         }
 
+        const projetoSelecionado = projetos.find((p: any) => {
+            return p.id === projetoFiltro || p.nomeProjeto === projetoFiltro || p.nome === projetoFiltro || p.projeto === projetoFiltro;
+        });
+
+        if (projetoSelecionado) {
+            const nomeProjeto = projetoSelecionado.nomeProjeto ?? projetoSelecionado.nome ?? projetoSelecionado.projeto;
+            return apontamentos.filter((apontamento) => apontamento.projeto === nomeProjeto);
+        }
+
         return apontamentos.filter((apontamento) => apontamento.projeto === projetoFiltro);
-    }, [apontamentos, projetoFiltro]);
+    }, [apontamentos, projetoFiltro, projetos]);
 
 
     return (
@@ -93,7 +126,14 @@ export default function ApontamentosGestor({ projetoFiltro = "all" }: Apontament
                         ) : (
                             filteredApontamentos.map((apontamento, index) => (
                                 <tr key={index} className="text-sm">
-                                    <th className="p-1 text-center"><input type="checkbox" className="checkbox" /></th>
+                                    <th className="p-1 text-center">
+                                        <input 
+                                            type="checkbox" 
+                                            className="checkbox" 
+                                            checked={selectedApontamentos.has(apontamento.id || "")}
+                                            onChange={(e) => handleCheckboxChange(apontamento.id || "", e.target.checked)}
+                                        />
+                                    </th>
                                     <td>{apontamento.usuario}</td>
                                     <td>{apontamento.projeto}</td>
                                     <td>{apontamento.item}</td>

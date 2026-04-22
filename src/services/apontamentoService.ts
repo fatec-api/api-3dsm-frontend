@@ -52,6 +52,12 @@ export async function aprovarApontamento(id: string) {
     return response.data
 }
 
+export async function aprovarApontamentos(ids: string[]) {
+    // const response = await api.put(`apontamentos/aprovar`, { ids });
+    // return response.data
+    return Promise.resolve({ message: "Apontamentos aprovados com sucesso", ids });
+}
+
 export async function reprovarApontamento(id: string) {
     const response = await api.put(`apontamentos/reprovar/${id}`);
     return response.data
