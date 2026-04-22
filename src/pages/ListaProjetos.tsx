@@ -4,12 +4,26 @@ import Header from "../shared/components/Header";
 import { listarProjetos } from "../services/projectService";
 import Card from "../shared/components/Card";
 
+interface Projeto {
+    id: number;
+    nomeProjeto: string;
+    tipoProjeto: string;
+    status: string;
+    horasPrevistasTotal: number;
+    horasRealizadasTotal: number;
+    horasPendentesTotal?: number;
+}
+
 export default function ListaProjetos() {
     // const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string }[]>([]);
-    const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string,id: number }[]>([]);
+    // const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string,id: number }[]>([]);
+    const [projetos, setProjetos] = useState<Projeto[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [erro, setErro] = useState(false);
+
     const navigate = useNavigate();
 
-    useEffect(() => {
+    /* useEffect(() => {
         const loadData = async () => {
             try {
                 const listaProjetos = await listarProjetos();
@@ -20,6 +34,54 @@ export default function ListaProjetos() {
         };
         loadData();
     }, []);
+  */
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const data = await listarProjetos();
+                setProjetos(data);
+            } catch (e) {
+                console.error("Erro ao carregar projetos", e);
+
+                setProjetos([
+                    {
+                        id: 1,
+                        nomeProjeto: "Projeto 1",
+                        tipoProjeto: "Desenvolvimento",
+                        status: "Em andamento",
+                        horasPrevistasTotal: 100,
+                        horasRealizadasTotal: 60,
+                        horasPendentesTotal: 10,
+                    },
+                    {
+                        id: 2,
+                        nomeProjeto: "Projeto 2",
+                        tipoProjeto: "Análise",
+                        status: "Atrasado",
+                        horasPrevistasTotal: 80,
+                        horasRealizadasTotal: 95,
+                        horasPendentesTotal: 5,
+                    },
+                    {
+                        id: 3,
+                        nomeProjeto: "Projeto 3",
+                        tipoProjeto: "Teste",
+                        status: "Concluído",
+                        horasPrevistasTotal: 100,
+                        horasRealizadasTotal: 90,
+                        horasPendentesTotal: 0,
+                    },
+                ]);
+                setErro(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
+
 
     return (
         <div className="flex h-screen bg-[#FFFFFF]">
