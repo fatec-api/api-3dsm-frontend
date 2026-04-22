@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarProjetos } from "../services/projectService";
-import Card from "../shared/components/Card";
+import { FaChevronRight } from "react-icons/fa";
 
 interface Projeto {
     id: number;
@@ -52,7 +52,7 @@ export default function ListaProjetos() {
                         status: "Em andamento",
                         horasPrevistasTotal: 100,
                         horasRealizadasTotal: 60,
-                        horasPendentesTotal: 10,
+                        horasPendentesTotal: 10, 
                     },
                     {
                         id: 2,
@@ -107,27 +107,54 @@ export default function ListaProjetos() {
     }
 
     return (
-        <div className="flex h-screen bg-[#FFFFFF]">
+        <div className="flex h-screen bg-white">
             <Header />
+
             <div className="flex mt-40 gap-6 w-full justify-center flex-wrap">
                 {projetos.length === 0 ? (
                     <div role="alert" className="alert alert-info alert-soft h-15">
                         <p className="text-lg">Nenhum projeto encontrado.</p>
                     </div>
                 ) : (
-                    projetos.map((projeto, index) => (
-                        <div
-                            key={index}
-                            className="cursor-pointer"
-                            onClick={() => navigate("/descricao-projeto", { state: { projeto } })}
-                        >
-                            <Card
-                                title={projeto.nomeProjeto}
-                                type={projeto.tipoProjeto}
-                                status={projeto.status}
-                            />
-                        </div>
-                    ))
+                    projetos.map((projeto) => {
+                        const cor = getCor(projeto);
+
+                        return (
+                            <div
+                                key={projeto.id}
+                                className="cursor-pointer"
+                                onClick={() =>
+                                    navigate("/descricao-projeto", {
+                                        state: { projeto },
+                                    })
+                                }
+                            >
+                                <div className="w-80 h-44 bg-white rounded-2xl shadow-md border border-gray-200 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
+                                    <div className={`w-3 ${cor}`} />
+                                    <div className="p-4 flex flex-col justify-between w-full">
+                                        <div className="flex justify-between items-center">
+                                            <h2 className="text-lg font-semibold">
+                                                {projeto.nomeProjeto}
+                                            </h2>
+                                             <FaChevronRight className="text-gray-400 group-hover:text-gray-600 transition" />
+                                        </div>
+
+                                        <div className="text-sm space-y-1">
+                                            <p>
+                                                <b>Tipo:</b> {projeto.tipoProjeto}
+                                            </p>
+                                            <p>
+                                                <b>Cliente:</b> Cliente
+                                            </p>
+                                            <p>
+                                                <b>Status:</b> {projeto.status}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })
                 )}
             </div>
         </div>
