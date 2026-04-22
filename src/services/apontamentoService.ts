@@ -58,7 +58,9 @@ export async function aprovarApontamentos(ids: string[]) {
     return Promise.resolve({ message: "Apontamentos aprovados com sucesso", ids });
 }
 
-export async function reprovarApontamento(id: string) {
-    const response = await api.put(`apontamentos/reprovar/${id}`);
-    return response.data
+export async function reprovarApontamento(id: string, justificativa: string) {
+    // Adicionamos 'justificativa' como segundo parâmetro
+    // E passamos ela no corpo (body) da requisição PUT
+    const response = await api.put(`apontamentos/reprovar/${id}`, { justificativa });
+    return response.data;
 }

@@ -4,6 +4,7 @@ import DropdownProjetos from "../components/DropdownProjetos";
 import Header from "../shared/components/Header";
 import { listarProjetosPorGestor } from "../services/projectService";
 import { aprovarApontamentos, reprovarApontamento } from "../services/apontamentoService";
+import ModalReprovarApontamento from "../components/ModalReprovarApontamento";
 
 type ProjetoOption = {
     label: string;
@@ -15,76 +16,89 @@ const TODOS_PROJETOS_VALUE = "all";
 export default function ListaApontamentosGestor() {
     const [selectedProjeto, setSelectedProjeto] = useState<string>(TODOS_PROJETOS_VALUE);
     const [projetoOptions, setProjetoOptions] = useState<ProjetoOption[]>([]);
-    const [selectedApontamentos, setSelectedApontamentos] = useState<string[]>([]);
+    
+    const [selectedItems, setSelectedItems] = useState<any[]>([]);
 
-    const gestorIdLogado = "gestor1"; // Valor mockado - substituir pela autenticação real
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isReprovando, setIsReprovando] = useState(false);
+
+    const gestorIdLogado = "gestor1";
 
     useEffect(() => {
         const loadProjetos = async () => {
             try {
                 const lista = await listarProjetosPorGestor(gestorIdLogado);
-
-                const options = lista.map((projeto: any) => {
-                    const label = projeto.nomeProjeto ?? projeto.nome ?? "Projeto";
-                    const value = projeto.id ?? projeto.nomeProjeto ?? projeto.nome ?? label;
-                    return { label, value };
-                });
-
+                const options = lista.map((projeto: any) => ({
+                    label: projeto.nomeProjeto ?? projeto.nome ?? "Projeto",
+                    value: projeto.id ?? projeto.nomeProjeto ?? projeto.nome ?? "Projeto"
+                }));
                 setProjetoOptions([{ label: "Todos os projetos", value: TODOS_PROJETOS_VALUE }, ...options]);
             } catch (error) {
-                console.error("Erro ao carregar projetos:", error);
+                console.error("[ERROR] Falha ao carregar projetos:", error);
                 setProjetoOptions([{ label: "Todos os projetos", value: TODOS_PROJETOS_VALUE }]);
             }
         };
-
         loadProjetos();
     }, [gestorIdLogado]);
 
     const handleAprovar = async () => {
-        if (selectedApontamentos.length === 0) {
-            alert("Selecione pelo menos um apontamento para aprovar.");
-            return;
-        }
-
+        if (selectedItems.length === 0) return;
+        const ids = selectedItems.map(item => item.id);
         try {
-            await aprovarApontamentos(selectedApontamentos);
+            await aprovarApontamentos(ids);
             alert("Apontamentos aprovados com sucesso!");
-            setSelectedApontamentos([]);
+            setSelectedItems([]);
         } catch (error) {
-            console.error("Erro ao aprovar apontamentos:", error);
+            console.error("[ERROR] Falha na aprovação:", error);
             alert("Erro ao aprovar apontamentos.");
         }
     };
 
-    const handleReprovar = async () => {
-        if (selectedApontamentos.length === 0) {
+    const handleAbrirModalReprovar = () => {
+        if (selectedItems.length === 0) {
             alert("Selecione um apontamento para reprovar.");
             return;
         }
-
-        if (selectedApontamentos.length > 1) {
+        if (selectedItems.length > 1) {
             alert("A reprovação deve ser feita um apontamento por vez.");
             return;
         }
+        setIsModalOpen(true);
+    };
 
+    const handleConfirmarReprovacao = async (justificativa: string) => {
+        const itemParaReprovar = selectedItems[0];
+        if (!itemParaReprovar) return;
+
+        setIsReprovando(true);
         try {
-            await reprovarApontamento(selectedApontamentos[0]);
+            console.info(`[ACTION] Reprovando ID: ${itemParaReprovar.id} | Motivo: ${justificativa}`);
+            
+            await reprovarApontamento(itemParaReprovar.id, justificativa);
+            
             alert("Apontamento reprovado com sucesso!");
-            setSelectedApontamentos([]);
+            setIsModalOpen(false);
+            setSelectedItems([]);
         } catch (error) {
-            console.error("Erro ao reprovar apontamento:", error);
-            alert("Erro ao reprovar apontamento.");
+            console.error("[ERROR] Erro ao reprovar apontamento:", error);
+            alert("Erro ao enviar a reprovação.");
+        } finally {
+            setIsReprovando(false);
         }
     };
 
-    const isReprovarDisabled = selectedApontamentos.length > 1;
+    const currentItem = selectedItems[0];
 
     return (
         <>
             <Header />
-            <div className="flex justify-between flex-wrap items-center border rounded-xl p-3 my-5 mx-15 gap-3">
-                <h1 className="text-2xl">APROVAÇÃO DOS APONTAMENTOS</h1>
-                <div className="flex gap-3 items-center flex-wrap">
+            {}
+            <div className="flex justify-between items-center border rounded-xl p-3 my-5 mx-15 gap-3 bg-white shadow-sm overflow-hidden">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex-1 truncate min-w-0">
+                    APROVAÇÃO DOS APONTAMENTOS
+                </h1>
+                
+                <div className="flex gap-3 items-center flex-shrink-0">
                     <DropdownProjetos
                         value={selectedProjeto}
                         options={projetoOptions}
@@ -94,24 +108,34 @@ export default function ListaApontamentosGestor() {
                     />
                     <button 
                         onClick={handleAprovar}
-                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-15 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={selectedApontamentos.length === 0}
+                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                        disabled={selectedItems.length === 0}
                     >
                         Aprovar
                     </button>
                     <button 
-                        onClick={handleReprovar}
-                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-15 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={selectedApontamentos.length === 0 || isReprovarDisabled}
+                        onClick={handleAbrirModalReprovar}
+                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                        disabled={selectedItems.length !== 1}
                     >
                         Reprovar
                     </button>
                 </div>
             </div>
+
             <ApontamentosGestor 
                 projetoFiltro={selectedProjeto} 
-                onSelectionChange={setSelectedApontamentos}
+                onSelectionChange={setSelectedItems}
             />
+
+            
+
+<ModalReprovarApontamento 
+    isOpen={isModalOpen}
+    onClose={() => setIsModalOpen(false)}
+    onConfirm={handleConfirmarReprovacao}
+    isLoading={isReprovando}
+/>
         </>
-    )
+    );
 }
