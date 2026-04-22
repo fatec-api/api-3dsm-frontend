@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 // import { listarApontamentosUsuarios} from "../services/apontamentoService";
 // import { listarItensPorProfissional } from "../services/ItemService";
 import { FaPencilAlt } from "react-icons/fa";
+import ModalEditarApontamento from "../components/ModalEditarApontamento";
 
 type Log = {
   id: number;
@@ -20,255 +21,51 @@ type Log = {
 export default function TelaLogProfissional() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState<string | null>(null);
+  
+  // 1. SOLUÇÃO: Prefixamos com '_' para o TS ignorar o aviso de "não lido"
+  const [erro, _setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<string | null>(null);
-  const { id } = useParams<{ id: string }>();
+  const { id: _id } = useParams<{ id: string }>();
+  
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 15;
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [logSelecionado, setLogSelecionado] = useState<Log | null>(null);
+
   /*useEffect(() => {
     const fetchLogs = async () => {
-      if (!id) return;
-
+      if (!_id) return;
       try {
         setLoading(true);
-        setErro(null);
-
-        const apontamentos = await listarApontamentosUsuarios(id);
-        const itens = await listarItensPorProfissional(id);
-
-        const logsCompletos: Log[] = apontamentos.map((a: any) => {
-          const item = itens.find((i: any) => i.id === a.itemId);
-
-          return {
-            id: a.id,
-            projeto: item?.projetoNome || item?.projeto?.nomeProjeto || "Sem projeto",
-            atividade: a.itemDescricao || a.atividade || "Sem atividade",
-            nivel: item?.nivelAtividade || String(a.nivel || "UNDEFINED"),
-            data: a.dataApontamento || a.data || "",
-            inicio: a.horaInicio || a.inicio || "",
-            fim: a.horaFim || a.fim || "",
-            status: a.status_apontamento || a.status || "PENDENTE",
-            justificativa: a.justificativa_rejeicao || a.justificativa || "-",
-          };
-        });
-
-        const logsOrdenados = logsCompletos.sort(
-        (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
-      );
-
-        setLogs(logsOrdenados);
+        // _setErro(null); ...
       } catch (error) {
-        console.error("Erro na requisição:", error);
-        setErro("Não foi possível carregar seus apontamentos no momento.");
-      } finally {
-        setLoading(false);
+        // _setErro("Erro...");
       }
     };
-
     fetchLogs();
-  }, [id]); */
+  }, [_id]); */
 
   useEffect(() => {
     const mockLogs: Log[] = [
-      {
-        id: 1,
-        projeto: "GSWProj1",
-        atividade: "Implementação API",
-        nivel: "Análise",
-        data: "2026-04-10",
-        inicio: "08:00",
-        fim: "12:00",
-        status: "PENDENTE",
-        justificativa: "-",
-      },
-      {
-        id: 2,
-        projeto: "GSWProj1",
-        atividade: "Correção de bug",
-        nivel: "Desenvolvimento",
-        data: "2026-04-09",
-        inicio: "13:00",
-        fim: "17:00",
-        status: "APROVADO",
-        justificativa: "-",
-      },
-      {
-        id: 3,
-        projeto: "GSWProj2",
-        atividade: "Refatoração",
-        nivel: "Teste",
-        data: "2026-04-08",
-        inicio: "09:00",
-        fim: "11:00",
-        status: "REPROVADO",
-        justificativa: "Horas inconsistentes",
-      },
-      {
-        id: 4,
-        projeto: "GSWProj1",
-        atividade: "Documentação técnica",
-        nivel: "Análise",
-        data: "2026-04-07",
-        inicio: "10:00",
-        fim: "12:00",
-        status: "PENDENTE",
-        justificativa: "-",
-      },
-      {
-        id: 5,
-        projeto: "GSWProj3",
-        atividade: "Implementação Frontend",
-        nivel: "Desenvolvimento",
-        data: "2026-04-06",
-        inicio: "08:00",
-        fim: "12:00",
-        status: "APROVADO",
-        justificativa: "-",
-      },
-      {
-        id: 6,
-        projeto: "GSWProj2",
-        atividade: "Testes unitários",
-        nivel: "Teste",
-        data: "2026-04-05",
-        inicio: "13:00",
-        fim: "16:00",
-        status: "REPROVADO",
-        justificativa: "Cobertura insuficiente",
-      },
-      {
-        id: 7,
-        projeto: "GSWProj1",
-        atividade: "Ajuste de layout",
-        nivel: "Desenvolvimento",
-        data: "2026-04-04",
-        inicio: "09:00",
-        fim: "11:00",
-        status: "PENDENTE",
-        justificativa: "-",
-      },
-      {
-        id: 8,
-        projeto: "GSWProj4",
-        atividade: "Reunião com cliente",
-        nivel: "Análise",
-        data: "2026-04-03",
-        inicio: "14:00",
-        fim: "16:00",
-        status: "APROVADO",
-        justificativa: "-",
-      },
-      {
-        id: 9,
-        projeto: "GSWProj2",
-        atividade: "Correção backend",
-        nivel: "Desenvolvimento",
-        data: "2026-04-02",
-        inicio: "10:00",
-        fim: "13:00",
-        status: "REPROVADO",
-        justificativa: "Erro não reproduzido",
-      },
-      {
-        id: 10,
-        projeto: "GSWProj3",
-        atividade: "Deploy aplicação",
-        nivel: "Teste",
-        data: "2026-04-01",
-        inicio: "15:00",
-        fim: "18:00",
-        status: "PENDENTE",
-        justificativa: "-",
-      },
-      {
-        id: 11,
-        projeto: "GSWProj1",
-        atividade: "Refatoração código",
-        nivel: "Desenvolvimento",
-        data: "2026-03-31",
-        inicio: "08:00",
-        fim: "12:00",
-        status: "APROVADO",
-        justificativa: "-",
-      },
-      {
-        id: 12,
-        projeto: "GSWProj4",
-        atividade: "Análise de requisitos",
-        nivel: "Análise",
-        data: "2026-03-30",
-        inicio: "09:00",
-        fim: "11:00",
-        status: "PENDENTE",
-        justificativa: "-",
-      },
-      {
-        id: 13,
-        projeto: "GSWProj2",
-        atividade: "Criação de testes",
-        nivel: "Teste",
-        data: "2026-03-29",
-        inicio: "13:00",
-        fim: "17:00",
-        status: "REPROVADO",
-        justificativa: "Faltou cenário",
-      },
-      {
-        id: 14,
-        projeto: "GSWProj3",
-        atividade: "Integração API",
-        nivel: "Desenvolvimento",
-        data: "2026-03-28",
-        inicio: "10:00",
-        fim: "12:00",
-        status: "APROVADO",
-        justificativa: "-",
-      },
-      {
-        id: 15,
-        projeto: "GSWProj1",
-        atividade: "Correção UI",
-        nivel: "Desenvolvimento",
-        data: "2026-03-27",
-        inicio: "14:00",
-        fim: "17:00",
-        status: "PENDENTE",
-        justificativa: "-",
-      },
-      {
-        id: 16,
-        projeto: "GSWProj4",
-        atividade: "Planejamento sprint",
-        nivel: "Análise",
-        data: "2026-03-26",
-        inicio: "09:00",
-        fim: "11:00",
-        status: "APROVADO",
-        justificativa: "-",
-      },
-      {
-        id: 17,
-        projeto: "GSWProj2",
-        atividade: "Debug sistema",
-        nivel: "Desenvolvimento",
-        data: "2026-03-25",
-        inicio: "11:00",
-        fim: "15:00",
-        status: "REPROVADO",
-        justificativa: "Erro persistente",
-      },
-      {
-        id: 18,
-        projeto: "GSWProj3",
-        atividade: "Validação final",
-        nivel: "Teste",
-        data: "2026-03-24",
-        inicio: "13:00",
-        fim: "16:00",
-        status: "PENDENTE",
-        justificativa: "-",
-      },
+      { id: 1, projeto: "GSWProj1", atividade: "Implementação API", nivel: "Análise", data: "2026-04-10", inicio: "08:00", fim: "12:00", status: "PENDENTE", justificativa: "-" },
+      { id: 2, projeto: "GSWProj1", atividade: "Correção de bug", nivel: "Desenvolvimento", data: "2026-04-09", inicio: "13:00", fim: "17:00", status: "APROVADO", justificativa: "-" },
+      { id: 3, projeto: "GSWProj2", atividade: "Refatoração", nivel: "Teste", data: "2026-04-08", inicio: "09:00", fim: "11:00", status: "REPROVADO", justificativa: "Horas inconsistentes" },
+      { id: 4, projeto: "GSWProj1", atividade: "Documentação técnica", nivel: "Análise", data: "2026-04-07", inicio: "10:00", fim: "12:00", status: "PENDENTE", justificativa: "-" },
+      { id: 5, projeto: "GSWProj3", atividade: "Implementação Frontend", nivel: "Desenvolvimento", data: "2026-04-06", inicio: "08:00", fim: "12:00", status: "APROVADO", justificativa: "-" },
+      { id: 6, projeto: "GSWProj2", atividade: "Testes unitários", nivel: "Teste", data: "2026-04-05", inicio: "13:00", fim: "16:00", status: "REPROVADO", justificativa: "Cobertura insuficiente" },
+      { id: 7, projeto: "GSWProj1", atividade: "Ajuste de layout", nivel: "Desenvolvimento", data: "2026-04-04", inicio: "09:00", fim: "11:00", status: "PENDENTE", justificativa: "-" },
+      { id: 8, projeto: "GSWProj4", atividade: "Reunião com cliente", nivel: "Análise", data: "2026-04-03", inicio: "14:00", fim: "16:00", status: "APROVADO", justificativa: "-" },
+      { id: 9, projeto: "GSWProj2", atividade: "Correção backend", nivel: "Desenvolvimento", data: "2026-04-02", inicio: "10:00", fim: "13:00", status: "REPROVADO", justificativa: "Erro não reproduzido" },
+      { id: 10, projeto: "GSWProj3", atividade: "Deploy aplicação", nivel: "Teste", data: "2026-04-01", inicio: "15:00", fim: "18:00", status: "PENDENTE", justificativa: "-" },
+      { id: 11, projeto: "GSWProj1", atividade: "Refatoração código", nivel: "Desenvolvimento", data: "2026-03-31", inicio: "08:00", fim: "12:00", status: "APROVADO", justificativa: "-" },
+      { id: 12, projeto: "GSWProj4", atividade: "Análise de requisitos", nivel: "Análise", data: "2026-03-30", inicio: "09:00", fim: "11:00", status: "PENDENTE", justificativa: "-" },
+      { id: 13, projeto: "GSWProj2", atividade: "Criação de testes", nivel: "Teste", data: "2026-03-29", inicio: "13:00", fim: "17:00", status: "REPROVADO", justificativa: "Faltou cenário" },
+      { id: 14, projeto: "GSWProj3", atividade: "Integração API", nivel: "Desenvolvimento", data: "2026-03-28", inicio: "10:00", fim: "12:00", status: "APROVADO", justificativa: "-" },
+      { id: 15, projeto: "GSWProj1", atividade: "Correção UI", nivel: "Desenvolvimento", data: "2026-03-27", inicio: "14:00", fim: "17:00", status: "PENDENTE", justificativa: "-" },
+      { id: 16, projeto: "GSWProj4", atividade: "Planejamento sprint", nivel: "Análise", data: "2026-03-26", inicio: "09:00", fim: "11:00", status: "APROVADO", justificativa: "-" },
+      { id: 17, projeto: "GSWProj2", atividade: "Debug sistema", nivel: "Desenvolvimento", data: "2026-03-25", inicio: "11:00", fim: "15:00", status: "REPROVADO", justificativa: "Erro persistente" },
+      { id: 18, projeto: "GSWProj3", atividade: "Validação final", nivel: "Teste", data: "2026-03-24", inicio: "13:00", fim: "16:00", status: "PENDENTE", justificativa: "-" },
     ];
 
     const logsOrdenados = mockLogs.sort((a, b) => {
@@ -280,16 +77,27 @@ export default function TelaLogProfissional() {
   }, []);
 
   const handleEditar = (id: number) => {
-    console.log("Editar apontamento:", id);
-    // integrar com o modal de edição
+    const item = logs.find(l => l.id === id);
+    if (item) {
+      setLogSelecionado(item);
+      setIsModalOpen(true);
+    }
   };
 
-  // lógica da paginação da tela
+  const handleSalvarEdicao = (dadosAtualizados: any) => {
+    setLogs(prev => prev.map(log => 
+      log.id === Number(dadosAtualizados.id) ? { ...log, ...dadosAtualizados, atividade: dadosAtualizados.item, inicio: dadosAtualizados.horaInicio, fim: dadosAtualizados.horaFim } : log
+    ));
+    setIsModalOpen(false);
+    
+    
+    setSucesso("Alterações salvas com sucesso!");
+    setTimeout(() => setSucesso(null), 3000);
+  };
+
   const inicio = (paginaAtual - 1) * itensPorPagina;
   const fim = inicio + itensPorPagina;
-
   const logsPaginamento = logs.slice(inicio, fim);
-
   const totalPaginas = Math.ceil(logs.length / itensPorPagina);
 
   return (
@@ -321,18 +129,10 @@ export default function TelaLogProfissional() {
                     <th className="text-center">Editar</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   {logsPaginamento.map((row) => {
                     const isEditavel = row.status === "PENDENTE";
-
-                    const badgeColor =
-                      row.status === "PENDENTE"
-                        ? "badge-warning"
-                        : row.status === "APROVADO"
-                          ? "badge-success"
-                          : "badge-error";
-
+                    const badgeColor = row.status === "PENDENTE" ? "badge-warning" : row.status === "APROVADO" ? "badge-success" : "badge-error";
                     return (
                       <tr key={row.id} className="hover">
                         <td>{row.projeto}</td>
@@ -341,85 +141,52 @@ export default function TelaLogProfissional() {
                         <td>{row.data}</td>
                         <td>{row.inicio}</td>
                         <td>{row.fim}</td>
-
-                        <td>
-                          <span className={`badge ${badgeColor}`}>
-                            {row.status}
-                          </span>
-                        </td>
-
+                        <td><span className={`badge ${badgeColor}`}>{row.status}</span></td>
                         <td>{row.justificativa || "-"}</td>
-
                         <td className="text-center">
-                          <div
-                            className="tooltip"
-                            data-tip={
-                              isEditavel
-                                ? "Editar apontamento"
-                                : "Este apontamento já foi revisado e não pode mais ser editado"
-                            }
+                          <button
+                            className={`btn btn-sm btn-circle ${isEditavel ? "btn-ghost" : "btn-disabled"}`}
+                            onClick={() => handleEditar(row.id)}
+                            disabled={!isEditavel}
                           >
-                            <button
-                              className={`btn btn-sm btn-circle ${isEditavel
-                                ? "btn-ghost hover:bg-base-300"
-                                : "btn-disabled"
-                                }`}
-                              onClick={() => handleEditar(row.id)}
-                              disabled={!isEditavel}
-                            >
-                              <FaPencilAlt size={14} />
-                            </button>
-                          </div>
+                            <FaPencilAlt size={14} />
+                          </button>
                         </td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-
-              {logs.length === 0 && (
-                <div className="text-center py-6 text-gray-500">
-                  Nenhum apontamento encontrado
-                </div>
-              )}
             </div>
           )}
 
-          {erro && (
-            <div className="alert alert-error mt-6">
-              <span>{erro}</span>
-            </div>
-          )}
-
-          {sucesso && (
-            <div className="alert alert-success mt-6">
-              <span>{sucesso}</span>
-            </div>
-          )}
+          {erro && <div className="alert alert-error mt-4">{erro}</div>}
+          {sucesso && <div className="alert alert-success mt-4">{sucesso}</div>}
 
           <div className="flex justify-center mt-8">
-            <div className="join shadow-sm">
-              <button
-                className="join-item btn btn-sm"
-                onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))}
-              >
-                «
-              </button>
-
-              <button className="join-item btn btn-sm btn-active">
-                Página {paginaAtual}
-              </button>
-
-              <button
-                className="join-item btn btn-sm"
-                onClick={() => setPaginaAtual(p => Math.min(p + 1, totalPaginas))}
-              >
-                »
-              </button>
+            <div className="join">
+              <button className="join-item btn btn-sm" onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))}>«</button>
+              <button className="join-item btn btn-sm btn-active">Página {paginaAtual}</button>
+              <button className="join-item btn btn-sm" onClick={() => setPaginaAtual(p => Math.min(p + 1, totalPaginas))}>»</button>
             </div>
           </div>
         </div>
       </div>
+
+      <ModalEditarApontamento 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSalvarEdicao}
+        apontamento={logSelecionado ? {
+            id: String(logSelecionado.id),
+            projeto: logSelecionado.projeto,
+            item: logSelecionado.atividade,
+            data: logSelecionado.data,
+            horaInicio: logSelecionado.inicio,
+            horaFim: logSelecionado.fim,
+            observacao: logSelecionado.justificativa || ""
+        } : null}
+      />
     </div>
   );
 }
