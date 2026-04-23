@@ -16,9 +16,7 @@ const TODOS_PROJETOS_VALUE = "all";
 export default function ListaApontamentosGestor() {
     const [selectedProjeto, setSelectedProjeto] = useState<string>(TODOS_PROJETOS_VALUE);
     const [projetoOptions, setProjetoOptions] = useState<ProjetoOption[]>([]);
-    
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isReprovando, setIsReprovando] = useState(false);
 
@@ -73,7 +71,6 @@ export default function ListaApontamentosGestor() {
         setIsReprovando(true);
         try {
             console.info(`[ACTION] Reprovando ID: ${itemParaReprovar.id} | Motivo: ${justificativa}`);
-            
             await reprovarApontamento(itemParaReprovar.id, justificativa);
             
             alert("Apontamento reprovado com sucesso!");
@@ -86,8 +83,6 @@ export default function ListaApontamentosGestor() {
             setIsReprovando(false);
         }
     };
-
-    const currentItem = selectedItems[0];
 
     return (
         <>
@@ -128,14 +123,12 @@ export default function ListaApontamentosGestor() {
                 onSelectionChange={setSelectedItems}
             />
 
-            
-
-<ModalReprovarApontamento 
-    isOpen={isModalOpen}
-    onClose={() => setIsModalOpen(false)}
-    onConfirm={handleConfirmarReprovacao}
-    isLoading={isReprovando}
-/>
+            <ModalReprovarApontamento 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmarReprovacao}
+                isLoading={isReprovando}
+            />
         </>
     );
 }

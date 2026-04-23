@@ -12,7 +12,13 @@ export interface ProjetoPayload {
     gestorResponsavel: string;
 }
 
-// CRIAR PROJETO
+const MOCK_PROJETOS = [
+    { id: "1", nomeProjeto: "Projeto A", nome: "Projeto A", gestorId: "gestor1" },
+    { id: "2", nomeProjeto: "Projeto B", nome: "Projeto B", gestorId: "gestor1" },
+    { id: "3", nomeProjeto: "Projeto C", nome: "Projeto C", gestorId: "gestor2" },
+    { id: "4", nomeProjeto: "Projeto D", nome: "Projeto D", gestorId: "gestor1" }
+];
+
 export const criarProjeto = async (dados: ProjetoPayload) => {
     try {
         const response = await api.post("/cadastrar/projeto", dados);
@@ -23,55 +29,33 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
     }
 };
 
-// LISTAR PROJETOS
 export async function listarProjetos() {
-    const response = await api.get(`/projetos`)
-    return response.data
+    console.warn("[MOCK] listarProjetos: Ignorando API para evitar Erro 500.");
+    return Promise.resolve(MOCK_PROJETOS);
 }
 
 export async function listarProjetosPorGestor(gestorId?: string) {
-    // const response = await api.get(`/projetos/gestor/${gestorId}`)
-    // return response.data
-    const todosProjetos = [
-        {
-            id: "1",
-            nomeProjeto: "Projeto A",
-            gestorId: "gestor1" 
-        },
-        {
-            id: "2",
-            nomeProjeto: "Projeto B",
-            gestorId: "gestor1"
-        },
-        {
-            id: "3",
-            nomeProjeto: "Projeto C",
-            gestorId: "gestor2"
-        },
-        {
-            id: "4",
-            nomeProjeto: "Projeto D",
-            gestorId: "gestor1"
-        }
-    ];
-
+    console.warn("[MOCK] listarProjetosPorGestor: Filtrando dados locais.");
+    
     if (gestorId) {
-        return Promise.resolve(todosProjetos.filter(projeto => projeto.gestorId === gestorId));
+        return Promise.resolve(MOCK_PROJETOS.filter(projeto => projeto.gestorId === gestorId));
     }
-    return Promise.resolve(todosProjetos);
+    return Promise.resolve(MOCK_PROJETOS);
 }
 
-// LISTAR PROJETO POR ID
 export async function listarProjetoId(id: number) {
+    const projetoMock = MOCK_PROJETOS.find(p => p.id === String(id));
+    if (projetoMock) return Promise.resolve(projetoMock);
+
     const response = await api.get(`/listar/projetos/${id}`)
     return response.data
 }
 
-// LISTAR PROFISSIONAIS
 export async function listarEquipeProjeto(id: number) {
     const response = await api.get(`/alocacoes/projeto/${id}`);
     return response.data;
 }
+
 export async function listarProfissionaisAtivos() {
     const response = await api.get("/alocacoes/profissionais/ativos");
     return response.data;
@@ -82,25 +66,12 @@ export async function listarUsuariosAtivos() {
     return response.data;
 }
 
-// LISTAR CLIENTES
 export function listarClientes() {
     return Promise.resolve([
-        {
-            nomeCliente: "Caio"
-        },
-        {
-            nomeCliente: "Guilherme"
-        },
-        {
-            nomeCliente: "Isaura"
-        },
-        {
-            nomeCliente: "Daniel"
-        },
-        {
-            nomeCliente: "Emmanuel"
-        }
+        { nomeCliente: "Caio" },
+        { nomeCliente: "Guilherme" },
+        { nomeCliente: "Isaura" },
+        { nomeCliente: "Daniel" },
+        { nomeCliente: "Emmanuel" }
     ]);
-
-
-};
+}

@@ -3,7 +3,7 @@ import { listarApontamentosPorProjeto } from "../services/apontamentoService";
 import { listarProjetos } from "../services/projectService";
 
 type Apontamento = {
-    id?: string;
+    id: string;
     usuario: string;
     projeto: string;
     item: string;
@@ -16,7 +16,7 @@ type Apontamento = {
 
 type ApontamentosGestorProps = {
     projetoFiltro?: string;
-    onSelectionChange?: (selectedIds: string[]) => void;
+    onSelectionChange?: (selectedItems: Apontamento[]) => void;
 };
 
 export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionChange }: ApontamentosGestorProps) {
@@ -27,24 +27,24 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const apontamentos = await listarApontamentosPorProjeto();
-                let projetos: any[] = [];
+                const dados = await listarApontamentosPorProjeto();
+                let listaProjetos: any[] = [];
 
                 try {
-                    projetos = await listarProjetos();
-                    setProjetos(projetos);
+                    listaProjetos = await listarProjetos();
+                    setProjetos(listaProjetos);
                 } catch (error) {
                     console.error("Erro ao buscar projetos:", error);
                     setProjetos([]);
                 }
 
-                const apontamentosComProjeto = apontamentos.map((a: any, index: number) => {
-                    const projeto = projetos.find(
+                const apontamentosComProjeto = dados.map((a: any, index: number) => {
+                    const projeto = listaProjetos.find(
                         (p: any) => p.projeto === a.projeto || p.nome === a.projeto || p.nomeProjeto === a.projeto
                     );
 
                     return {
-                        id: `apontamento-${index}`,
+                        id: String(a.id || `apontamento-${index}`),
                         usuario: a.usuario,
                         projeto: a.projeto || projeto?.nome || projeto?.nomeProjeto || "Sem projeto",
                         item: a.item || a.itemDescricao || "",
@@ -64,42 +64,35 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
 
         fetchLogs();
     }, []);
-
     useEffect(() => {
         if (onSelectionChange) {
-            onSelectionChange(Array.from(selectedApontamentos));
+            const selecionados = apontamentos.filter(a => selectedApontamentos.has(a.id));
+            onSelectionChange(selecionados);
         }
-    }, [selectedApontamentos, onSelectionChange]);
+    }, [selectedApontamentos, apontamentos, onSelectionChange]);
 
     const handleCheckboxChange = (apontamentoId: string, checked: boolean) => {
         setSelectedApontamentos(prev => {
             const newSet = new Set(prev);
-            if (checked) {
-                newSet.add(apontamentoId);
-            } else {
-                newSet.delete(apontamentoId);
-            }
+            if (checked) newSet.add(apontamentoId);
+            else newSet.delete(apontamentoId);
             return newSet;
         });
     };
 
     const filteredApontamentos = useMemo(() => {
-        if (!projetoFiltro || projetoFiltro === "all") {
-            return apontamentos;
-        }
+        if (!projetoFiltro || projetoFiltro === "all") return apontamentos;
 
-        const projetoSelecionado = projetos.find((p: any) => {
-            return p.id === projetoFiltro || p.nomeProjeto === projetoFiltro || p.nome === projetoFiltro || p.projeto === projetoFiltro;
-        });
+        const projetoSelecionado = projetos.find((p: any) => 
+            p.id === projetoFiltro || p.nomeProjeto === projetoFiltro || p.nome === projetoFiltro || p.projeto === projetoFiltro
+        );
 
         if (projetoSelecionado) {
             const nomeProjeto = projetoSelecionado.nomeProjeto ?? projetoSelecionado.nome ?? projetoSelecionado.projeto;
-            return apontamentos.filter((apontamento) => apontamento.projeto === nomeProjeto);
+            return apontamentos.filter((a) => a.projeto === nomeProjeto);
         }
-
-        return apontamentos.filter((apontamento) => apontamento.projeto === projetoFiltro);
+        return apontamentos.filter((a) => a.projeto === projetoFiltro);
     }, [apontamentos, projetoFiltro, projetos]);
-
 
     return (
         <div>
@@ -120,18 +113,22 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
                     </thead>
                     <tbody>
                         {filteredApontamentos.length === 0 ? (
-                            <div role="alert" className="alert alert-info alert-soft h-15">
-                                <p className="text-lg">Nenhum apontamento encontrado.</p>
-                            </div>
+                            <tr>
+                                <td colSpan={9}>
+                                    <div role="alert" className="alert alert-info alert-soft h-15">
+                                        <p className="text-lg">Nenhum apontamento encontrado.</p>
+                                    </div>
+                                </td>
+                            </tr>
                         ) : (
-                            filteredApontamentos.map((apontamento, index) => (
-                                <tr key={index} className="text-sm">
+                            filteredApontamentos.map((apontamento) => (
+                                <tr key={apontamento.id} className="text-sm">
                                     <th className="p-1 text-center">
                                         <input 
                                             type="checkbox" 
                                             className="checkbox" 
-                                            checked={selectedApontamentos.has(apontamento.id || "")}
-                                            onChange={(e) => handleCheckboxChange(apontamento.id || "", e.target.checked)}
+                                            checked={selectedApontamentos.has(apontamento.id)}
+                                            onChange={(e) => handleCheckboxChange(apontamento.id, e.target.checked)}
                                         />
                                     </th>
                                     <td>{apontamento.usuario}</td>

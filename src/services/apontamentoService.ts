@@ -2,19 +2,18 @@ import api from "./api";
 
 export async function listarApontamentos() {
     const response = await api.get(`/apontamentos`);
-    return response.data
+    return response.data;
 }
 
 export async function listarApontamentosUsuarios(id: string) {
     const response = await api.get(`apontamentos/usuario/${id}`);
-    return response.data
+    return response.data;
 }
 
 export function listarApontamentosPorProjeto() {
-    // const response = await api.get(`apontamentos/projeto/${id}`);
-    // return response.data
     return Promise.resolve([
         {
+            id: "1", 
             usuario: "João Silva",
             projeto: "Projeto A",
             item: "Desenvolvimento de funcionalidade X",
@@ -25,6 +24,7 @@ export function listarApontamentosPorProjeto() {
             status: "Aprovado"
         },
         {
+            id: "2",
             usuario: "Maria Souza",
             projeto: "Projeto B",
             item: "Correção de bug Y",
@@ -35,6 +35,7 @@ export function listarApontamentosPorProjeto() {
             status: "Pendente"
         },
         {
+            id: "3",
             usuario: "Calor Oliveira",
             projeto: "Projeto B",
             item: "Correção de bug Z",
@@ -49,18 +50,20 @@ export function listarApontamentosPorProjeto() {
 
 export async function aprovarApontamento(id: string) {
     const response = await api.put(`apontamentos/aprovar/${id}`);
-    return response.data
+    return response.data;
 }
 
 export async function aprovarApontamentos(ids: string[]) {
-    // const response = await api.put(`apontamentos/aprovar`, { ids });
-    // return response.data
     return Promise.resolve({ message: "Apontamentos aprovados com sucesso", ids });
 }
 
 export async function reprovarApontamento(id: string, justificativa: string) {
-    // Adicionamos 'justificativa' como segundo parâmetro
-    // E passamos ela no corpo (body) da requisição PUT
-    const response = await api.put(`apontamentos/reprovar/${id}`, { justificativa });
-    return response.data;
+    console.warn(`[MOCK API] Chamada simulada para ID: ${id} | Justificativa: ${justificativa}`);
+    
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({ message: "Reprovado com sucesso (MOCK)", id, justificativa });
+        }, 800);
+    });
+
 }
