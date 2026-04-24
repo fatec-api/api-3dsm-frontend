@@ -5,7 +5,7 @@ import Botao from "../shared/components/Botao";
 import Input from "../shared/components/Input";
 import { listarHistorico, type Log } from "../services/historicoService";
 
-export default function TelaHistorico() {
+export default function Historico() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
