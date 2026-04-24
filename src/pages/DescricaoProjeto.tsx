@@ -4,8 +4,17 @@ import Card from "../shared/components/Card";
 import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade, vincularProfissionalItem } from "../services/ItemService";
 import PaginaAlocacao from "./DevAllocationTest";
-import ModalAlocarFuncionarioItem from "../components/ModalAlocarFuncionarioItem";
+import ModalAlocarFuncionarioItem, { type Profissional } from "../components/ModalAlocarFuncionarioItem";
 import { listarEquipeProjeto, listarProjetoId } from "../services/projectService";
+import { getApontamentosAprovadosPorProjeto, type MetricasAtividade, } from "../services/apontamentoService";
+import IndicadorProgresso from "../components/IndicadorProgresso";
+
+const NIVEIS_BASE = ['ANALISE', 'DESENVOLVIMENTO', 'TESTE'];
+const NOMES_ATIVIDADES: Record<string, string> = {
+    'ANALISE': 'Análise',
+    'DESENVOLVIMENTO': 'Desenvolvimento',
+    'TESTE': 'Teste'
+};
 
 export default function DescricaoProjeto() {
     const { state } = useLocation();
@@ -17,6 +26,8 @@ export default function DescricaoProjeto() {
 
     const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNome: string }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
+    const [metricas, setMetricas] = useState<MetricasAtividade[]>([]);
+    const [loadingMetricas, setLoadingMetricas] = useState(false);
 
 
     const carregarDadosProjeto = async () => {
@@ -30,8 +41,14 @@ export default function DescricaoProjeto() {
 
             const listaEquipe = await listarEquipeProjeto(projetoState.id);
             setListaDeProfissionais(listaEquipe);
+
+            setLoadingMetricas(true);
+            const dadosMetricas = await getApontamentosAprovadosPorProjeto(projetoState.id);
+            setMetricas(dadosMetricas || []);
         } catch (error) {
             console.error("Erro ao carregar dados do projeto", error);
+        } finally {
+            setLoadingMetricas(false)
         }
     };
 
@@ -62,6 +79,11 @@ export default function DescricaoProjeto() {
         }
     };
 
+    const calcularPorcentagem = (previstas: number, realizadas: number) => {
+        if (!previstas || previstas === 0) return 0;
+        const calculo = (realizadas / previstas) * 100;
+        return Math.round(calculo);
+    };
 
     // trocar para a chamada da api depois
     const isGestor = true;
@@ -161,7 +183,47 @@ export default function DescricaoProjeto() {
                     </div>
                 </div>
 
+                {/* Horas distribuídas pelos níveis de Atividade */}
+                <div className="flex flex-col gap-4 mt-8">
+                    <h2 className="text-lg font-semibold mb-2">Horas realizadas vs. previstas por atividade</h2>
+
+                    {loadingMetricas ? (
+                        <div className="flex justify-center p-8 bg-base-100 rounded-box border border-base-content/10">
+                            <span className="loading loading-spinner text-primary loading-lg"></span>
+                        </div>
+                    ) : (
+                        <div className="flex flex-row flex-wrap md:flex-nowrap gap-6 justify-between">
+                            {NIVEIS_BASE.map(nivel => {
+                                const dadoDoNivel = metricas.find(m => m.nivelAtividade === nivel);
+
+                                const percentual = dadoDoNivel
+                                    ? calcularPorcentagem(dadoDoNivel.horasPrevistasAtiv, dadoDoNivel.horasRealizadasAtiv)
+                                    : 0;
+
+                                return (
+                                    <div
+                                        key={nivel}
+                                        className="card bg-base-100 flex-1 border border-base-content/10 shadow-sm transition-all hover:shadow-md"
+                                    >
+                                        <div className="card-body items-center text-center gap-6">
+                                            <h3 className="card-title text-base-content/70 font-medium">
+                                                {NOMES_ATIVIDADES[nivel]}
+                                            </h3>
+
+                                            <IndicadorProgresso
+                                                percentualAtiv={percentual}
+                                                horasPrevistas={dadoDoNivel?.horasPrevistasAtiv || 0}
+                                                horasRealizadas={dadoDoNivel?.horasRealizadasAtiv || 0}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
             </div>
+
             <ModalAlocarFuncionarioItem
                 isOpen={!!popupItem}
                 onClose={() => { setPopupItem(null); setSelectedProfId(""); }}
