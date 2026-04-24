@@ -24,6 +24,7 @@ export default function TelaLogProfissional() {
   const [sucesso, setSucesso] = useState<string | null>(null);
   const { id } = useParams<{ id: string }>();
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [justificativaSelecionada, setJustificativaSelecionada] = useState<string | null>(null);
   const itensPorPagina = 15;
 
   /*useEffect(() => {
@@ -292,6 +293,13 @@ export default function TelaLogProfissional() {
 
   const totalPaginas = Math.ceil(logs.length / itensPorPagina);
 
+  const justificativaLimpa = (text?: string) => {
+    if (!text) return null;
+    const t = text.trim();
+    if (t === "-" || t === "--") return null;
+    return t;
+  };
+
   return (
     <div className="min-h-screen bg-base-100">
       <Header />
@@ -306,7 +314,7 @@ export default function TelaLogProfissional() {
               <span className="loading loading-spinner loading-lg"></span>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div>
               <table className="table table-zebra">
                 <thead>
                   <tr>
@@ -348,7 +356,24 @@ export default function TelaLogProfissional() {
                           </span>
                         </td>
 
-                        <td>{row.justificativa || "-"}</td>
+                        <td className="align-middle">
+                          {(() => {
+                            const texto = justificativaLimpa(row.justificativa);
+
+                            if (!texto) {
+                              return <span className="text-gray-400">-</span>;
+                            }
+
+                            return (
+                              <span
+                                className="cursor-pointer underline block"
+                                onClick={() => setJustificativaSelecionada(texto)}
+                              >
+                                {texto.length > 20 ? texto.slice(0, 20) + "..." : texto}
+                              </span>
+                            );
+                          })()}
+                        </td>
 
                         <td className="text-center">
                           <div
@@ -394,6 +419,27 @@ export default function TelaLogProfissional() {
           {sucesso && (
             <div className="alert alert-success mt-6">
               <span>{sucesso}</span>
+            </div>
+          )}
+
+          {justificativaSelecionada && (
+            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="bg-gray-100 p-6 rounded-lg max-w-md w-full shadow-lg">
+                <h2 className="text-lg font-semibold mb-4">Justificativa</h2>
+
+                <p className="mb-4 break-words">
+                  {justificativaSelecionada}
+                </p>
+
+                <div className="flex justify-end">
+                  <button
+                    className="btn btn-sm"
+                    onClick={() => setJustificativaSelecionada(null)}
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
