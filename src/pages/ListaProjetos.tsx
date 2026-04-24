@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarProjetos } from "../services/projectService";
 import { FaChevronRight } from "react-icons/fa";
+import FiltrosListagemProjetos from "../components/FiltrosListagemProjetos";
 
 interface Projeto {
     id: number;
@@ -69,10 +70,10 @@ export default function ListaProjetos() {
     }
 
     return (
-        <div className="flex h-screen bg-white">
+        <div className="flex flex-col h-screen bg-white">
             <Header />
-
-            <div className="flex mt-40 gap-6 w-full justify-center flex-wrap">
+            <FiltrosListagemProjetos/>
+            <div className="flex gap-6 w-full justify-center flex-wrap">
                 {projetos.length === 0 ? (
                     <div role="alert" className="alert alert-info alert-soft h-15">
                         <p className="text-lg">Nenhum projeto encontrado.</p>
