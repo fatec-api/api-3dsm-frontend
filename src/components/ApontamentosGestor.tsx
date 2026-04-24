@@ -23,6 +23,8 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
     const [apontamentos, setApontamentos] = useState<Apontamento[]>([]);
     const [projetos, setProjetos] = useState<any[]>([]);
     const [selectedApontamentos, setSelectedApontamentos] = useState<Set<string>>(new Set());
+    const [paginaAtual, setPaginaAtual] = useState(1);
+    const itensPorPagina = 15;
 
     useEffect(() => {
         const fetchLogs = async () => {
@@ -81,18 +83,25 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
     };
 
     const filteredApontamentos = useMemo(() => {
-        if (!projetoFiltro || projetoFiltro === "all") return apontamentos;
+        // Primeiro filtra por status Pendente
+        const pendentes = apontamentos.filter((a) => a.status === "Pendente");
+        
+        if (!projetoFiltro || projetoFiltro === "all") return pendentes;
 
-        const projetoSelecionado = projetos.find((p: any) => 
+        const projetoSelecionado = projetos.find((p: any) =>
             p.id === projetoFiltro || p.nomeProjeto === projetoFiltro || p.nome === projetoFiltro || p.projeto === projetoFiltro
         );
 
         if (projetoSelecionado) {
             const nomeProjeto = projetoSelecionado.nomeProjeto ?? projetoSelecionado.nome ?? projetoSelecionado.projeto;
-            return apontamentos.filter((a) => a.projeto === nomeProjeto);
+            return pendentes.filter((a) => a.projeto === nomeProjeto);
         }
-        return apontamentos.filter((a) => a.projeto === projetoFiltro);
+        return pendentes.filter((a) => a.projeto === projetoFiltro);
     }, [apontamentos, projetoFiltro, projetos]);
+
+    const inicio = (paginaAtual - 1) * itensPorPagina;
+    const logsPaginados = filteredApontamentos.slice(inicio, inicio + itensPorPagina);
+    const totalPaginas = Math.ceil(filteredApontamentos.length / itensPorPagina);
 
     return (
         <div>
@@ -112,21 +121,21 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredApontamentos.length === 0 ? (
+                        {logsPaginados.length === 0 ? (
                             <tr>
                                 <td colSpan={9}>
-                                    <div role="alert" className="alert alert-info alert-soft h-15">
+                                    <div role="alert" className="alert alert-info alert-soft h-15 flex items-center justify-center">
                                         <p className="text-lg">Nenhum apontamento encontrado.</p>
                                     </div>
                                 </td>
                             </tr>
                         ) : (
-                            filteredApontamentos.map((apontamento) => (
+                            logsPaginados.map((apontamento) => (
                                 <tr key={apontamento.id} className="text-sm">
                                     <th className="p-1 text-center">
-                                        <input 
-                                            type="checkbox" 
-                                            className="checkbox" 
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox"
                                             checked={selectedApontamentos.has(apontamento.id)}
                                             onChange={(e) => handleCheckboxChange(apontamento.id, e.target.checked)}
                                         />
@@ -144,6 +153,26 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
                         )}
                     </tbody>
                 </table>
+                {/* Paginação */}
+                {totalPaginas > 1 && (
+                    <div className="flex justify-center mb-5">
+                        <div className="join shadow-sm">
+                            <button
+                                className="join-item btn btn-sm"
+                                disabled={paginaAtual === 1}
+                                onClick={() => setPaginaAtual(p => p - 1)}
+                            >«</button>
+                            <button className="join-item btn btn-sm no-animation font-normal">
+                                Página {paginaAtual} de {totalPaginas}
+                            </button>
+                            <button
+                                className="join-item btn btn-sm"
+                                disabled={paginaAtual === totalPaginas}
+                                onClick={() => setPaginaAtual(p => p + 1)}
+                            >»</button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -13,10 +13,16 @@ export interface ProjetoPayload {
 }
 
 const MOCK_PROJETOS = [
-    { id: "1", nomeProjeto: "Projeto A", nome: "Projeto A", gestorId: "gestor1" },
-    { id: "2", nomeProjeto: "Projeto B", nome: "Projeto B", gestorId: "gestor1" },
-    { id: "3", nomeProjeto: "Projeto C", nome: "Projeto C", gestorId: "gestor2" },
-    { id: "4", nomeProjeto: "Projeto D", nome: "Projeto D", gestorId: "gestor1" }
+    { "id": "1", "nome": "Projeto A", "gestorId": "Ana Costa" },
+    { "id": "2", "nome": "Projeto B", "gestorId": "Ana Costa" },
+    { "id": "3", "nome": "Projeto C", "gestorId": "Juliana Lima" },
+    { "id": "4", "nome": "Projeto D", "gestorId": "Ricardo Mendes" },
+    { "id": "5", "nome": "Sistema de Gestão Interna", "gestorId": "Ana Costa" },
+    { "id": "6", "nome": "Portal do Cliente", "gestorId": "Juliana Lima" },
+    { "id": "7", "nome": "App Mobile Vendas", "gestorId": "Ricardo Mendes" },
+    { "id": "8", "nome": "Migração de Nuvem", "gestorId": "Carlos Souza" },
+    { "id": "9", "nome": "Segurança 2024", "gestorId": "Carlos Souza" },
+    { "id": "10", "nome": "Data Analytics", "gestorId": "Juliana Lima" }
 ];
 
 export const criarProjeto = async (dados: ProjetoPayload) => {

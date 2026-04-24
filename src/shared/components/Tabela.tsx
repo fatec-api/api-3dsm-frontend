@@ -24,7 +24,6 @@ export default function Tabela<T>({
         <div className="border rounded-2xl overflow-hidden">
           <table className="w-full text-center border-collapse">
             
-            
             <thead className="bg-gray-200 text-black">
               <tr>
                 {columns.map((col, index) => (

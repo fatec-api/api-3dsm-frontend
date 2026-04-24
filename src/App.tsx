@@ -35,7 +35,7 @@ const router = createBrowserRouter(
      <Route path='/descricao-projeto' element={<DescricaoProjeto />}/>
      <Route path='/cadastro-item' element={<CadastroItem />} />
      <Route path='/logprofissional/:id' element={<TelaLogProfissional/>}/>
-     <Route path='/apontamentosgestor' element={<ListaApontamentosGestor/>}/>
+     <Route path='/apontamentos-gestor' element={<ListaApontamentosGestor/>}/>
    </>
  )
 )

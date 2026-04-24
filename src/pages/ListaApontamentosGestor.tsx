@@ -20,7 +20,7 @@ export default function ListaApontamentosGestor() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isReprovando, setIsReprovando] = useState(false);
 
-    const gestorIdLogado = "gestor1";
+    const gestorIdLogado = "Juliana Lima";
 
     useEffect(() => {
         const loadProjetos = async () => {
@@ -46,6 +46,7 @@ export default function ListaApontamentosGestor() {
             await aprovarApontamentos(ids);
             alert("Apontamentos aprovados com sucesso!");
             setSelectedItems([]);
+            window.location.reload();
         } catch (error) {
             console.error("[ERROR] Falha na aprovação:", error);
             alert("Erro ao aprovar apontamentos.");
@@ -76,6 +77,7 @@ export default function ListaApontamentosGestor() {
             alert("Apontamento reprovado com sucesso!");
             setIsModalOpen(false);
             setSelectedItems([]);
+            window.location.reload();
         } catch (error) {
             console.error("[ERROR] Erro ao reprovar apontamento:", error);
             alert("Erro ao enviar a reprovação.");
@@ -93,7 +95,7 @@ export default function ListaApontamentosGestor() {
                     APROVAÇÃO DOS APONTAMENTOS
                 </h1>
                 
-                <div className="flex gap-3 items-center flex-shrink-0">
+                <div className="flex gap-3 items-center shrink-0">
                     <DropdownProjetos
                         value={selectedProjeto}
                         options={projetoOptions}
