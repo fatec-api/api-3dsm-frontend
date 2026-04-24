@@ -23,77 +23,39 @@ export default function ListaProjetos() {
 
     const navigate = useNavigate();
 
-    /* useEffect(() => {
-        const loadData = async () => {
-            try {
-                const listaProjetos = await listarProjetos();
-                setProjetos(listaProjetos);
-            } catch (error) {
-                console.error("Erro ao carregar dados", error);
-            }
-        };
-        loadData();
-    }, []);
-  */
-
     useEffect(() => {
         const loadData = async () => {
             try {
-                const data = await listarProjetos();
-                setProjetos(data);
-            } catch (e) {
-                console.error("Erro ao carregar projetos", e);
+                const response = await listarProjetos();
+                console.log("Dados recebidos:", response);
 
-                setProjetos([
-                    {
-                        id: 1,
-                        nomeProjeto: "Projeto 1",
-                        tipoProjeto: "Desenvolvimento",
-                        status: "Em andamento",
-                        horasPrevistasTotal: 100,
-                        horasRealizadasTotal: 60,
-                        horasPendentesTotal: 10, 
-                    },
-                    {
-                        id: 2,
-                        nomeProjeto: "Projeto 2",
-                        tipoProjeto: "Análise",
-                        status: "Atrasado",
-                        horasPrevistasTotal: 80,
-                        horasRealizadasTotal: 95,
-                        horasPendentesTotal: 5,
-                    },
-                    {
-                        id: 3,
-                        nomeProjeto: "Projeto 3",
-                        tipoProjeto: "Teste",
-                        status: "Concluído",
-                        horasPrevistasTotal: 100,
-                        horasRealizadasTotal: 90,
-                        horasPendentesTotal: 0,
-                    },
-                ]);
+                const data = response?.data ?? response;
+
+                setProjetos(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Erro ao carregar projetos", error);
+
+                setProjetos([]);
                 setErro(true);
             } finally {
                 setLoading(false);
             }
         };
-
+ 
         loadData();
-    }, []);
+    }, []); 
 
     // regra de cor baseada no percentual
     const getCor = (projeto: Projeto) => {
         if (!projeto.horasPrevistasTotal) return "bg-gray-300";
 
-        const percentual =
+        const percentualConsumo =
             (projeto.horasRealizadasTotal / projeto.horasPrevistasTotal) * 100;
 
-        if (percentual <= 80) return "bg-green-500";
-        if (percentual <= 100) return "bg-yellow-400";
+        if (percentualConsumo <= 75) return "bg-green-500";
+        if (percentualConsumo <= 100) return "bg-yellow-400";
         return "bg-red-500";
     };
-
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center">
@@ -136,7 +98,7 @@ export default function ListaProjetos() {
                                             <h2 className="text-lg font-semibold">
                                                 {projeto.nomeProjeto}
                                             </h2>
-                                             <FaChevronRight className="text-gray-400 group-hover:text-gray-600 transition" />
+                                            <FaChevronRight className="text-gray-400 group-hover:text-gray-600 transition" />
                                         </div>
 
                                         <div className="text-sm space-y-1">
