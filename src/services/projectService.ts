@@ -24,12 +24,12 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
 };
 // LISTAR PROJETOS
 export async function listarProjetos() {
-    const response = await api.get("/listar/projetos")
+    const response = await api.get("/projetos/listar")
     return response.data
 }
 // LISTAR PROJETO POR ID
 export async function listarProjetoId(id: number) {
-    const response = await api.get(`/listar/projetos/${id}`)
+    const response = await api.get(`/projetos/${id}`)
     return response.data
 }
 
@@ -44,7 +44,7 @@ export async function listarProfissionaisAtivos() {
 }
 
 export async function listarUsuariosAtivos() {
-    const response = await api.get("/alocacoes/usuarios/ativos");
+    const response = await api.get("/alocacoes/profissionais-ativos");
     return response.data;
 }
 
