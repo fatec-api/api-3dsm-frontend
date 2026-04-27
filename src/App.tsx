@@ -15,6 +15,7 @@ import CadastroItem from './pages/CadastroItem'
 import TelaLogProfissional from './pages/TelaLogProfissional'
 import Historico from './pages/Historico'
 import ListaApontamentosGestor from './pages/ListaApontamentosGestor'
+import TelaTeste from './pages/TelaTeste'
 
 
 const router = createBrowserRouter(
@@ -38,7 +39,8 @@ const router = createBrowserRouter(
      <Route path='/logprofissional/:id' element={<TelaLogProfissional/>}/>
      <Route path='/tela-historico' element={<Historico/>}/>
      <Route path='/apontamentos-gestor' element={<ListaApontamentosGestor/>}/>
-   </>
+     <Route path='/teste-k' element={<TelaTeste />}/>
+     </>
  )
 )
 
