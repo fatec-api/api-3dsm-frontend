@@ -36,10 +36,8 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
 };
 
 export async function listarProjetos() {
-    // const response = await api.get("/listar/projetos")
-    // return response.data;
-    console.warn("[MOCK] listarProjetos: Ignorando API para evitar Erro 500.");
-    return Promise.resolve(MOCK_PROJETOS);
+    const response = await api.get("/projetos/listar")
+    return response.data
 }
 
 export async function listarProjetosPorGestor(gestorId?: string) {
@@ -54,10 +52,7 @@ export async function listarProjetosPorGestor(gestorId?: string) {
 }
 
 export async function listarProjetoId(id: number) {
-    const projetoMock = MOCK_PROJETOS.find(p => p.id === String(id));
-    if (projetoMock) return Promise.resolve(projetoMock);
-
-    const response = await api.get(`/listar/projetos/${id}`)
+    const response = await api.get(`/projetos/${id}`)
     return response.data
 }
 
@@ -72,7 +67,7 @@ export async function listarProfissionaisAtivos() {
 }
 
 export async function listarUsuariosAtivos() {
-    const response = await api.get("/alocacoes/usuarios/ativos");
+    const response = await api.get("/alocacoes/profissionais-ativos");
     return response.data;
 }
 
