@@ -22,12 +22,12 @@ export default function Header() {
                 <div className="flex gap-2">
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                             <FiUser className="w-8 h-8" />
+                             <FiUser className="w-6 h-6" />
                         </div>
                     </div>
 
                     <div className="w-10 btn btn-ghost btn-circle avatar"  onClick={() => navigate("/telalogin")}>
-                        <FiLogOut className="w-8 h-8" />
+                        <FiLogOut className="w-6 h-6" />
                     </div>
                 </div>
             </div>
