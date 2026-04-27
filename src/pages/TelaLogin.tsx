@@ -78,21 +78,23 @@ export default function TelaLogin() {
 
 
   return (
-    <div className="flex h-screen bg-[#FFFFFF]">
+    <div className="flex min-h-screen flex-col lg:flex-row bg-gray-50">
 
+      <div className="w-1/2 flex flex-col justify-center items-start pl-32 relative">
 
-      <div className="w-1/2 flex flex-col justify-center items-start pl-32">
-
-
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">
+        <div className="mb-10">
+        <h1 className="text-4xl font-bold text-gray-800 tracking-tight">
           Seja Bem vindo!
         </h1>
+        <p className="text-gray-500 mt-2">
+          Faça login para acessar sua conta
+        </p>
+      </div>
 
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-6 w-80">
+        <form onSubmit={handleLogin} className="flex flex-col gap-6 w-96 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
           <div>
             <label className="block mb-2 font-medium">E-mail</label>
-
 
             <Input
               type="email"
@@ -103,8 +105,8 @@ export default function TelaLogin() {
             />
           </div>
           <div>
-            <label className="block mb-2 font-medium">Senha</label>
 
+            <label className="block mb-2 font-medium">Senha</label>
 
             <Input
               type={mostrarSenha ? "text" : "password"}
@@ -127,34 +129,29 @@ export default function TelaLogin() {
             />
           </div>
 
-
           {erro && (
             <p className="text-red-600 text-sm">
               {erro}
             </p>
           )}
 
-
-          <Botao type="submit">
+          <Botao type="submit" variant="primary" >
             Login
           </Botao>
 
-
         </form>
-
-
       </div>
 
-
-      <div className="w-1/2 flex items-center justify-center relative bg-[#FFFFF] overflow-hidden">
-        <div className="absolute right-[350px] w-[400px] h-[700px] bg-[#1F3A5F] rounded-t-[250px] flex items-center justify-center">
+      <div className="hidden lg:flex w-1/2 items-end justify-center bg-gray-50">
+        <div className="flex items-center justify-center w-[60%] max-w-[420px] aspect-[4/7] bg-[#173052] rounded-t-full -translate-x-6">
           <img
             src={logo}
-            alt="logo gsw"
-            className="w-72 z-10"
+            alt="Logo"
+            className="w-2/3 max-w-[260px]"
           />
         </div>
+
       </div>
-    </div>
+   </div>
   );
 }
