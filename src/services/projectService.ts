@@ -36,10 +36,10 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
 };
 
 export async function listarProjetos() {
-    const response = await api.get("/listar/projetos")
-    return response.data;
-    // console.warn("[MOCK] listarProjetos: Ignorando API para evitar Erro 500.");
-    // return Promise.resolve(MOCK_PROJETOS);
+    // const response = await api.get("/listar/projetos")
+    // return response.data;
+    console.warn("[MOCK] listarProjetos: Ignorando API para evitar Erro 500.");
+    return Promise.resolve(MOCK_PROJETOS);
 }
 
 export async function listarProjetosPorGestor(gestorId?: string) {
