@@ -10,7 +10,7 @@ export default function IndicadorProgresso({ percentualAtiv, horasPrevistas, hor
   
   const obterCor = (valor: number) => {
     if (valor > 100) return 'text-error';
-    if (valor > 80) return 'text-warning';
+    if (valor > 75) return 'text-warning';
     return 'text-success';
   };
 
