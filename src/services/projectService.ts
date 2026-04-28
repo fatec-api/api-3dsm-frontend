@@ -13,16 +13,16 @@ export interface ProjetoPayload {
 }
 
 const MOCK_PROJETOS = [
-    { "id": "1", "nome": "Projeto A", "gestorId": "Ana Costa" },
-    { "id": "2", "nome": "Projeto B", "gestorId": "Ana Costa" },
-    { "id": "3", "nome": "Projeto C", "gestorId": "Juliana Lima" },
-    { "id": "4", "nome": "Projeto D", "gestorId": "Ricardo Mendes" },
-    { "id": "5", "nome": "Sistema de Gestão Interna", "gestorId": "Ana Costa" },
-    { "id": "6", "nome": "Portal do Cliente", "gestorId": "Juliana Lima" },
-    { "id": "7", "nome": "App Mobile Vendas", "gestorId": "Ricardo Mendes" },
-    { "id": "8", "nome": "Migração de Nuvem", "gestorId": "Carlos Souza" },
-    { "id": "9", "nome": "Segurança 2024", "gestorId": "Carlos Souza" },
-    { "id": "10", "nome": "Data Analytics", "gestorId": "Juliana Lima" }
+    { "id": "1", "nomeProjeto": "Projeto A", "gestorId": "Ana Costa", "tipoProjeto": "Alocacao", "status": "Andamento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 50, "horasPendentesTotal": 150 },
+    { "id": "2", "nomeProjeto": "Projeto B", "gestorId": "Ana Costa", "tipoProjeto": "Hora Fechada", "status": "Desenvolvimento", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 },
+    { "id": "3", "nomeProjeto": "Projeto C", "gestorId": "Juliana Lima", "tipoProjeto": "Alocacao", "status": "Concluída", "cliente": "Lovelace Inc", "horasPrevistasTotal": 200, "horasRealizadasTotal": 190, "horasPendentesTotal": 10 },
+    { "id": "4", "nomeProjeto": "Projeto D", "gestorId": "Ricardo Mendes", "tipoProjeto": "Hora Fechada", "status": "Andamento", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 150, "horasPendentesTotal": 50 },
+    { "id": "5", "nomeProjeto": "Sistema de Gestão Interna", "gestorId": "Ana Costa", "tipoProjeto": "Alocacao", "status": "Concluída", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 },
+    { "id": "6", "nomeProjeto": "Portal do Cliente", "gestorId": "Juliana Lima", "tipoProjeto": "Hora Fechada", "status": "Desenvolvimento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 198, "horasPendentesTotal": 2 },
+    { "id": "7", "nomeProjeto": "App Mobile Vendas", "gestorId": "Ricardo Mendes", "tipoProjeto": "Alocacao", "status": "Andamento", "cliente": "Lovelace Inc", "horasPrevistasTotal": 200, "horasRealizadasTotal": 150, "horasPendentesTotal": 50 },
+    { "id": "8", "nomeProjeto": "Migração de Nuvem", "gestorId": "Carlos Souza", "tipoProjeto": "Hora Fechada", "status": "Desenvolvimento", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 100, "horasPendentesTotal": 100 },
+    { "id": "9", "nomeProjeto": "Segurança 2024", "gestorId": "Carlos Souza", "tipoProjeto": "Alocacao", "status": "Concluída", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 150, "horasPendentesTotal": 50 },
+    { "id": "10", "nomeProjeto": "Data Analytics", "gestorId": "Juliana Lima", "tipoProjeto": "Hora Fechada", "status": "Andamento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 }
 ];
 
 export const criarProjeto = async (dados: ProjetoPayload) => {

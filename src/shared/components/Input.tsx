@@ -6,7 +6,7 @@ type InputProps = {
   placeholder?: string;
   value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  type?: "text" | "email" | "password" | "number" | "date" | "double";
+  type?: "text" | "email" | "password" | "number" | "date" | "double" | "datetime-local";
   icon?: React.ReactNode;
   rightElement?: React.ReactNode;
   widthPx?: number;
