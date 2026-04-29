@@ -50,7 +50,7 @@ export async function listarProjetos() {
 export async function listarProjetosPorGestor(gestorId?: string) {
     // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO QUANDO O BACKEND SUPORTAR ESTE FILTRO)
     // try {
-    //     const response = await api.get(`/listar/projetos/gestor/${gestorId}`);
+    //     const response = await api.get(`/projetos/listar/gestor/${gestorId}`);
     //     return response.data;
     // } catch (error) {
     //     console.error({ event: "API_ERROR", action: "listarProjetosPorGestor", error });
@@ -87,7 +87,7 @@ export async function listarEquipeProjeto(id: number) {
 
 export async function listarProfissionaisAtivos() {
     try {
-        const response = await api.get("/alocacoes/profissionais/ativos");
+        const response = await api.get("/alocacoes/profissionais-ativos");
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "listarProfissionaisAtivos", error });

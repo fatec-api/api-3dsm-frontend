@@ -18,17 +18,17 @@ export default function Navbar() {
                             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
 
                             <li><Link to="/">Home</Link></li>
-                            <li><Link to="/listaprojetos">Projetos</Link></li>
-                            <li><Link to="/telafuncionarios">Funcionários</Link></li>
-                            <li><Link to="/logprofissional/550e8400-e29b-41d4-a716-446655440010">Apontamento de Horas</Link></li>
+                            <li><Link to="/lista-projetos">Projetos</Link></li>
+                            <li><Link to="/tela-funcionarios">Funcionários</Link></li>
+                            <li><Link to="/log-profissional/550e8400-e29b-41d4-a716-446655440010">Apontamento de Horas</Link></li>
 
                             <li>
                                 <a>Criação</a>
                                 <ul className="p-2">
                                     <li><Link to="/cadastroprojeto">Cadastro de Projeto</Link></li>
                                     <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
-                                    <li><Link to="/cadastro-item">Cadastro de Item</Link></li>
-                                    <li><Link to="/apontamentohoras">Apontamento de Horas</Link></li>
+                                    <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                    <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
                                 </ul>
                             </li>
 
@@ -40,7 +40,7 @@ export default function Navbar() {
                                 </ul>
                             </li>
 
-                            <li><Link to="/telalogin">Login</Link></li>
+                            <li><Link to="/tela-login">Login</Link></li>
 
                         </ul>
                     </div>
@@ -50,21 +50,21 @@ export default function Navbar() {
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
                         <li><Link to="/">Home</Link></li>
-                        <li><Link to="/listaprojetos">Projetos</Link></li>
-                        <li><Link to="/logprofissional/550e8400-e29b-41d4-a716-446655440010">Apontamento</Link></li>
+                        <li><Link to="/lista-projetos">Projetos</Link></li>
+                        <li><Link to="/log-profissional/550e8400-e29b-41d4-a716-446655440010">Apontamento</Link></li>
 
                         <li>
                             <details>
                                 <summary>Criação</summary>
                                 <ul className="p-2 bg-base-100 w-52 z-1">
-                                    <li><Link to="/cadastroprojeto">Cadastro de Projeto</Link></li>
+                                    <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
                                     <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
-                                    <li><Link to="/cadastro-item">Cadastro de Item</Link></li>
-                                    <li><Link to="/apontamentohoras">Apontamento de Horas</Link></li>
+                                    <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                    <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
                                 </ul>
                             </details>
                         </li>
-                        <li><Link to="/telahistorico">Historico</Link></li>
+                        <li><Link to="/tela-historico">Historico</Link></li>
                     </ul>
                 </div>
                 <div className="navbar-end"></div>

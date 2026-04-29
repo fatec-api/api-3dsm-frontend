@@ -46,7 +46,7 @@ export const PaginaAlocacao = ({ projetoId, projetoNome }: Props) => {
         setMessage(null);
       }, 1500);
     } catch (error: any) {
-      setMessage({ type: 'error', text: 'Erro ao salvar alocação no banco.' });
+      setMessage({ type: 'error', text: 'Erro ao salvar alocação.' });
     } finally {
       setIsLoading(false);
     }

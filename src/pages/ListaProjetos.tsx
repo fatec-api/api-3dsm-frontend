@@ -56,7 +56,7 @@ export default function ListaProjetos() {
         if (filtros.cliente && projeto.cliente !== filtros.cliente) return false;
 
         return true;
-    });
+    }); 
 
     const handleFilterChange = (novosFiltros: any) => {
         setFiltros({

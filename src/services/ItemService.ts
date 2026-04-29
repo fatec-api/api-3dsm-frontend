@@ -1,6 +1,6 @@
 import api from "./api";
 
-export type NivelAtividade = "ANALISE" | "DESENVOLVIMENTO" | "TESTE";
+export type NivelAtividade = "Analise" | "Desenvolvimento" | "Teste";
 
 // LISTAR ITENS POR UM ID DE PROJETO
 export async function listarItens(id: number) {
