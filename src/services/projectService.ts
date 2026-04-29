@@ -25,24 +25,38 @@ const MOCK_PROJETOS = [
     { "id": "10", "nomeProjeto": "Data Analytics", "gestorId": "Juliana Lima", "tipoProjeto": "Hora Fechada", "status": "Andamento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 }
 ];
 
+
+
 export const criarProjeto = async (dados: ProjetoPayload) => {
     try {
         const response = await api.post("/cadastrar/projeto", dados);
         return response.data;
     } catch (error) {
-        console.error("Erro ao criar projeto", error);
+        console.error({ event: "API_ERROR", action: "criarProjeto", error });
         throw error;
     }
 };
 
 export async function listarProjetos() {
-    const response = await api.get("/projetos/listar")
-    return response.data
+    try {
+        const response = await api.get("/projetos/listar");
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarProjetos", error });
+        throw error;
+    }
 }
 
 export async function listarProjetosPorGestor(gestorId?: string) {
-    // const response = await api.get("/listar/projetos/gestor/${gestorId}")
-    // return response.data
+    // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO QUANDO O BACKEND SUPORTAR ESTE FILTRO)
+    // try {
+    //     const response = await api.get(`/listar/projetos/gestor/${gestorId}`);
+    //     return response.data;
+    // } catch (error) {
+    //     console.error({ event: "API_ERROR", action: "listarProjetosPorGestor", error });
+    //     throw error;
+    // }
+    
     console.warn("[MOCK] listarProjetosPorGestor: Filtrando dados locais.");
     
     if (gestorId) {
@@ -52,23 +66,43 @@ export async function listarProjetosPorGestor(gestorId?: string) {
 }
 
 export async function listarProjetoId(id: number) {
-    const response = await api.get(`/projetos/${id}`)
-    return response.data
+    try {
+        const response = await api.get(`/projetos/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarProjetoId", error });
+        throw error;
+    }
 }
 
 export async function listarEquipeProjeto(id: number) {
-    const response = await api.get(`/alocacoes/projeto/${id}`);
-    return response.data;
+    try {
+        const response = await api.get(`/alocacoes/projeto/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarEquipeProjeto", error });
+        throw error;
+    }
 }
 
 export async function listarProfissionaisAtivos() {
-    const response = await api.get("/alocacoes/profissionais/ativos");
-    return response.data;
+    try {
+        const response = await api.get("/alocacoes/profissionais/ativos");
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarProfissionaisAtivos", error });
+        throw error;
+    }
 }
 
 export async function listarUsuariosAtivos() {
-    const response = await api.get("/alocacoes/profissionais-ativos");
-    return response.data;
+    try {
+        const response = await api.get("/alocacoes/profissionais-ativos");
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarUsuariosAtivos", error });
+        throw error;
+    }
 }
 
 export function listarClientes() {
@@ -77,6 +111,7 @@ export function listarClientes() {
         { nomeCliente: "Guilherme" },
         { nomeCliente: "Isaura" },
         { nomeCliente: "Daniel" },
-        { nomeCliente: "Emmanuel" }
+        { nomeCliente: "Emmanuel" },
+        { nomeCliente: "Claudio" }
     ]);
 }
