@@ -26,7 +26,7 @@ export default function TelaLogProfissional() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-const mockLogs: Log[] = [
+    const mockLogs: Log[] = [
         { id: 1, projeto: "GSWProj1", atividade: "Implementação API", nivel: "Análise", data: "2026-04-10", inicio: "08:00", fim: "12:00", status: "PENDENTE", justificativa: "-" },
         { id: 2, projeto: "GSWProj1", atividade: "Correção de bug", nivel: "Desenvolvimento", data: "2026-04-09", inicio: "13:00", fim: "17:00", status: "APROVADO", justificativa: "-" },
         { id: 3, projeto: "GSWProj2", atividade: "Refatoração", nivel: "Teste", data: "2026-04-08", inicio: "09:00", fim: "11:00", status: "REPROVADO", justificativa: "Horas inconsistentes" },
@@ -45,7 +45,7 @@ const mockLogs: Log[] = [
         { id: 16, projeto: "GSWProj4", atividade: "Planejamento sprint", nivel: "Análise", data: "2026-03-26", inicio: "09:00", fim: "11:00", status: "APROVADO", justificativa: "-" },
         { id: 17, projeto: "GSWProj2", atividade: "Debug sistema", nivel: "Desenvolvimento", data: "2026-03-25", inicio: "11:00", fim: "15:00", status: "REPROVADO", justificativa: "Erro persistente" },
         { id: 18, projeto: "GSWProj3", atividade: "Validação final", nivel: "Teste", data: "2026-03-24", inicio: "13:00", fim: "16:00", status: "PENDENTE", justificativa: "-" },
-      ];
+    ];
 
     const ordenados = [...mockLogs].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
     setLogs(ordenados);
@@ -63,52 +63,78 @@ const mockLogs: Log[] = [
   const handleSalvarEdicao = async (dadosAtualizados: any) => {
     setIsSaving(true);
     setErro(null);
-    try {
-      const payload = { 
-        ...dadosAtualizados, 
-        status: "PENDENTE",
-        atividade: dadosAtualizados.item 
-      };
-      
-      await atualizarApontamento(dadosAtualizados.id, payload);
-      setLogs(prev => prev.map(log => 
-        log.id === Number(dadosAtualizados.id) 
-          ? { 
-              ...log, 
-              ...dadosAtualizados, 
-              atividade: dadosAtualizados.item, 
-              inicio: dadosAtualizados.horaInicio, 
-              fim: dadosAtualizados.horaFim, 
-              status: "PENDENTE" 
-            } 
-          : log
-      ));
+    setTimeout(async () => {
+        try {
+              /*
+              //  Descomente este bloco quando o backend Java estiver online
+              try {
+                const payload = { 
+                  ...dadosAtualizados, 
+                  status: "PENDENTE",
+                  atividade: dadosAtualizados.item 
+                };
+                
+                // Chama a função do service que faz a comunicação via rede
+                await atualizarApontamento(dadosAtualizados.id, payload);
+                
+                // A atualização do estado (setLogs) ocorre apenas após a confirmação do servidor
+              } catch (error) {
+                setErro("Erro ao salvar alterações no servidor. Tente novamente.");
+                setTimeout(() => setErro(null), 4000);
+              } finally {
+                setIsSaving(false);
+              }
+              */
 
-      setSucesso("Apontamento atualizado e enviado para análise!");
-      setIsModalOpen(false);
-      setTimeout(() => setSucesso(null), 3000);
-    } catch (error) {
-      setErro("Erro ao salvar alterações. Tente novamente.");
-      setTimeout(() => setErro(null), 4000);
-    } finally {
-      setIsSaving(false);
-    }
+            setLogs(prev => prev.map(log => 
+                String(log.id) === String(dadosAtualizados.id) 
+                ? { 
+                    ...log, 
+                    ...dadosAtualizados, 
+                    atividade: dadosAtualizados.item, 
+                    inicio: dadosAtualizados.horaInicio, 
+                    fim: dadosAtualizados.horaFim, 
+                    status: "PENDENTE" 
+                  } 
+                : log
+            ));
+
+            setSucesso("Apontamento atualizado e enviado para análise!");
+            setIsModalOpen(false);
+        } catch (e) {
+            setErro("Falha ao salvar no servidor.");
+        } finally {
+            setIsSaving(false);
+            setTimeout(() => setSucesso(null), 3500);
+        }
+    }, 400);
   };
 
   return (
-    <div className="min-h-screen bg-base-100">
+    <div className="min-h-screen bg-base-100 text-black">
       <Header />
+      
+      {}
+      <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[1000] w-full max-w-md px-4 pointer-events-none">
+        {sucesso && (
+          <div className="alert alert-success shadow-2xl flex justify-center font-bold border border-success animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <span>{sucesso}</span>
+          </div>
+        )}
+        {erro && (
+          <div className="alert alert-error shadow-2xl flex justify-center font-bold animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto">
+            <span>{erro}</span>
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-center mt-24 px-6 pb-12">
         <div className="w-full max-w-7xl bg-base-200 rounded-2xl p-8 shadow-md relative">
           
-          {/* Feedbacks Visuais */}
-          {sucesso && <div className="alert alert-success absolute -top-16 left-0 w-full shadow-lg"><span>{sucesso}</span></div>}
-          {erro && <div className="alert alert-error absolute -top-16 left-0 w-full shadow-lg"><span>{erro}</span></div>}
-
           <h1 className="text-center text-2xl font-semibold mb-8">Meus Últimos Apontamentos</h1>
 
           <div className="overflow-x-auto">
-            <table className="table table-zebra w-full">
+            <table className="table table-zebra w-full text-black">
               <thead>
                 <tr className="text-gray-600">
                   <th>Projeto</th>
@@ -125,7 +151,7 @@ const mockLogs: Log[] = [
                   <tr><td colSpan={7} className="text-center py-10"><span className="loading loading-spinner"></span></td></tr>
                 ) : (
                   logs.map((row) => {
-                    const isEditavel = row.status === "PENDENTE" || row.status === "REPROVADO";
+                    const isEditavel = row.status === "PENDENTE";
                     const statusClass = row.status === "PENDENTE" ? "badge-warning" : row.status === "APROVADO" ? "badge-success" : "badge-error";
                     
                     return (
@@ -156,7 +182,6 @@ const mockLogs: Log[] = [
         </div>
       </div>
 
-      {}
       <ModalEditarApontamento 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
