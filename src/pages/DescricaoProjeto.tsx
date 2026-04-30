@@ -25,7 +25,7 @@ export default function DescricaoProjeto() {
 
     const [selectedProfList, setSelectedProfList] = useState<Profissional[]>([]);
 
-    const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNomes: string[] }[]>([]);
+    const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNome: string }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
     const [metricas, setMetricas] = useState<MetricasAtividade[]>([]);
     const [loadingMetricas, setLoadingMetricas] = useState(false);
@@ -38,10 +38,10 @@ export default function DescricaoProjeto() {
     const profissionaisFiltrados = listaDeProfissionais.filter(prof => {
         const termo = buscaProfissional.toLowerCase();
         return (
-            prof.nomeUsuario.toLowerCase().includes(termo) ||
-            prof.email.toLowerCase().includes(termo) ||
-            prof.nivelExperiencia.toLowerCase().includes(termo) ||
-            prof.cargo.toLowerCase().includes(termo) ||
+            prof.nomeUsuario?.toLowerCase().includes(termo) ||
+            prof.email?.toLowerCase().includes(termo) ||
+            prof.nivelExperiencia?.toLowerCase().includes(termo) ||
+            prof.cargo?.toLowerCase().includes(termo) ||
             prof.valorHora?.toString().includes(termo)
         );
     });
@@ -49,10 +49,10 @@ export default function DescricaoProjeto() {
     const itensFiltrados = itens.filter(item => {
         const termo = buscaItem.toLowerCase();
         return (
-            (item.usuarioNomes?.some(n => n.toLowerCase().includes(termo)) || false) ||
-            item.nivelAtividade.toLowerCase().includes(termo) ||
-            item.codigo.toLowerCase().includes(termo) ||
-            item.descricao.toLowerCase().includes(termo)
+            (item.usuarioNome?.toLowerCase() || "").includes(termo) ||
+            item.nivelAtividade?.toLowerCase().includes(termo) ||
+            item.codigo?.toLowerCase().includes(termo) ||
+            item.descricao?.toLowerCase().includes(termo)
         );
     });
 
@@ -249,12 +249,10 @@ export default function DescricaoProjeto() {
                                     title={item.codigo}
                                     type={item.descricao}
                                     status={item.nivelAtividade}
-                                    responsaveis={item.usuarioNomes}
+                                    responsavel={item.usuarioNome}
                                     showResponsavel={true}
                                     isGestor={isGestor}
-                                    onClick={isGestor && (!item.usuarioNomes || item.usuarioNomes.length === 0)
-                                        ? () => setPopupItem(item)
-                                        : undefined}
+                                    onClick={isGestor ? () => setPopupItem(item) : undefined}
                                 />
                             ))
                         )}
