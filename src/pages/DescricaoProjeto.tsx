@@ -63,7 +63,8 @@ export default function DescricaoProjeto() {
             setProjeto(projeto);
 
             const listaItens = await listarItens(projetoState.id);
-            setItens(listaItens);
+            // setItens(listaItens)
+            setItens(Array.isArray(listaItens) ? listaItens : []);
 
             const listaEquipe = await listarEquipeProjeto(projetoState.id);
             setListaDeProfissionais(listaEquipe);

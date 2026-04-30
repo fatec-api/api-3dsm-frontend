@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarProjetos } from "../services/projectService";
@@ -56,9 +56,10 @@ export default function ListaProjetos() {
         if (filtros.cliente && projeto.cliente !== filtros.cliente) return false;
 
         return true;
-    }); 
+    });
 
-    const handleFilterChange = (novosFiltros: any) => {
+
+    const handleFilterChange = useCallback((novosFiltros: any) => {
         setFiltros({
             nome: novosFiltros.nome,
             progresso: novosFiltros.progresso,
@@ -66,7 +67,7 @@ export default function ListaProjetos() {
             tipoProjeto: novosFiltros.tipoProjeto,
             cliente: novosFiltros.cliente
         });
-    };
+    }, []);
     useEffect(() => {
         const loadData = async () => {
             try {
