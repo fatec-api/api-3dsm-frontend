@@ -29,7 +29,7 @@ const MOCK_PROJETOS = [
 
 export const criarProjeto = async (dados: ProjetoPayload) => {
     try {
-        const response = await api.post("/cadastrar/projeto", dados);
+        const response = await api.post("/projetos/cadastrar", dados);
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "criarProjeto", error });
@@ -97,7 +97,7 @@ export async function listarProfissionaisAtivos() {
 
 export async function listarUsuariosAtivos() {
     try {
-        const response = await api.get("/alocacoes/profissionais-ativos");
+        const response = await api.get("/usuarios/ativos");
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "listarUsuariosAtivos", error });

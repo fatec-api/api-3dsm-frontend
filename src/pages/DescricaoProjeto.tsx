@@ -8,6 +8,7 @@ import ModalAlocarFuncionarioItem, { type Profissional } from "../components/Mod
 import { listarEquipeProjeto, listarProjetoId } from "../services/projectService";
 import { getApontamentosAprovadosPorProjeto, type MetricasAtividade, } from "../services/apontamentoService";
 import IndicadorProgresso from "../components/IndicadorProgresso";
+import Botao from "../shared/components/Botao";
 
 const NIVEIS_BASE = ['ANALISE', 'DESENVOLVIMENTO', 'TESTE'];
 const NOMES_ATIVIDADES: Record<string, string> = {
@@ -25,7 +26,7 @@ export default function DescricaoProjeto() {
 
     const [selectedProfList, setSelectedProfList] = useState<Profissional[]>([]);
 
-    const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNome: string }[]>([]);
+    const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNomes: string[] }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
     const [metricas, setMetricas] = useState<MetricasAtividade[]>([]);
     const [loadingMetricas, setLoadingMetricas] = useState(false);
@@ -49,7 +50,7 @@ export default function DescricaoProjeto() {
     const itensFiltrados = itens.filter(item => {
         const termo = buscaItem.toLowerCase();
         return (
-            (item.usuarioNome?.toLowerCase() || "").includes(termo) ||
+            (item.usuarioNomes?.some(n => n?.toLowerCase().includes(termo)) || false) ||
             item.nivelAtividade?.toLowerCase().includes(termo) ||
             item.codigo?.toLowerCase().includes(termo) ||
             item.descricao?.toLowerCase().includes(termo)
@@ -216,11 +217,9 @@ export default function DescricaoProjeto() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                    <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-4">
-                        <div className="justify-self-start">
-                            <h2 className="text-lg font-semibold whitespace-nowrap">Atividades</h2>
-                        </div>
-                        <div className="relative w-full max-w-md justify-self-center">
+                    <div className="flex flex-row justify-between items-center gap-4">
+                        <h2 className="text-lg font-semibold whitespace-nowrap">Atividades</h2>
+                        <div className="relative flex-1 max-w-md">
                             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <svg className="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -234,7 +233,11 @@ export default function DescricaoProjeto() {
                                 onChange={(e) => setBuscaItem(e.target.value)}
                             />
                         </div>
-                        <div className="hidden md:block"></div>
+                        <div className="flex items-center justify-center bg-gray-50">
+                            <Botao type="button" className="h-10 ml-auto" onClick={() => navigate("/cadastro-item")}>
+                                Criar Atividade
+                            </Botao>
+                        </div>
                     </div>
 
                     <div className="flex flex-row flex-wrap gap-4">
@@ -249,7 +252,7 @@ export default function DescricaoProjeto() {
                                     title={item.codigo}
                                     type={item.descricao}
                                     status={item.nivelAtividade}
-                                    responsavel={item.usuarioNome}
+                                    responsavel={item.usuarioNomes?.join(", ")}
                                     showResponsavel={true}
                                     isGestor={isGestor}
                                     onClick={isGestor ? () => setPopupItem(item) : undefined}
