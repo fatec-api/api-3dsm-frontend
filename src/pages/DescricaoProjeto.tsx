@@ -25,7 +25,7 @@ export default function DescricaoProjeto() {
 
     const [selectedProfList, setSelectedProfList] = useState<Profissional[]>([]);
 
-    const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNome: string }[]>([]);
+    const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNomes: string[] }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
     const [metricas, setMetricas] = useState<MetricasAtividade[]>([]);
     const [loadingMetricas, setLoadingMetricas] = useState(false);
@@ -49,7 +49,7 @@ export default function DescricaoProjeto() {
     const itensFiltrados = itens.filter(item => {
         const termo = buscaItem.toLowerCase();
         return (
-            (item.usuarioNome?.toLowerCase() || "").includes(termo) ||
+            (item.usuarioNomes?.some(n => n.toLowerCase().includes(termo)) || false) ||
             item.nivelAtividade.toLowerCase().includes(termo) ||
             item.codigo.toLowerCase().includes(termo) ||
             item.descricao.toLowerCase().includes(termo)
@@ -249,10 +249,12 @@ export default function DescricaoProjeto() {
                                     title={item.codigo}
                                     type={item.descricao}
                                     status={item.nivelAtividade}
-                                    responsavel={item.usuarioNome}
+                                    responsaveis={item.usuarioNomes}
                                     showResponsavel={true}
                                     isGestor={isGestor}
-                                    onClick={isGestor && !item.usuarioNome ? () => setPopupItem(item) : undefined}
+                                    onClick={isGestor && (!item.usuarioNomes || item.usuarioNomes.length === 0)
+                                        ? () => setPopupItem(item)
+                                        : undefined}
                                 />
                             ))
                         )}

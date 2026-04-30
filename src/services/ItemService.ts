@@ -5,12 +5,14 @@ export type NivelAtividade = "Analise" | "Desenvolvimento" | "Teste";
 // LISTAR ITENS POR UM ID DE PROJETO
 export async function listarItens(id: number) {
     const response = await api.get(`http://localhost:8082/itens/projeto/${id}`);
-
-    if (response.status === 204 || !response.data) {
-      return []
-    }
-
-    return response.data
+    return response.data.map((item: any) => ({
+        ...item,
+        usuarioNomes: item.usuarioNomes?.length
+            ? item.usuarioNomes
+            : item.usuarioNome
+                ? [item.usuarioNome]
+                : []
+    }));
 }
 
 export async function listarItensPorProfissional(id: string) {
