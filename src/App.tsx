@@ -20,8 +20,8 @@ import ListaApontamentosGestor from './pages/ListaApontamentosGestor'
 const router = createBrowserRouter(
  createRoutesFromElements(
    <>
-     <Route path="/" element={<Header />}>
-       <Route index element={<Home />}/>
+     <Route path="/" element={<ListaProjetos />}>
+       {/* <Route index element={<Home />}/> */}
        {/* <Route path='input' element={<Input/>}/>
        <Route path='dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/> */}
        <Route path='login' element={<TelaLogin/>}/>

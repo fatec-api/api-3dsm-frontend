@@ -3,16 +3,16 @@ import api from "./api"
 export interface MetricasAtividade {
     horasPrevistasAtiv: number
     horasRealizadasAtiv: number
-    nivelAtividade: 'ANALISE' | 'DESENVOLVIMENTO' | 'TESTE'
+    nivelAtividade: 'Analise' | 'Desenvolvimento' | 'Teste'
 }
 
 export const getApontamentosAprovadosPorProjeto = async (projetoId: number): Promise<MetricasAtividade[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve([
-                { nivelAtividade: 'ANALISE', horasPrevistasAtiv: 100, horasRealizadasAtiv: 70 }, 
-                { nivelAtividade: 'DESENVOLVIMENTO', horasPrevistasAtiv: 200, horasRealizadasAtiv: 250 }, 
-                { nivelAtividade: 'TESTE', horasPrevistasAtiv: 50, horasRealizadasAtiv: 45 } 
+                { nivelAtividade: 'Analise', horasPrevistasAtiv: 100, horasRealizadasAtiv: 70 }, 
+                { nivelAtividade: 'Desenvolvimento', horasPrevistasAtiv: 200, horasRealizadasAtiv: 250 }, 
+                { nivelAtividade: 'Teste', horasPrevistasAtiv: 50, horasRealizadasAtiv: 45 } 
             ]);
         }, 800);
     });
