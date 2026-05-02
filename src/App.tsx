@@ -1,22 +1,21 @@
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import Input from './shared/components/Input'
 import Header from './shared/components/Header'
-import Home from './pages/Home'
+import Home from './pages/TelaHome'
 import TelaLogin from './pages/TelaLogin'
 import Dropdown from './shared/components/Dropdown'
 import CadastroUsuario from "./pages/TelaCadastroUsuario"
-import CadastroProjeto from './pages/CadastroProjeto'
-import ListaProjetos from './pages/ListaProjetos'
+import CadastroProjeto from './pages/TelaCadastroProjeto'
+import ListaProjetos from './pages/TelaListaProjetos'
 import ApontamentoHoras from './pages/TelaApontamentoHoras'
-import DevAllocationTest from './pages/DevAllocationTest';
-import DescricaoProjeto from './pages/DescricaoProjeto'
+import DevAllocationTest from './pages/TelaDevAllocationTest';
+import DescricaoProjeto from './pages/TelaDescricaoProjeto'
 import TelaFuncionarios from './pages/TelaFuncionarios'
-import CadastroItem from './pages/CadastroItem'
+import CadastroItem from './pages/TelaCadastroItem'
 import TelaLogProfissional from './pages/TelaLogProfissional'
-import Historico from './pages/Historico'
-import ListaApontamentosGestor from './pages/ListaApontamentosGestor'
+import Historico from './pages/TelaHistorico'
+import ListaApontamentosGestor from './pages/TelaListaApontamentosGestor'
 import TelaTeste from './pages/TelaTeste'
-
 
 const router = createBrowserRouter(
  createRoutesFromElements(
