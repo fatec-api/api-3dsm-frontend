@@ -21,8 +21,8 @@ import TelaTeste from './pages/TelaTeste'
 const router = createBrowserRouter(
  createRoutesFromElements(
    <>
-     <Route path="/" element={<Header />}>
-       <Route index element={<Home />}/>
+     <Route path="/" element={<ListaProjetos />}>
+       {/* <Route index element={<Home />}/> */}
        {/* <Route path='input' element={<Input/>}/>
        <Route path='dropdown' element={<Dropdown options={['Opção 1', 'Opção 2', 'Opção 3']} />}/> */}
        <Route path='login' element={<TelaLogin/>}/>
@@ -30,13 +30,13 @@ const router = createBrowserRouter(
      </Route>
      <Route path='/telalogin' element={<TelaLogin/>}/>
      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
-     <Route path='/cadastroprojeto' element={<CadastroProjeto/>}/>
-     <Route path='/listaprojetos' element={<ListaProjetos/>}/>
-     <Route path='/apontamentohoras' element={<ApontamentoHoras/>}/>
+     <Route path='/cadastro-projeto' element={<CadastroProjeto/>}/>
+     <Route path='/lista-projetos' element={<ListaProjetos/>}/>
+     <Route path='/apontamento-horas' element={<ApontamentoHoras/>}/>
      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
      <Route path='/descricao-projeto' element={<DescricaoProjeto />}/>
      <Route path='/cadastro-item' element={<CadastroItem />} />
-     <Route path='/logprofissional/:id' element={<TelaLogProfissional/>}/>
+     <Route path='/log-profissional/:id' element={<TelaLogProfissional/>}/>
      <Route path='/tela-historico' element={<Historico/>}/>
      <Route path='/apontamentos-gestor' element={<ListaApontamentosGestor/>}/>
      <Route path='/teste-k' element={<TelaTeste />}/>

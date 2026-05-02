@@ -52,7 +52,7 @@ export default function FormCadastroItem() {
   useEffect(() => {
     async function carregarProjetos() {
       try {
-        const res = await fetch("http://localhost:8080/listar/projetos");
+        const res = await fetch("http://localhost:8082/projetos/listar");
         if (!res.ok) throw new Error("Erro ao buscar projetos.");
         setProjetos(await res.json());
       } catch (error) {
@@ -71,7 +71,7 @@ export default function FormCadastroItem() {
 
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:8080/alocacoes/projeto/${projetoIdEstado}`);
+        const res = await fetch(`http://localhost:8082/alocacoes/projeto/${projetoIdEstado}`);
 
         if (!res.ok) throw new Error("Erro ao buscar profissionais do projeto.");
 
@@ -95,7 +95,7 @@ export default function FormCadastroItem() {
     if (!descricao.trim()) return "A descrição é obrigatória.";
     if (previsaoHoras !== "" && Number(previsaoHoras) < 0)
       return "A previsão de horas não pode ser negativa.";
-    return "";    
+    return "";
   };
 
   const limpar = () => {
@@ -143,7 +143,7 @@ export default function FormCadastroItem() {
   };
 
   async function cadastrarItem(payload: ItemPayload): Promise<void> {
-    const response = await fetch("http://localhost:8080/itens/cadastro/item", {
+    const response = await fetch("http://localhost:8082/itens/cadastrar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -164,7 +164,7 @@ export default function FormCadastroItem() {
       className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-140 flex flex-col gap-8"
     >
       <h1 className="text-2xl font-semibold text-gray-800 text-center">
-        Cadastro de Item
+        Cadastro de Atividade
       </h1>
 
       {/* Projeto vem primeiro pois o código é gerado a partir dele */}
@@ -215,9 +215,9 @@ export default function FormCadastroItem() {
         value={nivelAtividade}
         onChange={(e) => setNivelAtividade(e.target.value)}
         options={[
-          { label: "Análise", value: "ANALISE" },
-          { label: "Desenvolvimento", value: "DESENVOLVIMENTO" },
-          { label: "Teste", value: "TESTE" },
+          { label: "Análise", value: "Analise" },
+          { label: "Desenvolvimento", value: "Desenvolvimento" },
+          { label: "Teste", value: "Teste" },
         ]}
         icon={<FiUser size={18} />}
         required={false}

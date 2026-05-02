@@ -1,25 +1,32 @@
 import { Outlet } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
+import logo from "../../assets/gsw-logo-colorida.png";
+import { FiUser, FiLogOut } from "react-icons/fi";
 import { useContext } from "react";
 import { KeycloakContext } from "../../contexts/KeycloakProvider";
 
 export default function Header() {
+    const navigate = useNavigate();
+
     const { autenticado, login, logout, getUsuario } = useContext(KeycloakContext);
     const usuario = getUsuario();
     return (
         <>
             <div className="navbar fixed top-0 left-0 w-full z-50 bg-base-100 shadow-sm">
                 <div className="flex-1">
-                    <a className="btn btn-ghost text-xl">GSW</a>
-                </div>
+                   <a className="btn btn-ghost text-xl">
+                      <img
+                        src={logo}
+                        alt="Logo GSW"
+                        className="h-8 w-auto"
+                        />
+                   </a>
+               </div>
                 <div className="flex gap-2">
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                            <div className="w-10 rounded-full">
-                                <img
-                                    alt="Tailwind CSS Navbar component"
-                                    src="https://img.icons8.com/material-rounded/48/user.png" />
-                            </div>
+                             <FiUser className="w-6 h-6" />
                         </div>
                         <ul
                             tabIndex={-1}
@@ -42,8 +49,8 @@ export default function Header() {
                         <div>
                             <span>Olá, {usuario?.nome}</span>
 
-                            <button onClick={logout} className="w-10 btn btn-ghost btn-circle avatar" >
-                        <img src="https://img.icons8.com/fluency-systems-filled/48/exit.png" alt="" />
+                            <button onClick={logout} className="w-10 btn btn-ghost btn-circle avatar">
+                        <FiLogOut className="w-6 h-6" />
                             </button>
                         </div>
                     )}

@@ -8,6 +8,7 @@ import ModalAlocarFuncionarioItem, { type Profissional } from "../components/Mod
 import { listarEquipeProjeto, listarProjetoId } from "../services/projectService";
 import { getApontamentosAprovadosPorProjeto, type MetricasAtividade, } from "../services/apontamentoService";
 import IndicadorProgresso from "../components/IndicadorProgresso";
+import Botao from "../shared/components/Botao";
 
 const NIVEIS_BASE = ['ANALISE', 'DESENVOLVIMENTO', 'TESTE'];
 const NOMES_ATIVIDADES: Record<string, string> = {
@@ -22,13 +23,39 @@ export default function DescricaoProjeto() {
     const projetoState = state?.projeto;
     const [projeto, setProjeto] = useState<any>(projetoState);
     const [popupItem, setPopupItem] = useState<any | null>(null);
-    const [selectedProfId, setSelectedProfId] = useState("");
 
-    const [itens, setItens] = useState<{ codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNome: string }[]>([]);
+    const [selectedProfList, setSelectedProfList] = useState<Profissional[]>([]);
+
+    const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNomes: string[] }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
     const [metricas, setMetricas] = useState<MetricasAtividade[]>([]);
     const [loadingMetricas, setLoadingMetricas] = useState(false);
+    const [modalLoading, setModalLoading] = useState(false);
+    const [modalMessage, setModalMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+    const [buscaProfissional, setBuscaProfissional] = useState("");
+    const [buscaItem, setBuscaItem] = useState("");
+
+    const profissionaisFiltrados = listaDeProfissionais.filter(prof => {
+        const termo = buscaProfissional.toLowerCase();
+        return (
+            prof.nomeUsuario?.toLowerCase().includes(termo) ||
+            prof.email?.toLowerCase().includes(termo) ||
+            prof.nivelExperiencia?.toLowerCase().includes(termo) ||
+            prof.cargo?.toLowerCase().includes(termo) ||
+            prof.valorHora?.toString().includes(termo)
+        );
+    });
+
+    const itensFiltrados = itens.filter(item => {
+        const termo = buscaItem.toLowerCase();
+        return (
+            (item.usuarioNomes?.some(n => n?.toLowerCase().includes(termo)) || false) ||
+            item.nivelAtividade?.toLowerCase().includes(termo) ||
+            item.codigo?.toLowerCase().includes(termo) ||
+            item.descricao?.toLowerCase().includes(termo)
+        );
+    });
 
     const carregarDadosProjeto = async () => {
         if (!projetoState?.id) return;
@@ -37,7 +64,8 @@ export default function DescricaoProjeto() {
             setProjeto(projeto);
 
             const listaItens = await listarItens(projetoState.id);
-            setItens(listaItens);
+            // setItens(listaItens)
+            setItens(Array.isArray(listaItens) ? listaItens : []);
 
             const listaEquipe = await listarEquipeProjeto(projetoState.id);
             setListaDeProfissionais(listaEquipe);
@@ -48,44 +76,65 @@ export default function DescricaoProjeto() {
         } catch (error) {
             console.error("Erro ao carregar dados do projeto", error);
         } finally {
-            setLoadingMetricas(false)
+            setLoadingMetricas(false);
         }
     };
 
     useEffect(() => {
         if (!projetoState?.id) {
-            navigate("/listaprojetos");
+            navigate("/lista-projetos");
             return;
         }
         carregarDadosProjeto();
     }, [projetoState?.id]);
 
+    const handleFecharModal = () => {
+        setPopupItem(null);
+        setSelectedProfList([]);
+        setModalMessage(null);
+    };
+
+    const handleSelectProfissional = (p: Profissional) => {
+        setSelectedProfList(prev => [...prev, p]);
+    };
+
+    const handleRemoveProfissional = (id: string) => {
+        setSelectedProfList(prev => prev.filter(p => p.id !== id));
+    };
+
     const handleAlocar = async () => {
-        if (!popupItem || !selectedProfId) return;
+        if (!popupItem || selectedProfList.length === 0) return;
 
         try {
+            setModalLoading(true);
+            setModalMessage(null);
+
             await vincularProfissionalItem({
-                projectId: projeto.id,
+                projetoId: projeto.id,
                 itemId: popupItem.id,
-                professionalIds: [selectedProfId],
+                profissionalIds: selectedProfList.map(p => p.id),
             });
 
-            setPopupItem(null);
-            setSelectedProfId("");
+            setModalMessage({ type: 'success', text: 'Profissionais alocados com sucesso!' });
 
             await carregarDadosProjeto();
+
+            setTimeout(() => {
+                handleFecharModal();
+            }, 1500);
         } catch (error) {
             console.error("Erro ao alocar:", error);
+            setModalMessage({ type: 'error', text: 'Erro ao alocar profissionais. Tente novamente.' });
+        } finally {
+            setModalLoading(false);
         }
     };
 
     const calcularPorcentagem = (previstas: number, realizadas: number) => {
         if (!previstas || previstas === 0) return 0;
-        const calculo = (realizadas / previstas) * 100;
-        return Math.round(calculo);
+        return Math.round((realizadas / previstas) * 100);
     };
 
-    // trocar para a chamada da api depois
     const isGestor = true;
 
     if (!projeto) return null;
@@ -96,7 +145,6 @@ export default function DescricaoProjeto() {
 
             <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col gap-6">
 
-                {/* banner header do projeto aberto */}
                 <div className="card bg-base-100 shadow-sm border border-base-content/10">
                     <div className="card-body flex flex-row justify-between items-start">
                         <div className="flex flex-col gap-2">
@@ -109,20 +157,31 @@ export default function DescricaoProjeto() {
                     </div>
                 </div>
 
-                {/* lista de profissionais alocados */}
                 <div className="flex flex-col gap-3">
-                    <div className="flex flex-row justify-between items-center">
-                        <h2 className="text-lg font-semibold">Profissionais Alocados</h2>
+                    <div className="flex flex-row justify-between items-center gap-4">
+                        <h2 className="text-lg font-semibold whitespace-nowrap">Profissionais Alocados</h2>
+                        <div className="relative flex-1 max-w-md">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <svg className="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input
+                                type="text"
+                                placeholder="Pesquise por nome, e-mail, nível, cargo..."
+                                className="input input-bordered w-full pl-10 h-10"
+                                value={buscaProfissional}
+                                onChange={(e) => setBuscaProfissional(e.target.value)}
+                            />
+                        </div>
                         {isGestor && (
-                            // <Botao type="button">
-                            //     Alocar Funcionarios
-                            // </Botao>
                             <PaginaAlocacao
                                 projetoId={projeto.id}
                                 projetoNome={projeto.nomeProjeto}
                             />
                         )}
                     </div>
+
                     <div className="overflow-x-auto rounded-box border border-base-content/10 bg-base-100">
                         <table className="table">
                             <thead>
@@ -132,16 +191,17 @@ export default function DescricaoProjeto() {
                                     <th>E-mail</th>
                                     <th>Nível de Experiência</th>
                                     <th>Cargo</th>
+                                    <th>Valor/hora</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {listaDeProfissionais.length === 0 ? (
+                                {profissionaisFiltrados.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="text-center py-4">Nenhum profissional alocado.</td>
+                                        <td colSpan={6} className="text-center py-4 text-base-content/50">Nenhum resultado para os filtros aplicados.</td>
                                     </tr>
                                 ) : (
-                                    listaDeProfissionais.map((prof, index) => (
-                                        <tr key={prof.id}>
+                                    profissionaisFiltrados.map((prof, index) => (
+                                        <tr key={prof.id} className="hover">
                                             <th>{index + 1}</th>
                                             <td>{prof.nomeUsuario}</td>
                                             <td>{prof.email}</td>
@@ -156,60 +216,71 @@ export default function DescricaoProjeto() {
                     </div>
                 </div>
 
-                {/* lista de cards itens */}
                 <div className="flex flex-col gap-3">
-                    <div className="flex flex-row justify-between items-center">
-                        <h2 className="text-lg font-semibold">Itens</h2>
+                    <div className="flex flex-row justify-between items-center gap-4">
+                        <h2 className="text-lg font-semibold whitespace-nowrap">Atividades</h2>
+                        <div className="relative flex-1 max-w-md">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <svg className="w-5 h-5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input
+                                type="text"
+                                placeholder="Pesquise por item, responsável ou nível..."
+                                className="input input-bordered w-full pl-10 h-10"
+                                value={buscaItem}
+                                onChange={(e) => setBuscaItem(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex items-center justify-center bg-gray-50">
+                            <Botao type="button" className="h-10 ml-auto" onClick={() => navigate("/cadastro-item")}>
+                                Criar Atividade
+                            </Botao>
+                        </div>
                     </div>
+
                     <div className="flex flex-row flex-wrap gap-4">
-                        {itens.length === 0 ? (
-                            <div role="alert" className="alert alert-info alert-soft">
-                                <p className="text-lg">Nenhum item encontrado.</p>
+                        {itensFiltrados.length === 0 ? (
+                            <div role="alert" className="alert alert-info alert-soft w-full text-sm">
+                                <span>Sem resultados para a pesquisa de atividades.</span>
                             </div>
                         ) : (
-                            itens.map((item, index) => (
+                            itensFiltrados.map((item, index) => (
                                 <Card
                                     key={index}
                                     title={item.codigo}
                                     type={item.descricao}
                                     status={item.nivelAtividade}
-                                    responsavel={item.usuarioNome}
+                                    responsavel={item.usuarioNomes?.join(", ")}
                                     showResponsavel={true}
                                     isGestor={isGestor}
-                                    onClick={isGestor && !item.usuarioNome ? () => setPopupItem(item) : undefined}
+                                    onClick={isGestor ? () => setPopupItem(item) : undefined}
                                 />
                             ))
                         )}
                     </div>
                 </div>
 
-                {/* Horas distribuídas pelos níveis de Atividade */}
                 <div className="flex flex-col gap-4 mt-8">
-                    <h2 className="text-lg font-semibold mb-2">Horas realizadas vs. previstas por atividade</h2>
-
+                    <h2 className="text-lg font-semibold mb-2">Progresso por nível de atividade</h2>
                     {loadingMetricas ? (
-                        <div className="flex justify-center p-8 bg-base-100 rounded-box border border-base-content/10">
+                        <div className="flex justify-center p-8 bg-base-100 rounded-box">
                             <span className="loading loading-spinner text-primary loading-lg"></span>
                         </div>
                     ) : (
                         <div className="flex flex-row flex-wrap md:flex-nowrap gap-6 justify-between">
                             {NIVEIS_BASE.map(nivel => {
                                 const dadoDoNivel = metricas.find(m => m.nivelAtividade === nivel);
-
                                 const percentual = dadoDoNivel
                                     ? calcularPorcentagem(dadoDoNivel.horasPrevistasAtiv, dadoDoNivel.horasRealizadasAtiv)
                                     : 0;
-
                                 return (
-                                    <div
-                                        key={nivel}
-                                        className="card bg-base-100 flex-1 border border-base-content/10 shadow-sm transition-all hover:shadow-md"
-                                    >
+                                    <div key={nivel} className="card bg-base-100 flex-1 border border-base-content/10 shadow-sm">
                                         <div className="card-body items-center text-center gap-6">
                                             <h3 className="card-title text-base-content/70 font-medium">
                                                 {NOMES_ATIVIDADES[nivel]}
                                             </h3>
-
                                             <IndicadorProgresso
                                                 percentualAtiv={percentual}
                                                 horasPrevistas={dadoDoNivel?.horasPrevistasAtiv || 0}
@@ -226,14 +297,15 @@ export default function DescricaoProjeto() {
 
             <ModalAlocarFuncionarioItem
                 isOpen={!!popupItem}
-                onClose={() => { setPopupItem(null); setSelectedProfId(""); }}
-                itemName={popupItem?.titulo ?? ""}
+                onClose={handleFecharModal}
+                itemName={popupItem?.codigo ?? ""}
                 profissionais={listaDeProfissionais}
-                selectedId={selectedProfId}
-                onSelect={setSelectedProfId}
+                selectedList={selectedProfList}
+                onSelect={handleSelectProfissional}
+                onRemove={handleRemoveProfissional}
                 onSave={handleAlocar}
-                isLoading={false}
-                message={null}
+                isLoading={modalLoading}
+                message={modalMessage}
             />
         </div>
     );

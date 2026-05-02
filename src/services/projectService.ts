@@ -13,38 +13,50 @@ export interface ProjetoPayload {
 }
 
 const MOCK_PROJETOS = [
-    { "id": "1", "nome": "Projeto A", "gestorId": "Ana Costa" },
-    { "id": "2", "nome": "Projeto B", "gestorId": "Ana Costa" },
-    { "id": "3", "nome": "Projeto C", "gestorId": "Juliana Lima" },
-    { "id": "4", "nome": "Projeto D", "gestorId": "Ricardo Mendes" },
-    { "id": "5", "nome": "Sistema de Gestão Interna", "gestorId": "Ana Costa" },
-    { "id": "6", "nome": "Portal do Cliente", "gestorId": "Juliana Lima" },
-    { "id": "7", "nome": "App Mobile Vendas", "gestorId": "Ricardo Mendes" },
-    { "id": "8", "nome": "Migração de Nuvem", "gestorId": "Carlos Souza" },
-    { "id": "9", "nome": "Segurança 2024", "gestorId": "Carlos Souza" },
-    { "id": "10", "nome": "Data Analytics", "gestorId": "Juliana Lima" }
+    { "id": "1", "nomeProjeto": "Projeto A", "gestorId": "Ana Costa", "tipoProjeto": "Alocacao", "status": "Andamento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 50, "horasPendentesTotal": 150 },
+    { "id": "2", "nomeProjeto": "Projeto B", "gestorId": "Ana Costa", "tipoProjeto": "Hora Fechada", "status": "Desenvolvimento", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 },
+    { "id": "3", "nomeProjeto": "Projeto C", "gestorId": "Juliana Lima", "tipoProjeto": "Alocacao", "status": "Concluída", "cliente": "Lovelace Inc", "horasPrevistasTotal": 200, "horasRealizadasTotal": 190, "horasPendentesTotal": 10 },
+    { "id": "4", "nomeProjeto": "Projeto D", "gestorId": "Ricardo Mendes", "tipoProjeto": "Hora Fechada", "status": "Andamento", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 150, "horasPendentesTotal": 50 },
+    { "id": "5", "nomeProjeto": "Sistema de Gestão Interna", "gestorId": "Ana Costa", "tipoProjeto": "Alocacao", "status": "Concluída", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 },
+    { "id": "6", "nomeProjeto": "Portal do Cliente", "gestorId": "Juliana Lima", "tipoProjeto": "Hora Fechada", "status": "Desenvolvimento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 198, "horasPendentesTotal": 2 },
+    { "id": "7", "nomeProjeto": "App Mobile Vendas", "gestorId": "Ricardo Mendes", "tipoProjeto": "Alocacao", "status": "Andamento", "cliente": "Lovelace Inc", "horasPrevistasTotal": 200, "horasRealizadasTotal": 150, "horasPendentesTotal": 50 },
+    { "id": "8", "nomeProjeto": "Migração de Nuvem", "gestorId": "Carlos Souza", "tipoProjeto": "Hora Fechada", "status": "Desenvolvimento", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 100, "horasPendentesTotal": 100 },
+    { "id": "9", "nomeProjeto": "Segurança 2024", "gestorId": "Carlos Souza", "tipoProjeto": "Alocacao", "status": "Concluída", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 150, "horasPendentesTotal": 50 },
+    { "id": "10", "nomeProjeto": "Data Analytics", "gestorId": "Juliana Lima", "tipoProjeto": "Hora Fechada", "status": "Andamento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 }
 ];
+
+
 
 export const criarProjeto = async (dados: ProjetoPayload) => {
     try {
-        const response = await api.post("/cadastrar/projeto", dados);
+        const response = await api.post("/projetos/cadastrar", dados);
         return response.data;
     } catch (error) {
-        console.error("Erro ao criar projeto", error);
+        console.error({ event: "API_ERROR", action: "criarProjeto", error });
         throw error;
     }
 };
 
 export async function listarProjetos() {
-    // const response = await api.get("/listar/projetos")
-    // return response.data;
-    console.warn("[MOCK] listarProjetos: Ignorando API para evitar Erro 500.");
-    return Promise.resolve(MOCK_PROJETOS);
+    try {
+        const response = await api.get("/projetos/listar");
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarProjetos", error });
+        throw error;
+    }
 }
 
 export async function listarProjetosPorGestor(gestorId?: string) {
-    // const response = await api.get("/listar/projetos/gestor/${gestorId}")
-    // return response.data
+    // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO QUANDO O BACKEND SUPORTAR ESTE FILTRO)
+    // try {
+    //     const response = await api.get(`/projetos/listar/gestor/${gestorId}`);
+    //     return response.data;
+    // } catch (error) {
+    //     console.error({ event: "API_ERROR", action: "listarProjetosPorGestor", error });
+    //     throw error;
+    // }
+    
     console.warn("[MOCK] listarProjetosPorGestor: Filtrando dados locais.");
     
     if (gestorId) {
@@ -54,26 +66,43 @@ export async function listarProjetosPorGestor(gestorId?: string) {
 }
 
 export async function listarProjetoId(id: number) {
-    const projetoMock = MOCK_PROJETOS.find(p => p.id === String(id));
-    if (projetoMock) return Promise.resolve(projetoMock);
-
-    const response = await api.get(`/listar/projetos/${id}`)
-    return response.data
+    try {
+        const response = await api.get(`/projetos/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarProjetoId", error });
+        throw error;
+    }
 }
 
 export async function listarEquipeProjeto(id: number) {
-    const response = await api.get(`/alocacoes/projeto/${id}`);
-    return response.data;
+    try {
+        const response = await api.get(`/alocacoes/projeto/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarEquipeProjeto", error });
+        throw error;
+    }
 }
 
 export async function listarProfissionaisAtivos() {
-    const response = await api.get("/alocacoes/profissionais/ativos");
-    return response.data;
+    try {
+        const response = await api.get("/alocacoes/profissionais-ativos");
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarProfissionaisAtivos", error });
+        throw error;
+    }
 }
 
 export async function listarUsuariosAtivos() {
-    const response = await api.get("/alocacoes/usuarios/ativos");
-    return response.data;
+    try {
+        const response = await api.get("/usuarios/ativos");
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarUsuariosAtivos", error });
+        throw error;
+    }
 }
 
 export function listarClientes() {
@@ -82,6 +111,7 @@ export function listarClientes() {
         { nomeCliente: "Guilherme" },
         { nomeCliente: "Isaura" },
         { nomeCliente: "Daniel" },
-        { nomeCliente: "Emmanuel" }
+        { nomeCliente: "Emmanuel" },
+        { nomeCliente: "Claudio" }
     ]);
 }
