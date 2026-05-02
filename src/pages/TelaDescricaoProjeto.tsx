@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../shared/components/Card";
 import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade, vincularProfissionalItem } from "../services/ItemService";
-import PaginaAlocacao from "./DevAllocationTest";
+import PaginaAlocacao from "./TelaDevAllocationTest";
 import ModalAlocarFuncionarioItem, { type Profissional } from "../components/ModalAlocarFuncionarioItem";
 import { listarEquipeProjeto, listarProjetoId } from "../services/projectService";
 import { getApontamentosAprovadosPorProjeto, type MetricasAtividade, } from "../services/apontamentoService";

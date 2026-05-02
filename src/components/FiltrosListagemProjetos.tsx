@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import type { Projeto } from "../pages/ListaProjetos";
+import type { Projeto } from "../pages/TelaListaProjetos";
 
 interface FiltrosListagemProjetosProps {
     projetos: Projeto[];
