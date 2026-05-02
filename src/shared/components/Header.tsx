@@ -1,7 +1,11 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
+import { useContext } from "react";
+import { KeycloakContext } from "../../contexts/KeycloakProvider";
 
 export default function Header() {
+    const { autenticado, login, logout, getUsuario } = useContext(KeycloakContext);
+    const usuario = getUsuario();
     return (
         <>
             <div className="navbar fixed top-0 left-0 w-full z-50 bg-base-100 shadow-sm">
@@ -27,23 +31,32 @@ export default function Header() {
                                 </a>
                             </li>
                             <li><a>Settings</a></li>
-                            <li><a>Logout</a></li>
+                            <li onClick={logout}><a>Logout</a></li>
                         </ul>
-                    </div>
 
-                    <div className="w-10 btn btn-ghost btn-circle avatar">
-                        <img src="https://img.icons8.com/fluency-systems-filled/48/exit.png" alt="" />
                     </div>
+                    {!autenticado ? (
+                        <button className="w-10 btn btn-ghost" onClick={login} >Login
+                        </button>
+                    ) : (
+                        <div>
+                            <span>Olá, {usuario?.nome}</span>
+
+                            <button onClick={logout} className="w-10 btn btn-ghost btn-circle avatar" >
+                        <img src="https://img.icons8.com/fluency-systems-filled/48/exit.png" alt="" />
+                            </button>
+                        </div>
+                    )}
+                   
                 </div>
             </div>
 
             <div className="fixed top-16 left-0 w-full z-40 ">
                 <Navbar />
             </div>
-
             {/* pode ser necessário para o bom funcionamento correto da navbar */}
             <div className="pt-32 flex flex-col">
-            <Outlet />
+                <Outlet />
             </div>
 
         </>
