@@ -1,3 +1,4 @@
+import instance from "../api/instance";
 import api from "./api";
 
 export type Log = {
@@ -139,7 +140,7 @@ const mockLogs: Log[] = [
 
 export async function listarHistorico(): Promise<Log[]> {
   try {
-    const response = await api.get("/historico");
+    const response = await instance.get("/auditoria/auditorias");
     return response.data;
   } catch (error) {
     console.warn("Erro ao buscar histórico da API, usando dados mockados:", error);

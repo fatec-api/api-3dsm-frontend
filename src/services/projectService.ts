@@ -1,3 +1,4 @@
+import instance from "../api/instance";
 import api from "./api";
 
 export interface ProjetoPayload {
@@ -29,7 +30,7 @@ const MOCK_PROJETOS = [
 
 export const criarProjeto = async (dados: ProjetoPayload) => {
     try {
-        const response = await api.post("/projetos/cadastrar", dados);
+        const response = await instance.post("/gestao/projetos/cadastrar", dados);
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "criarProjeto", error });
@@ -39,7 +40,7 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
 
 export async function listarProjetos() {
     try {
-        const response = await api.get("/projetos/listar");
+        const response = await instance.get("/gestao/projetos/listar");
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "listarProjetos", error });
@@ -50,7 +51,7 @@ export async function listarProjetos() {
 export async function listarProjetosPorGestor(gestorId?: string) {
     // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO QUANDO O BACKEND SUPORTAR ESTE FILTRO)
     // try {
-    //     const response = await api.get(`/projetos/listar/gestor/${gestorId}`);
+    //     const response = await instance.get(`/projetos/listar/gestor/${gestorId}`);
     //     return response.data;
     // } catch (error) {
     //     console.error({ event: "API_ERROR", action: "listarProjetosPorGestor", error });
@@ -67,7 +68,7 @@ export async function listarProjetosPorGestor(gestorId?: string) {
 
 export async function listarProjetoId(id: number) {
     try {
-        const response = await api.get(`/projetos/${id}`);
+        const response = await instance.get(`/gestao/projetos/${id}`);
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "listarProjetoId", error });
@@ -77,7 +78,7 @@ export async function listarProjetoId(id: number) {
 
 export async function listarEquipeProjeto(id: number) {
     try {
-        const response = await api.get(`/alocacoes/projeto/${id}`);
+        const response = await instance.get(`/gestao/alocacoes/projeto/${id}`);
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "listarEquipeProjeto", error });
@@ -87,7 +88,7 @@ export async function listarEquipeProjeto(id: number) {
 
 export async function listarProfissionaisAtivos() {
     try {
-        const response = await api.get("/alocacoes/profissionais-ativos");
+        const response = await instance.get("/gestao/alocacoes/profissionais-ativos");
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "listarProfissionaisAtivos", error });
@@ -97,7 +98,7 @@ export async function listarProfissionaisAtivos() {
 
 export async function listarUsuariosAtivos() {
     try {
-        const response = await api.get("/usuarios/ativos");
+        const response = await instance.get("/gestao/usuarios/ativos");
         return response.data;
     } catch (error) {
         console.error({ event: "API_ERROR", action: "listarUsuariosAtivos", error });

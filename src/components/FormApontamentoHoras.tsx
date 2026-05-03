@@ -6,6 +6,7 @@ import Botao from "../shared/components/Botao";
 import { FiClock, FiCalendar } from "react-icons/fi";
 import { listarProjetos } from "../services/projectService";
 import { useParams } from "react-router-dom";
+import instance from "../api/instance";
 
 export default function FormularioApontamento() {
     const [projeto, setProjeto] = useState("");
@@ -20,21 +21,18 @@ export default function FormularioApontamento() {
     const [pausaInicio, setPausaInicio] = useState("");
     const [pausaFim, setPausaFim] = useState("");
 
-
     const [observacao, setObservacao] = useState("");
-
 
     const [erro, setErro] = useState("");
     const [loading, setLoading] = useState(false);
     const [mostrarPopup, setMostrarPopup] = useState(false);
-
 
     const [horasLiquidas, setHorasLiquidas] = useState<number | null>(null);
 
     const [projetos, setProjetos] = useState<{ nomeProjeto: string, id: number, titulo: string }[]>([]);
     const [projetoSelecionado, setProjetoSelecionado] = useState<any>(null);
     const { projetoId } = useParams<{ projetoId: string }>();
-    const [itens, setItens] = useState<any[]>([]);;
+    const [itens, setItens] = useState<any[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -59,43 +57,18 @@ export default function FormularioApontamento() {
 
             try {
                 setLoading(true);
-                // Ajuste a URL conforme o seu endpoint de busca por projeto
-                const res = await fetch(`http://localhost:8080/itens/projeto/${idParaBusca}`);
-
-                if (!res.ok) throw new Error("Erro ao buscar profissionais do projeto.");
-
-                const dados = await res.json();
-                setItens(dados);
-                // setUsuarioId(""); // Reseta o profissional selecionado ao mudar o projeto
+                const response = await instance.get(`/gestao/itens/projeto/${idParaBusca}`); // ← trocado
+                setItens(response.data);
             } catch (error) {
                 console.error(error);
-                setErro("Erro ao carregar profissionais deste projeto.");
+                setErro("Erro ao carregar itens deste projeto.");
             } finally {
                 setLoading(false);
             }
         }
 
         itensPorProjeto();
-    }, [projetoSelecionado]); // Executa sempre que projetoId mudar
-
-    // const itensPorProjeto: any = {
-    //     "TURING_APP": [
-    //         { id: 1, nome: "Item 1 - Análise" },
-    //         { id: 2, nome: "Item 2 - Desenvolvimento" }
-    //     ],
-    //     "Projeto B": ["Item 3 - Teste"],
-    // };
-
-    // Temporário: usar mock até backend estar pronto
-    // useEffect(() => {
-    //     if (projeto && itensPorProjeto[projeto]) {
-    //         setItens(itensPorProjeto[projeto]);
-    //     } else {
-    //         setItens([]);
-    //         setItem("");
-    //     }
-    // }, [projeto]);
-
+    }, [projetoSelecionado]);
 
     function parseHora(h: string) {
         const apenasHora = h.includes("T") ? h.split("T")[1] : h;
@@ -104,20 +77,14 @@ export default function FormularioApontamento() {
     }
 
     const validar = () => {
-        const hoje = new Date().toISOString().split("T")[0];
-
-
         if (!projeto || !item) {
             return "Selecione projeto e item.";
         }
-
 
         if (!data || !item || !horaInicio || !horaFim) {
             return "Preencha todos os campos obrigatórios.";
         }
 
-
-        // Permite apenas datas até o dia atual (não aceita datas futuras)
         const hojeDate = new Date();
         const dataSelecionada = new Date(data);
         hojeDate.setHours(23, 59, 59, 999);
@@ -131,7 +98,6 @@ export default function FormularioApontamento() {
         if (dataHoraFim <= dataHoraInicio) {
             return "Hora fim deve ser maior que início.";
         }
-
 
         if (usarPausa) {
             if (!pausaInicio || !pausaFim) {
@@ -150,30 +116,23 @@ export default function FormularioApontamento() {
             }
         }
 
-
         return "";
     };
 
-
-    // cálculo horas liquidas
     useEffect(() => {
         if (!horaInicio || !horaFim) {
             setHorasLiquidas(null);
             return;
         }
 
-
         let total = parseHora(horaFim) - parseHora(horaInicio);
-
 
         if (usarPausa && pausaInicio && pausaFim) {
             total -= parseHora(pausaFim) - parseHora(pausaInicio);
         }
 
-
         setHorasLiquidas(total / 60);
     }, [horaInicio, horaFim, pausaInicio, pausaFim, usarPausa]);
-
 
     const limpar = () => {
         setProjeto("");
@@ -187,18 +146,20 @@ export default function FormularioApontamento() {
         setUsarPausa(false);
     };
 
+    async function apontarHora(payload: any) {
+        const response = await instance.post("/apontamento/apontamentos/", payload);
+        return response.data;
+    }
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         setErro("");
-
 
         const erroValidacao = validar();
         if (erroValidacao) {
             setErro(erroValidacao);
             return;
         }
-
 
         const payload = {
             projeto,
@@ -214,57 +175,21 @@ export default function FormularioApontamento() {
             observacao,
         };
 
-        console.log(payload)
-
+        console.log(payload);
 
         try {
             setLoading(true);
-
-
             await apontarHora(payload);
-            console.log("ENVIAR:", payload);
-
-
             limpar();
             setMostrarPopup(true);
-
-
-            setTimeout(() => {
-                setMostrarPopup(false);
-            }, 3000);
-        } catch (error) {
-            setErro("Erro ao registrar apontamento.");
+            setTimeout(() => setMostrarPopup(false), 3000);
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Erro ao registrar apontamento.";
+            setErro(message);
         } finally {
             setLoading(false);
         }
     };
-
-    async function apontarHora(payload: any) {
-        const response = await fetch("http://localhost:8080/apontamentos", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-            const message = data?.message || data?.error || "Erro ao apontar horas";
-            throw { message };
-        }
-
-        if (data?.status && !["success", "ok"].includes(String(data.status).toLowerCase())) {
-            throw {
-                code: data.code || "UNKNOWN",
-                message: data.message || data.error || "Erro ao cadastrar usuário",
-            };
-        }
-
-        return data;
-    }
-
 
     return (
         <>
@@ -280,43 +205,29 @@ export default function FormularioApontamento() {
                         <Dropdown
                             label="Projeto"
                             value={projeto}
-                            // onChange={(e: any) => setProjeto(e.target.value)}
                             onChange={(e: any) => {
                                 const nome = e.target.value;
                                 setProjeto(nome);
-                                // Busca o objeto completo na lista que veio do backend
                                 const projObj = projetos.find(p => p.nomeProjeto === nome);
                                 setProjetoSelecionado(projObj);
                             }}
-                            //    options={projetos}
                             options={projetos.map(p => p.nomeProjeto)}
                             widthPx={300}
                         />
 
-
                         <Dropdown
                             label="Item"
                             value={item}
-                            // onChange={(e: any) => {
-                            //     setItem(e.target.value);
-                            //     setItemSelecionado({ id: e.target.value, nome: e.target.value });
-                            // }}
                             onChange={(e: any) => {
                                 const valorSelecionado = e.target.value;
                                 setItem(valorSelecionado);
-
-                                // BUSCA CORRETA: Se você exibiu 'descricao', procure por 'descricao'
                                 const objetoItem = itens.find((i: any) => i.titulo === valorSelecionado);
-
-                                console.log("Objeto encontrado:", objetoItem); // Verifique se o ID aparece aqui
+                                console.log("Objeto encontrado:", objetoItem);
                                 setItemSelecionado(objetoItem);
                             }}
                             options={itens.map((i: any) => (typeof i === 'string' ? i : i.titulo))}
-                            // options={itens}
                             widthPx={300}
                         />
-
-
 
                         <Input
                             label="Data"
@@ -328,11 +239,7 @@ export default function FormularioApontamento() {
                         />
                     </div>
 
-
                     <div className="flex flex-col gap-8">
-
-
-
                         <Input
                             label="Hora Início"
                             type="datetime-local"
@@ -341,7 +248,6 @@ export default function FormularioApontamento() {
                             icon={<FiClock size={18} />}
                             widthPx={300}
                         />
-
 
                         <Input
                             label="Hora Fim"
@@ -364,54 +270,15 @@ export default function FormularioApontamento() {
                     </div>
                 </div>
 
-
-                <div className="flex flex-col gap-4">
-                    <label className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            checked={usarPausa}
-                            onChange={(e) => setUsarPausa(e.target.checked)}
-                        />
-                        Adicionar pausa
-                    </label>
-
-
-                    {usarPausa && (
-                        <div className="flex gap-8">
-                            <Input
-                                label="Início Pausa"
-                                type="datetime-local"
-                                value={pausaInicio}
-                                onChange={(e: any) => setPausaInicio(e.target.value)}
-                                widthPx={300}
-                            />
-
-
-                            <Input
-                                label="Fim Pausa"
-                                type="datetime-local"
-                                value={pausaFim}
-                                onChange={(e: any) => setPausaFim(e.target.value)}
-                                widthPx={300}
-                            />
-                        </div>
-                    )}
-                </div>
-
-
                 {horasLiquidas !== null && (
                     <p className="text-center text-sm">
                         Horas líquidas: <strong>{horasLiquidas.toFixed(2)}h</strong>
                     </p>
                 )}
 
-
                 {erro && (
-                    <p className="text-red-600 text-sm text-center">
-                        {erro}
-                    </p>
+                    <p className="text-red-600 text-sm text-center">{erro}</p>
                 )}
-
 
                 <div className="flex flex-col items-center gap-6">
                     <Botao type="submit" disabled={loading}>
