@@ -7,7 +7,7 @@ const Painel = () => {
 
   const testarBackend = async () => {
     try {
-      const resposta = await axios.get('http://localhost:8082/api/gestao/projetos', {
+      const resposta = await axios.get('http://localhost:8080/api/gestao/projetos', {
         headers: { Authorization: `Bearer ${getToken()}` }
       });
       alert('Conexão com o Java funcionou!');

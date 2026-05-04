@@ -5,6 +5,7 @@ import Botao from "../shared/components/Botao";
 import { GoProject } from "react-icons/go";
 import { FiFileText, FiClock, FiUser } from "react-icons/fi";
 import { useParams } from "react-router-dom";
+import instance from "../api/instance";
 
 type Profissional = { id: string; nomeUsuario: string };
 type Projeto = { id: number; nomeProjeto: string };
@@ -34,9 +35,8 @@ export default function FormCadastroItem() {
   useEffect(() => {
     async function carregarProjetos() {
       try {
-        const res = await fetch("http://localhost:8082/projetos/listar");
-        if (!res.ok) throw new Error();
-        setProjetos(await res.json());
+        const res = await instance.get("/gestao/projetos/listar");
+        setProjetos(res.data);
       } catch {
         setErro("Não foi possível carregar os projetos.");
       }
@@ -49,9 +49,8 @@ export default function FormCadastroItem() {
       if (!projetoIdEstado) { setProfissionais([]); return; }
       try {
         setLoading(true);
-        const res = await fetch(`http://localhost:8082/alocacoes/projeto/${projetoIdEstado}`);
-        if (!res.ok) throw new Error();
-        setProfissionais(await res.json());
+        const res = await instance.get(`/gestao/alocacoes/projeto/${projetoIdEstado}`);
+        setProfissionais(res.data);
         setUsuarioId("");
       } catch {
         setErro("Erro ao carregar profissionais deste projeto.");
@@ -98,23 +97,15 @@ export default function FormCadastroItem() {
       setMostrarPopup(true);
       setTimeout(() => setMostrarPopup(false), 3000);
     } catch (error: any) {
-      setErro(error?.mensagem || "Erro ao cadastrar o item.");
+      const mensagem = error.response?.data?.Mensagem || error.response?.data?.message || "Erro ao cadastrar item.";
+      throw { code: error.response?.data?.code ?? "HTTP_ERROR", mensagem };
     } finally {
       setLoading(false);
     }
   };
 
   async function cadastrarItem(payload: ItemPayload): Promise<void> {
-    const response = await fetch("http://localhost:8082/itens/cadastrar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) {
-      const mensagem = data?.Mensagem || data?.message || "Erro ao cadastrar item.";
-      throw { code: data?.code ?? "HTTP_ERROR", mensagem };
-    }
+    await instance.post("/gestao/itens/cadastrar", payload);
   }
 
   return (

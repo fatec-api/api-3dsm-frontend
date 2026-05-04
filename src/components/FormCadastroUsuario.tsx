@@ -3,6 +3,7 @@ import Input from "../shared/components/Input";
 import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
 import { FiUser, FiMail, FiLock, FiDollarSign, FiEye, FiEyeOff, FiBriefcase } from "react-icons/fi";
+import instance from "../api/instance";
 
 export default function FormularioCadastro() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -66,22 +67,8 @@ export default function FormularioCadastro() {
   };
 
   async function cadastrarUsuario(payload: any) {
-    const response = await fetch("http://localhost:8080/cadastrar/usuario", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await response.json().catch(() => null);
-    if (!response.ok) {
-      const message = data?.message || data?.error || "Erro ao cadastrar usuário";
-      const code = data?.code || "HTTP_ERROR";
-      throw { code, message };
-    }
-    if (!data) throw { code: "NO_DATA", message: "Erro ao processar resposta do servidor." };
-    if (data.code && data.code !== "SUCCESS") throw data;
-    if (data.status && !["success", "ok"].includes(String(data.status).toLowerCase()))
-      throw { code: data.code || "UNKNOWN", message: data.message || data.error || "Erro ao cadastrar usuário" };
-    return data;
+    const response = await instance.post("/gestao/usuarios/cadastrar", payload);
+    return response.data;
   }
 
   return (

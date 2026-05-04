@@ -1,12 +1,15 @@
-import api from "./api";
+import instance from "../api/instance";
 
-export type Log = {
+export interface Log {
+  id: string;
   usuario: string;
   data: string;
   hora: string;
   acao: string;
   justificativa?: string;
-};
+  itemId?: number;
+  horasLiquidas?: number;
+}
 
 const mockLogs: Log[] = [
   {
@@ -139,8 +142,23 @@ const mockLogs: Log[] = [
 
 export async function listarHistorico(): Promise<Log[]> {
   try {
-    const response = await api.get("/historico");
-    return response.data;
+    const response = await instance.get("/auditoria/auditorias");
+    const dados = Array.isArray(response.data) ? response.data : [];
+
+    return dados.map((item: any): Log => {
+      const [dataParte, horaParte] = (item.criadoEm ?? "").split(" ");
+
+      return {
+        id: item.id ?? "",
+        usuario: item.usuarioId ?? "Desconhecido",
+        data: dataParte ?? "",
+        hora: horaParte ?? "",
+        acao: item.observacao ?? "Sem descrição",
+        justificativa: undefined,
+        itemId: item.itemId,
+        horasLiquidas: item.horasLiquidas,
+      };
+    });
   } catch (error) {
     console.warn("Erro ao buscar histórico da API, usando dados mockados:", error);
     return mockLogs;
