@@ -130,10 +130,6 @@ export default function DescricaoProjeto() {
         }
     };
 
-    const calcularPorcentagem = (previstas: number, realizadas: number) => {
-        if (!previstas || previstas === 0) return 0;
-        return Math.round((realizadas / previstas) * 100);
-    };
 
     const isGestor = true;
 
@@ -271,10 +267,9 @@ export default function DescricaoProjeto() {
                     ) : (
                         <div className="flex flex-row flex-wrap md:flex-nowrap gap-6 justify-between">
                             {NIVEIS_BASE.map(nivel => {
-                                const dadoDoNivel = metricas.find(m => m.nivelAtividade === nivel);
-                                const percentual = dadoDoNivel
-                                    ? calcularPorcentagem(dadoDoNivel.horasPrevistasAtiv, dadoDoNivel.horasRealizadasAtiv)
-                                    : 0;
+                                const dadoDoNivel = metricas.find(
+                                    m => m.nivelAtividade.toUpperCase() === nivel
+                                );
                                 return (
                                     <div key={nivel} className="card bg-base-100 flex-1 border border-base-content/10 shadow-sm">
                                         <div className="card-body items-center text-center gap-6">
@@ -282,7 +277,7 @@ export default function DescricaoProjeto() {
                                                 {NOMES_ATIVIDADES[nivel]}
                                             </h3>
                                             <IndicadorProgresso
-                                                percentualAtiv={percentual}
+                                                percentualAtiv={dadoDoNivel ? Math.round(dadoDoNivel.percentual) : 0}
                                                 horasPrevistas={dadoDoNivel?.horasPrevistasAtiv || 0}
                                                 horasRealizadas={dadoDoNivel?.horasRealizadasAtiv || 0}
                                             />

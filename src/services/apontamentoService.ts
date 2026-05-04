@@ -1,22 +1,26 @@
 import instance from "../api/instance";
-import api from "./api"
 
 export interface MetricasAtividade {
-    horasPrevistasAtiv: number
-    horasRealizadasAtiv: number
-    nivelAtividade: 'Analise' | 'Desenvolvimento' | 'Teste'
+    nivelAtividade: string;
+    horasPrevistasAtiv: number;
+    horasRealizadasAtiv: number;
+    percentual: number;
 }
 
-export const getApontamentosAprovadosPorProjeto = async (projetoId: number): Promise<MetricasAtividade[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve([
-                { nivelAtividade: 'Analise', horasPrevistasAtiv: 100, horasRealizadasAtiv: 70 }, 
-                { nivelAtividade: 'Desenvolvimento', horasPrevistasAtiv: 200, horasRealizadasAtiv: 250 }, 
-                { nivelAtividade: 'Teste', horasPrevistasAtiv: 50, horasRealizadasAtiv: 45 } 
-            ]);
-        }, 800);
-    });
+export async function getApontamentosAprovadosPorProjeto(projetoId: number): Promise<MetricasAtividade[]> {
+    try {
+        const response = await instance.get(`/gestao/itens/projeto/${projetoId}/horas`);
+        return Array.isArray(response.data) ? response.data.map((item: any) => ({
+            nivelAtividade: item.nivelAtividade,
+            horasPrevistasAtiv: item.horasPrevistas,
+            horasRealizadasAtiv: item.horasRealizadas,
+            percentual: item.percentual,
+        })) : [];
+    } catch (error) {
+        console.error("Erro ao buscar métricas:", error);
+        return [];
+    }
+}
 
     // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
     /*
@@ -28,7 +32,7 @@ export const getApontamentosAprovadosPorProjeto = async (projetoId: number): Pro
         throw error;
     }
     */
-};
+// };
 
 export async function listarApontamentos() {
     const response = await instance.get(`/apontamento/apontamentos`)
@@ -73,9 +77,9 @@ export async function reprovarApontamento(id: string, justificativa: string) {
     // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
     // const response = await instance.put(`/apontamentos/reprovar/${id}`, { justificativa });
     // return response.data;
-    
+
     console.warn(`[MOCK API] Chamada simulada para ID: ${id} | Justificativa: ${justificativa}`);
-    
+
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve({ message: "Reprovado com sucesso (MOCK)", id, justificativa });
@@ -89,7 +93,7 @@ export async function reprovarApontamento(id: string, justificativa: string) {
  */
 export async function atualizarApontamento(id: string, dados: any) {
     console.info(`[MOCK API] Simulação de atualização para o ID: ${id}`, dados);
-    
+
     // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
     /* 
     try {
@@ -100,7 +104,7 @@ export async function atualizarApontamento(id: string, dados: any) {
         throw error;
     }
     */
-    
+
     // Retorno fake para não quebrar a Promise do componente
     return Promise.resolve({ message: "Mock success" });
 }
