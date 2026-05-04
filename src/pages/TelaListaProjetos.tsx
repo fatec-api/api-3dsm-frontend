@@ -11,7 +11,7 @@ export interface Projeto {
     gestorId: string;
     tipoProjeto: string;
     status: string;
-    cliente: string;
+    nomeCliente: string;
     horasPrevistasTotal: number;
     horasRealizadasTotal: number;
     horasPendentesTotal?: number;
@@ -28,7 +28,7 @@ export default function ListaProjetos() {
         progresso: "",
         status: "",
         tipoProjeto: "",
-        cliente: ""
+        nomeCliente: ""
     });
 
     const navigate = useNavigate();
@@ -53,7 +53,7 @@ export default function ListaProjetos() {
         if (filtros.progresso && progressoProjeto !== filtros.progresso) return false;
         if (filtros.status && projeto.status !== filtros.status) return false;
         if (filtros.tipoProjeto && projeto.tipoProjeto !== filtros.tipoProjeto) return false;
-        if (filtros.cliente && projeto.cliente !== filtros.cliente) return false;
+        if (filtros.nomeCliente && projeto.nomeCliente !== filtros.nomeCliente) return false;
 
         return true;
     });
@@ -65,7 +65,7 @@ export default function ListaProjetos() {
             progresso: novosFiltros.progresso,
             status: novosFiltros.statusProjeto,
             tipoProjeto: novosFiltros.tipoProjeto,
-            cliente: novosFiltros.cliente
+            nomeCliente: novosFiltros.nomeCliente
         });
     }, []);
     useEffect(() => {
@@ -154,7 +154,7 @@ export default function ListaProjetos() {
                                                 <b>Tipo:</b> {projeto.tipoProjeto}
                                             </p>
                                             <p>
-                                                <b>Cliente:</b> {projeto.cliente}
+                                                <b>Cliente:</b> {projeto.nomeCliente}
                                             </p>
                                             <p>
                                                 <b>Status:</b> {projeto.status}

@@ -1,7 +1,15 @@
 import { Link } from "react-router-dom";
 import { Outlet } from "react-router-dom";
+import { useContext } from "react";
+import { KeycloakContext } from "../../contexts/KeycloakProvider";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Navbar() {
+    const { getUsuario } = useContext(KeycloakContext);
+    const navigate = useNavigate();
+    const usuario = getUsuario();
+
     return (
         <>
             <div className="navbar bg-base-100 shadow-sm">
@@ -51,7 +59,7 @@ export default function Navbar() {
                     <ul className="menu menu-horizontal px-1">
                         {/* <li><Link to="/">Home</Link></li> */}
                         <li><Link to="/lista-projetos">Projetos</Link></li>
-                        <li><Link to="/log-profissional/550e8400-e29b-41d4-a716-446655440010">Apontamento</Link></li>
+                        <li><Link to={`/log-profissional/${usuario?.id}`}>Apontamento</Link></li>
 
                         <li>
                             <details>

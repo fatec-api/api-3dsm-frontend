@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Input from "../shared/components/Input";
 import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
 
 import { FiClock, FiCalendar } from "react-icons/fi";
 import { listarProjetos } from "../services/projectService";
-import { useParams } from "react-router-dom";
 import instance from "../api/instance";
+import { KeycloakContext } from "../contexts/KeycloakProvider";
 
 export default function FormularioApontamento() {
+    const { getUsuario } = useContext(KeycloakContext);
+
     const [projeto, setProjeto] = useState("");
     const [item, setItem] = useState("");
     const [itemSelecionado, setItemSelecionado] = useState<any>(null);
@@ -31,7 +33,6 @@ export default function FormularioApontamento() {
 
     const [projetos, setProjetos] = useState<{ nomeProjeto: string, id: number, titulo: string }[]>([]);
     const [projetoSelecionado, setProjetoSelecionado] = useState<any>(null);
-    const { projetoId } = useParams<{ projetoId: string }>();
     const [itens, setItens] = useState<any[]>([]);
 
     useEffect(() => {
@@ -57,7 +58,7 @@ export default function FormularioApontamento() {
 
             try {
                 setLoading(true);
-                const response = await instance.get(`/gestao/itens/projeto/${idParaBusca}`); // ← trocado
+                const response = await instance.get(`/gestao/itens/projeto/${idParaBusca}`);
                 setItens(response.data);
             } catch (error) {
                 console.error(error);
@@ -77,43 +78,29 @@ export default function FormularioApontamento() {
     }
 
     const validar = () => {
-        if (!projeto || !item) {
-            return "Selecione projeto e item.";
-        }
-
-        if (!data || !item || !horaInicio || !horaFim) {
-            return "Preencha todos os campos obrigatórios.";
-        }
+        if (!projeto || !item) return "Selecione projeto e item.";
+        if (!data || !horaInicio || !horaFim) return "Preencha todos os campos obrigatórios.";
 
         const hojeDate = new Date();
         const dataSelecionada = new Date(data);
         hojeDate.setHours(23, 59, 59, 999);
-        if (dataSelecionada > hojeDate) {
-            return "Data não pode ser futura.";
-        }
+
+        if (dataSelecionada > hojeDate) return "Data não pode ser futura.";
 
         const dataHoraInicio = new Date(horaInicio);
         const dataHoraFim = new Date(horaFim);
 
-        if (dataHoraFim <= dataHoraInicio) {
-            return "Hora fim deve ser maior que início.";
-        }
+        if (dataHoraFim <= dataHoraInicio) return "Hora fim deve ser maior que início.";
 
         if (usarPausa) {
-            if (!pausaInicio || !pausaFim) {
-                return "Preencha a pausa completa.";
-            }
+            if (!pausaInicio || !pausaFim) return "Preencha a pausa completa.";
 
             const dataHoraPausaInicio = new Date(pausaInicio);
             const dataHoraPausaFim = new Date(pausaFim);
 
-            if (dataHoraPausaFim <= dataHoraPausaInicio) {
-                return "Pausa inválida.";
-            }
-
-            if (dataHoraPausaInicio < dataHoraInicio || dataHoraPausaFim > dataHoraFim) {
+            if (dataHoraPausaFim <= dataHoraPausaInicio) return "Pausa inválida.";
+            if (dataHoraPausaInicio < dataHoraInicio || dataHoraPausaFim > dataHoraFim)
                 return "Pausa fora do horário de trabalho.";
-            }
         }
 
         return "";
@@ -145,9 +132,19 @@ export default function FormularioApontamento() {
         setObservacao("");
         setUsarPausa(false);
     };
+    function formatarDataApontamento(dateStr: string) {
+        if (!dateStr) return null;
+        const somenteData = dateStr.split("T")[0];
+        return `${somenteData}T00:00:00`;
+    }
+
+    function formatarDataHora(dateStr: string) {
+        if (!dateStr) return null;
+        return dateStr.length === 16 ? `${dateStr}:00` : dateStr;
+    }
 
     async function apontarHora(payload: any) {
-        const response = await instance.post("/apontamento/apontamentos/", payload);
+        const response = await instance.post("/apontamento/apontamentos", payload);
         return response.data;
     }
 
@@ -161,21 +158,21 @@ export default function FormularioApontamento() {
             return;
         }
 
+        const usuario = getUsuario();
+
+        if (!usuario?.id) {
+            setErro("Usuário não autenticado.");
+            return;
+        }
+
         const payload = {
-            projeto,
-            projetoId: projetoSelecionado?.id,
             itemId: itemSelecionado?.id,
-            nivel: item.includes(" - ") ? item.split(" - ")[1].trim() : "",
-            dataApontamento: data,
-            horaInicio,
-            horaFim,
-            pausaInicio: usarPausa ? pausaInicio : null,
-            pausaFim: usarPausa ? pausaFim : null,
-            usuarioId: "550e8400-e29b-41d4-a716-446655440010",
+            usuarioId: usuario.id,
+            dataApontamento: formatarDataApontamento(data),
+            horaInicio: formatarDataHora(horaInicio),
+            horaFim: formatarDataHora(horaFim),
             observacao,
         };
-
-        console.log(payload);
 
         try {
             setLoading(true);
@@ -200,6 +197,7 @@ export default function FormularioApontamento() {
                 <h1 className="text-2xl font-semibold text-gray-800 text-center">
                     Apontamento de Horas
                 </h1>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
                     <div className="flex flex-col gap-8">
                         <Dropdown
@@ -221,11 +219,14 @@ export default function FormularioApontamento() {
                             onChange={(e: any) => {
                                 const valorSelecionado = e.target.value;
                                 setItem(valorSelecionado);
-                                const objetoItem = itens.find((i: any) => i.titulo === valorSelecionado);
-                                console.log("Objeto encontrado:", objetoItem);
+
+                                const objetoItem = itens.find(
+                                    (i: any) => i.codigo === valorSelecionado
+                                );
+
                                 setItemSelecionado(objetoItem);
                             }}
-                            options={itens.map((i: any) => (typeof i === 'string' ? i : i.titulo))}
+                            options={itens.map((i: any) => i.codigo)}
                             widthPx={300}
                         />
 

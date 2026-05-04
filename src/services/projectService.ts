@@ -1,5 +1,4 @@
 import instance from "../api/instance";
-import api from "./api";
 
 export interface ProjetoPayload {
     nomeProjeto: string;
