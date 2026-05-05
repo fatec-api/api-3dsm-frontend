@@ -29,7 +29,7 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const dados = await listarApontamentosPorProjeto();
+                const dados = await listarApontamentosPorProjeto(projetoFiltro);
                 let listaProjetos: any[] = [];
 
                 try {
@@ -42,18 +42,18 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
 
                 const apontamentosComProjeto = dados.map((a: any, index: number) => {
                     const projeto = listaProjetos.find(
-                        (p: any) => p.projeto === a.projeto || p.nome === a.projeto || p.nomeProjeto === a.projeto
+                        (p: any) => p.id === a.projetoId || p.id === a.itemId
                     );
 
                     return {
-                        id: String(a.id || `apontamento-${index}`),
-                        usuario: a.usuario,
-                        projeto: a.projeto || projeto?.nome || projeto?.nomeProjeto || "Sem projeto",
-                        item: a.item || a.itemDescricao || "",
-                        nivel: a.nivel || a.nivelAtividade || "UNDEFINED",
-                        data: a.data || a.dataApontamento || "",
-                        inicio: a.inicio || a.horaInicio || "",
-                        fim: a.fim || a.horaFim || "",
+                        id: String(a.id || index),
+                        usuario: a.usuario || a.usuarioId || "Desconhecido",
+                        projeto: projeto?.nome || projeto?.nomeProjeto || "Projeto não identificado",
+                        item: a.observacao || a.itemDescricao || "Sem descrição",
+                        nivel: a.nivel || "N/A",
+                        data: a.dataApontamento ? a.dataApontamento.split(' ')[0] : "",
+                        inicio: a.horaInicio ? a.horaInicio.split(' ')[1] : "",
+                        fim: a.horaFim ? a.horaFim.split(' ')[1] : "",
                         status: a.status
                     };
                 });
@@ -65,7 +65,7 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
         };
 
         fetchLogs();
-    }, []);
+    }, [projetoFiltro]);
     useEffect(() => {
         if (onSelectionChange) {
             const selecionados = apontamentos.filter(a => selectedApontamentos.has(a.id));
@@ -83,9 +83,8 @@ export default function ApontamentosGestor({ projetoFiltro = "all", onSelectionC
     };
 
     const filteredApontamentos = useMemo(() => {
-        // Primeiro filtra por status Pendente
-        const pendentes = apontamentos.filter((a) => a.status === "Pendente");
-        
+        const pendentes = apontamentos.filter((a) => a.status === "PENDENTE");
+
         if (!projetoFiltro || projetoFiltro === "all") return pendentes;
 
         const projetoSelecionado = projetos.find((p: any) =>
