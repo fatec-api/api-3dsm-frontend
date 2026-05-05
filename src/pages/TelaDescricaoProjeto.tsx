@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../shared/components/Card";
+import { useParams } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade, vincularProfissionalItem } from "../services/ItemService";
 import PaginaAlocacao from "./TelaDevAllocationTest";
@@ -47,6 +48,10 @@ export default function DescricaoProjeto() {
         );
     });
 
+
+    const { id } = useParams();
+
+
     const itensFiltrados = itens.filter(item => {
         const termo = buscaItem.toLowerCase();
         return (
@@ -58,21 +63,21 @@ export default function DescricaoProjeto() {
     });
 
     const carregarDadosProjeto = async () => {
-        if (!projetoState?.id) return;
+        if (!id) return;
+
         try {
-            const projeto = await listarProjetoId(projetoState.id);
+            const projeto = await listarProjetoId(id);
             setProjeto(projeto);
 
-            const listaItens = await listarItens(projetoState.id);
-            // setItens(listaItens)
-            setItens(Array.isArray(listaItens) ? listaItens : []);
+            const listaItens = await listarItens(id);
+            setItens(Array.isArray(listaItens) ? [...listaItens] : []);
 
-            const listaEquipe = await listarEquipeProjeto(projetoState.id);
-            setListaDeProfissionais(listaEquipe);
+            const listaEquipe = await listarEquipeProjeto(id);
+            setListaDeProfissionais([...listaEquipe]);
 
             setLoadingMetricas(true);
-            const dadosMetricas = await getApontamentosAprovadosPorProjeto(projetoState.id);
-            setMetricas(dadosMetricas || []);
+            const dadosMetricas = await getApontamentosAprovadosPorProjeto(id);
+            setMetricas([...dadosMetricas]);
         } catch (error) {
             console.error("Erro ao carregar dados do projeto", error);
         } finally {
@@ -81,12 +86,12 @@ export default function DescricaoProjeto() {
     };
 
     useEffect(() => {
-        if (!projetoState?.id) {
+        if (!id) {
             navigate("/lista-projetos");
             return;
         }
         carregarDadosProjeto();
-    }, [projetoState?.id]);
+    }, [id]);
 
     const handleFecharModal = () => {
         setPopupItem(null);

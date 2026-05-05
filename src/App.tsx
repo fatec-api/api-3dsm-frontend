@@ -29,7 +29,7 @@ const router = createBrowserRouter(
       <Route path='/lista-projetos' element={<ListaProjetos/>}/>
       <Route path='/apontamento-horas' element={<ApontamentoHoras/>}/>
       <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
-      <Route path='/descricao-projeto' element={<DescricaoProjeto />}/>
+      <Route path="/descricao-projeto/:id" element={<DescricaoProjeto />} />
       <Route path='/cadastro-item' element={<CadastroItem />} />
       <Route path='/log-profissional/:id' element={<TelaLogProfissional/>}/>
       <Route path='/tela-historico' element={<Historico/>}/>
