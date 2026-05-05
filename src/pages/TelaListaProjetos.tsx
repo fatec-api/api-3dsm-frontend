@@ -133,11 +133,7 @@ export default function ListaProjetos() {
                             <div
                                 key={projeto.id}
                                 className="cursor-pointer"
-                                onClick={() =>
-                                    navigate("/descricao-projeto", {
-                                        state: { projeto },
-                                    })
-                                }
+                                onClick={() => navigate(`/descricao-projeto/${projeto.id}`)}
                             >
                                 <div className="w-80 h-44 bg-white rounded-2xl shadow-md border border-gray-200 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
                                     <div className={`w-3 ${cor}`} />

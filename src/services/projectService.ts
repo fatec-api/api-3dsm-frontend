@@ -48,21 +48,13 @@ export async function listarProjetos() {
 }
 
 export async function listarProjetosPorGestor(gestorId?: string) {
-    // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO QUANDO O BACKEND SUPORTAR ESTE FILTRO)
-    // try {
-    //     const response = await instance.get(`/projetos/listar/gestor/${gestorId}`);
-    //     return response.data;
-    // } catch (error) {
-    //     console.error({ event: "API_ERROR", action: "listarProjetosPorGestor", error });
-    //     throw error;
-    // }
-    
-    console.warn("[MOCK] listarProjetosPorGestor: Filtrando dados locais.");
-    
-    if (gestorId) {
-        return Promise.resolve(MOCK_PROJETOS.filter(projeto => projeto.gestorId === gestorId));
+    try {
+        const response = await instance.get(`gestao/projetos/gestor/${gestorId}`);
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarProjetosPorGestor", error });
+        throw error;
     }
-    return Promise.resolve(MOCK_PROJETOS);
 }
 
 export async function listarProjetoId(id: number) {

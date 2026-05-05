@@ -22,16 +22,16 @@ export async function getApontamentosAprovadosPorProjeto(projetoId: number): Pro
     }
 }
 
-    // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
-    /*
-    try {
-        const response = await instance.get(`/apontamento/apontamentos/aprovado/projeto/${projetoId}`);
-        return response.data;
-    } catch (error) {
-        console.error({ event: "API_ERROR", action: "getApontamentosAprovadosPorProjeto", error });
-        throw error;
-    }
-    */
+// INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
+/*
+try {
+    const response = await instance.get(`/apontamento/apontamentos/aprovado/projeto/${projetoId}`);
+    return response.data;
+} catch (error) {
+    console.error({ event: "API_ERROR", action: "getApontamentosAprovadosPorProjeto", error });
+    throw error;
+}
+*/
 // };
 
 export async function listarApontamentos() {
@@ -46,7 +46,10 @@ export async function listarApontamentosUsuarios(id: string) {
 
 export async function listarApontamentosPorProjeto(id?: string) {
     // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
-    const response = await instance.get(`/apontamento/apontamentos/projeto/${id}`);
+    const endpoint = (id && id !== "all")
+        ? `/apontamento/apontamentos/pendente/projeto/${id}`
+        : `/apontamento/apontamentos`;
+    const response = await instance.get(`${endpoint}`);
     return response.data;
 }
 
@@ -55,12 +58,24 @@ export async function aprovarApontamento(id: string) {
     return response.data;
 }
 
-export async function aprovarApontamentos(ids: string[]) {
-    // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
-    // const response = await instance.put('/apontamentos/aprovar', { ids });
-    // return response.data;
+// export async function aprovarApontamentos(ids: string[]) {
+//     // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
+//     const response = await instance.put('apontamento/apontamentos/{id}/status', { ids });
+//     return response.data;
 
-    return Promise.resolve({ message: "Apontamentos aprovados com sucesso", ids });
+//     return Promise.resolve({ message: "Apontamentos aprovados com sucesso", ids });
+// }
+
+export async function aprovarApontamentos(ids: string[]) {
+    const promises = ids.map(id =>
+        instance.patch(`/apontamento/apontamentos/${id}/status`, {
+            status: "APROVADO",
+            justificativa: null
+        })
+    );
+
+    const results = await Promise.all(promises);
+    return results.map(res => res.data);
 }
 
 export async function buscarApontamentoPorId(id: string) {
@@ -74,17 +89,12 @@ export async function atualizarApontamentoPatch(id: string, dados: any) {
 }
 
 export async function reprovarApontamento(id: string, justificativa: string) {
-    // INTEGRAÇÃO REAL (DESCOMENTAR NO FUTURO)
-    // const response = await instance.put(`/apontamentos/reprovar/${id}`, { justificativa });
-    // return response.data;
-
-    console.warn(`[MOCK API] Chamada simulada para ID: ${id} | Justificativa: ${justificativa}`);
-
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({ message: "Reprovado com sucesso (MOCK)", id, justificativa });
-        }, 800);
+    const response = await instance.patch(`/apontamento/apontamentos/${id}/status`, {
+        status: "REPROVADO",
+        justificativaReprovacao: justificativa
     });
+    return response.data;
+
 }
 
 /**

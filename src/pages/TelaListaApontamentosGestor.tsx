@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
 import ApontamentosGestor from "../components/ApontamentosGestor";
 import DropdownProjetos from "../components/DropdownProjetos";
 import Header from "../shared/components/Header";
 import { listarProjetosPorGestor } from "../services/projectService";
 import { aprovarApontamentos, reprovarApontamento } from "../services/apontamentoService";
 import ModalReprovarApontamento from "../components/ModalReprovarApontamento";
+import { KeycloakContext } from "../contexts/KeycloakProvider";
 
 type ProjetoOption = {
     label: string;
@@ -19,8 +20,9 @@ export default function ListaApontamentosGestor() {
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isReprovando, setIsReprovando] = useState(false);
-
-    const gestorIdLogado = "Juliana Lima";
+    const { getUsuario } = useContext(KeycloakContext);
+    const usuario = getUsuario();
+    const gestorIdLogado = usuario?.id;
 
     useEffect(() => {
         const loadProjetos = async () => {
