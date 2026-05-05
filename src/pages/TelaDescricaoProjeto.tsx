@@ -94,6 +94,11 @@ export default function DescricaoProjeto() {
         setModalMessage(null);
     };
 
+    const formatarData = (data?: string) => {
+        if (!data) return "-";
+        return new Date(data).toLocaleDateString("pt-BR");
+    };
+
     const handleSelectProfissional = (p: Profissional) => {
         setSelectedProfList(prev => [...prev, p]);
     };
@@ -147,8 +152,13 @@ export default function DescricaoProjeto() {
                             <h1 className="text-3xl font-bold">{projeto.nomeProjeto}</h1>
                             <span className="badge badge-warning">{projeto.status}</span>
                         </div>
-                        <div className="text-right text-sm text-base-content/60">
+                        <div className="text-right text-sm text-base-content/60 flex flex-col items-end">
                             <p>{projeto.tipoProjeto}</p>
+
+                            <div className="mt-2 text-xs">
+                                <p><strong>Início:</strong> {formatarData(projeto.dataInicio)}</p>
+                                <p><strong>Fim:</strong> {formatarData(projeto.dataFim)}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
