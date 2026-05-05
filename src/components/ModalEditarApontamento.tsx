@@ -230,8 +230,10 @@ export default function ModalEditarApontamento({
                     <textarea name="observacao" value={formData.observacao} onChange={handleChange} className="w-full border p-3 rounded-xl" />
 
                     <div className="grid grid-cols-2 gap-4 mt-6">
-                        <button onClick={onClose} className="border rounded-xl p-3">Cancelar</button>
-                        <button onClick={handleValidarESalvar} className="bg-black text-white rounded-xl p-3">
+                        <button onClick={onClose} className="border hover:bg-gray-100 hover:scale-105 hover:transition rounded-xl p-3">
+                            Cancelar
+                        </button>
+                        <button onClick={handleValidarESalvar} className="bg-black hover:scale-105 hover:transition text-white hover:bg-gray-800 rounded-xl p-3">
                             Salvar Alterações
                         </button>
                     </div>
