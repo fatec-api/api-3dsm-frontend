@@ -26,10 +26,12 @@ export default function Navbar() {
                             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
 
                             {/* <li><Link to="/">Home</Link></li> */}
-                            <li><Link to="/lista-projetos">Projetos</Link></li>
+                            {temPermissao('GESTOR') && (
+                                <li><Link to="/lista-projetos">Projetos</Link></li>
+                            )}
                             <li><Link to="/tela-funcionarios">Funcionários</Link></li>
                             <li><Link to="/log-profissional">Apontamento de Horas</Link></li>
-                        
+
                             <li>
                                 <a>Criação</a>
                                 <ul className="p-2">
@@ -43,10 +45,10 @@ export default function Navbar() {
                                     <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
                                 </ul>
                             </li>
-                             {temPermissao('GESTOR') && ( <>
-                        <li><Link to="/tela-historico">Histórico</Link></li> 
-                        <li><Link to="/apontamentos-gestor">Gestão de Apontamentos</Link></li>
-                        </>)}
+                            {temPermissao('GESTOR') && (<>
+                                <li><Link to="/tela-historico">Histórico</Link></li>
+                                <li><Link to="/apontamentos-gestor">Gestão de Apontamentos</Link></li>
+                            </>)}
 
                             <li>
                                 <a>Outros</a>
@@ -66,27 +68,29 @@ export default function Navbar() {
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
                         {/* <li><Link to="/">Home</Link></li> */}
-                        <li><Link to="/lista-projetos">Projetos</Link></li>
+                        {temPermissao('GESTOR') && (
+                            <li><Link to="/lista-projetos">Projetos</Link></li>
+                        )}
                         <li><Link to={`/log-profissional/${usuario?.id}`}>Apontamento</Link></li>
 
                         <li>
                             <details>
                                 <summary>Criação</summary>
                                 <ul className="p-2 bg-base-100 w-52 z-1">
-                                                                        {temPermissao('GESTOR') && (
-<>
-                                    <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
-                                    <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
-                                    <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
-                                    </>
-                                                                        )}
+                                    {temPermissao('GESTOR') && (
+                                        <>
+                                            <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
+                                            <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
+                                            <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                        </>
+                                    )}
                                     <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
                                 </ul>
                             </details>
                         </li>
-                       {temPermissao('GESTOR') && ( <>
-                        <li><Link to="/tela-historico">Histórico</Link></li> 
-                        <li><Link to="/apontamentos-gestor">Gestão de apontamentos</Link></li>
+                        {temPermissao('GESTOR') && (<>
+                            <li><Link to="/tela-historico">Histórico</Link></li>
+                            <li><Link to="/apontamentos-gestor">Gestão de apontamentos</Link></li>
                         </>)}
                     </ul>
                 </div>
