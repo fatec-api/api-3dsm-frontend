@@ -64,7 +64,7 @@ export const KeycloakProvider = ({ children }: KeycloakProviderProps) => {
     return {
       nome: (keycloak.tokenParsed.name || keycloak.tokenParsed.preferred_username) as string,
       email: keycloak.tokenParsed.email as string,
-      id: keycloak.subject
+      id: keycloak.tokenParsed.sub as string
     };
   };
 
