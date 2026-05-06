@@ -7,11 +7,12 @@ import { listarHistorico, type Log } from "../services/historicoService";
 
 export default function Historico() {
   const [logs, setLogs] = useState<Log[]>([]);
+  const [loadingInicial, setLoadingInicial] = useState(true);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [busca, setBusca] = useState("");
-  const [ordemDescendente, setOrdemDescendente] = useState(true); 
+  const [ordemDescendente, setOrdemDescendente] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const itensPorPagina = 15;
 
@@ -22,9 +23,9 @@ export default function Historico() {
   }, []);
 
   useEffect(() => {
-    const fetchLogs = async () => {
+    const fetchLogs = async (inicial = false) => {
       try {
-        setLoading(true);
+        if (inicial) setLoadingInicial(true);
         setErro(null);
         const dados = await listarHistorico();
         setLogs(dados);
@@ -32,10 +33,14 @@ export default function Historico() {
         console.error("Erro ao carregar histórico:", error);
         setErro("Não foi possível carregar o histórico no momento.");
       } finally {
-        setLoading(false);
+        if (inicial) setLoadingInicial(false);
       }
     };
-    fetchLogs();
+
+    fetchLogs(true);
+
+    const intervalo = setInterval(() => fetchLogs(false), 30000); // att a cada 30s
+    return () => clearInterval(intervalo);
   }, []);
 
   // Lógica de filtro (Memoizada)
@@ -58,7 +63,7 @@ export default function Historico() {
 
   const handleExportarCSV = () => {
     // Exportação sempre do mais novo para o mais antigo para o arquivo
-    const dadosParaExportar = [...logsFiltrados].sort((a, b) => 
+    const dadosParaExportar = [...logsFiltrados].sort((a, b) =>
       new Date(b.data).getTime() - new Date(a.data).getTime()
     );
 
@@ -86,7 +91,7 @@ export default function Historico() {
 
     const BOM = "\uFEFF";
     const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
-    
+
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -118,16 +123,16 @@ export default function Historico() {
                   setPaginaAtual(1);
                 }}
                 widthPx={
-                  windowWidth < 768 
-                    ? 320 
-                    : windowWidth < 1150 
-                      ? 550 
+                  windowWidth < 768
+                    ? 320
+                    : windowWidth < 1150
+                      ? 550
                       : 700
                 }
               />
 
               {/* Container do Botão: Direita em telas < 1024px (lg), Esquerda/Start em telas grandes */}
-              <div className="w-full lg:w-48 flex justify-end lg:justify-start"> 
+              <div className="w-full lg:w-48 flex justify-end lg:justify-start">
                 <Botao onClick={handleExportarCSV}>
                   <span className="flex items-center justify-center gap-2 whitespace-nowrap">
                     <FaDownload />
@@ -138,7 +143,7 @@ export default function Historico() {
             </div>
           </div>
 
-          {loading ? (
+          {loadingInicial ? (
             <div className="flex justify-center py-12">
               <span className="loading loading-spinner loading-lg"></span>
             </div>
@@ -148,7 +153,7 @@ export default function Historico() {
                 <thead>
                   <tr>
                     <th>Usuário</th>
-                    <th 
+                    <th
                       className="cursor-pointer hover:bg-base-300 transition-colors"
                       onClick={() => setOrdemDescendente(!ordemDescendente)}
                     >
@@ -189,16 +194,16 @@ export default function Historico() {
           {totalPaginas > 1 && (
             <div className="flex justify-center mt-8">
               <div className="join shadow-sm">
-                <button 
-                  className="join-item btn btn-sm" 
+                <button
+                  className="join-item btn btn-sm"
                   disabled={paginaAtual === 1}
                   onClick={() => setPaginaAtual(p => p - 1)}
                 >«</button>
                 <button className="join-item btn btn-sm no-animation font-normal">
                   Página {paginaAtual} de {totalPaginas}
                 </button>
-                <button 
-                  className="join-item btn btn-sm" 
+                <button
+                  className="join-item btn btn-sm"
                   disabled={paginaAtual === totalPaginas}
                   onClick={() => setPaginaAtual(p => p + 1)}
                 >»</button>
