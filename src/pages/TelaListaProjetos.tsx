@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
-import { listarProjetos } from "../services/projectService";
+import { listarProjetosPorGestor } from "../services/projectService";
 import { FaChevronRight } from "react-icons/fa";
 import FiltrosListagemProjetos from "../components/FiltrosListagemProjetos";
+import { KeycloakContext } from '../contexts/KeycloakProvider';
+import { listarApontamentos } from "../services/apontamentoService";
+import { listarItens } from "../services/ItemService";
 
 export interface Projeto {
     id: number;
@@ -18,8 +21,9 @@ export interface Projeto {
 }
 
 export default function ListaProjetos() {
-    // const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string }[]>([]);
-    // const [projetos, setProjetos] = useState<{ nomeProjeto: string; tipoProjeto: string; status: string,id: number }[]>([]);
+    const { getUsuario } = useContext(KeycloakContext);
+    const usuario = getUsuario();
+    const id = usuario?.id;
     const [projetos, setProjetos] = useState<Projeto[]>([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(false);
@@ -30,6 +34,28 @@ export default function ListaProjetos() {
         tipoProjeto: "",
         nomeCliente: ""
     });
+
+    const calcularHorasRealizadasProjeto = async (projetoId: number) => {
+        try {
+            const [itens, apontamentos] = await Promise.all([
+                listarItens(projetoId),
+                listarApontamentos()
+            ]);
+
+            const itemIds = itens.map((item: any) => item.id);
+
+            const horas = apontamentos
+                .filter((ap: any) =>
+                    itemIds.includes(ap.itemId) && ap.status === "APROVADO"
+                )
+                .reduce((total: number, ap: any) => total + ap.horasLiquidas, 0);
+
+            return horas;
+        } catch (error) {
+            console.error("Erro ao calcular horas:", error);
+            return 0;
+        }
+    };
 
     const navigate = useNavigate();
 
@@ -69,18 +95,33 @@ export default function ListaProjetos() {
         });
     }, []);
     useEffect(() => {
+        if (!id) return;
+
         const loadData = async () => {
             try {
-                const response = await listarProjetos();
-                console.log("Dados recebidos:", response);
-
+                const response = await listarProjetosPorGestor(id);
                 const data = response?.data ?? response;
 
-                setProjetos(Array.isArray(data) ? data : []);
+                if (!Array.isArray(data)) {
+                    setProjetos([]);
+                    return;
+                }
+
+                const projetosComHoras = await Promise.all(
+                    data.map(async (proj: Projeto) => {
+                        const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
+
+                        return {
+                            ...proj,
+                            horasRealizadasTotal: horasRealizadas
+                        };
+                    })
+                );
+
+                setProjetos(projetosComHoras);
+
             } catch (error) {
                 console.error("Erro ao carregar projetos", error);
-
-                setProjetos([]);
                 setErro(true);
             } finally {
                 setLoading(false);
@@ -88,7 +129,7 @@ export default function ListaProjetos() {
         };
 
         loadData();
-    }, []);
+    }, [id]);
 
     // regra de cor baseada no percentual
     const getCor = (projeto: Projeto) => {

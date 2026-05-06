@@ -7,7 +7,7 @@ import { listarItens, type NivelAtividade, vincularProfissionalItem } from "../s
 import PaginaAlocacao from "./TelaDevAllocationTest";
 import ModalAlocarFuncionarioItem, { type Profissional } from "../components/ModalAlocarFuncionarioItem";
 import { listarEquipeProjeto, listarProjetoId } from "../services/projectService";
-import { getApontamentosAprovadosPorProjeto, type MetricasAtividade, } from "../services/apontamentoService";
+import { listarApontamentos, type MetricasAtividade } from "../services/apontamentoService";
 import IndicadorProgresso from "../components/IndicadorProgresso";
 import Botao from "../shared/components/Botao";
 
@@ -48,6 +48,44 @@ export default function DescricaoProjeto() {
         );
     });
 
+    const calcularMetricas = async (projetoId: number) => {
+        const [itens, apontamentos] = await Promise.all([
+            listarItens(projetoId),
+            listarApontamentos()
+        ]);
+
+        const resultado: Record<string, any> = {};
+
+        itens.forEach((item: any) => {
+            const nivel = item.nivelAtividade.toUpperCase();
+
+            if (!resultado[nivel]) {
+                resultado[nivel] = {
+                    nivelAtividade: nivel,
+                    horasPrevistasAtiv: 0,
+                    horasRealizadasAtiv: 0
+                };
+            }
+
+            resultado[nivel].horasPrevistasAtiv += item.previsaoHoras;
+
+            const horasItem = apontamentos
+                .filter((ap: any) =>
+                    ap.itemId === item.id && ap.status === "APROVADO"
+                )
+                .reduce((sum: number, ap: any) => sum + ap.horasLiquidas, 0);
+
+            resultado[nivel].horasRealizadasAtiv += horasItem;
+        });
+
+        return Object.values(resultado).map((m: any) => ({
+            ...m,
+            percentual: m.horasPrevistasAtiv
+                ? (m.horasRealizadasAtiv / m.horasPrevistasAtiv) * 100
+                : 0
+        }));
+    };
+
 
     const { id } = useParams();
 
@@ -76,7 +114,7 @@ export default function DescricaoProjeto() {
             setListaDeProfissionais([...listaEquipe]);
 
             setLoadingMetricas(true);
-            const dadosMetricas = await getApontamentosAprovadosPorProjeto(id);
+            const dadosMetricas = await calcularMetricas(Number(id));
             setMetricas([...dadosMetricas]);
         } catch (error) {
             console.error("Erro ao carregar dados do projeto", error);
