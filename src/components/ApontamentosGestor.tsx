@@ -28,27 +28,45 @@ export default function ApontamentosGestor({
     const [apontamentos, setApontamentos] = useState<Apontamento[]>([]);
     const [selectedApontamentos, setSelectedApontamentos] = useState<Set<string>>(new Set());
     const [paginaAtual, setPaginaAtual] = useState(1);
+
     const itensPorPagina = 15;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [apontamentosResp, projetosResp, itensResp] = await Promise.all([
+                const [apontamentosResp, projetosResp] = await Promise.all([
                     listarApontamentosPorProjeto(projetoFiltro),
-                    listarProjetos(),
-                    listarItensPorProfissional("a8590c02-2ebd-4674-9711-dd5e8de7fcf7")
+                    listarProjetos()
                 ]);
 
                 const projetosArr = Array.isArray(projetosResp) ? projetosResp : [];
-                const itensArr = Array.isArray(itensResp) ? itensResp : [];
                 const apontamentosArr = Array.isArray(apontamentosResp) ? apontamentosResp : [];
 
+                const projetosMap = new Map(
+                    projetosArr.map((p: any) => [String(p.id), p])
+                );
+                const usuariosUnicos = Array.from(
+                    new Set(apontamentosArr.map((a: any) => a.usuarioId).filter(Boolean))
+                );
+                const itensPorUsuarioMap = new Map<string, any[]>();
+
+                await Promise.all(
+                    usuariosUnicos.map(async (userId) => {
+                        const itens = await listarItensPorProfissional(userId);
+                        itensPorUsuarioMap.set(userId, Array.isArray(itens) ? itens : []);
+                    })
+                );
+
                 const merged = apontamentosArr.map((a: any, index: number) => {
-                    const item = itensArr.find((i: any) =>
+
+                    const itensUsuario = itensPorUsuarioMap.get(a.usuarioId) || [];
+
+                    const item = itensUsuario.find((i: any) =>
                         String(i.id) === String(a.itemId)
                     );
-                    const projeto = projetosArr.find((p: any) =>
-                        String(p.id) === String(item?.projetoId || a.projetoId)
+
+                    const projeto = projetosMap.get(
+                        String(item?.projetoId || a.projetoId)
                     );
 
                     return {
@@ -72,11 +90,7 @@ export default function ApontamentosGestor({
                             a.nivel ||
                             "N/A",
 
-                        data:
-                            a.dataApontamento?.split("T")[0] ||
-                            a.data ||
-                            "",
-
+                        data: a.dataApontamento?.split(" ")[0] || "",
                         inicio: a.horaInicio || "",
                         fim: a.horaFim || "",
                         status: a.status || "PENDENTE"
@@ -94,12 +108,21 @@ export default function ApontamentosGestor({
     }, [projetoFiltro]);
     useEffect(() => {
         if (onSelectionChange) {
-            const selecionados = apontamentos.filter(a =>
-                selectedApontamentos.has(a.id)
+            onSelectionChange(
+                apontamentos.filter(a => selectedApontamentos.has(a.id))
             );
-            onSelectionChange(selecionados);
         }
     }, [selectedApontamentos, apontamentos, onSelectionChange]);
+
+    const filtered = useMemo(() => {
+        const pendentes = apontamentos.filter(a => a.status === "PENDENTE");
+        if (projetoFiltro === "all") return pendentes;
+        return pendentes.filter(a => a.projeto === projetoFiltro);
+    }, [apontamentos, projetoFiltro]);
+
+    const inicio = (paginaAtual - 1) * itensPorPagina;
+    const paginados = filtered.slice(inicio, inicio + itensPorPagina);
+    const totalPaginas = Math.ceil(filtered.length / itensPorPagina);
 
     const handleCheckboxChange = (id: string, checked: boolean) => {
         setSelectedApontamentos(prev => {
@@ -109,20 +132,6 @@ export default function ApontamentosGestor({
             return newSet;
         });
     };
-
-    const filtered = useMemo(() => {
-        const pendentes = apontamentos.filter(a => a.status === "PENDENTE");
-
-        if (projetoFiltro === "all") return pendentes;
-
-        return pendentes.filter(a =>
-            a.projeto === projetoFiltro
-        );
-    }, [apontamentos, projetoFiltro]);
-
-    const inicio = (paginaAtual - 1) * itensPorPagina;
-    const paginados = filtered.slice(inicio, inicio + itensPorPagina);
-    const totalPaginas = Math.ceil(filtered.length / itensPorPagina);
 
     return (
         <div className="overflow-x-auto">
@@ -182,9 +191,7 @@ export default function ApontamentosGestor({
                     <div className="join">
                         <button
                             className="join-item btn btn-sm"
-                            onClick={() =>
-                                setPaginaAtual(p => Math.max(p - 1, 1))
-                            }
+                            onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))}
                         >
                             «
                         </button>
@@ -196,9 +203,7 @@ export default function ApontamentosGestor({
                         <button
                             className="join-item btn btn-sm"
                             onClick={() =>
-                                setPaginaAtual(p =>
-                                    Math.min(p + 1, totalPaginas)
-                                )
+                                setPaginaAtual(p => Math.min(p + 1, totalPaginas))
                             }
                         >
                             »
