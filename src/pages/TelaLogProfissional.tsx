@@ -6,6 +6,7 @@ import { listarItensPorProfissional } from "../services/ItemService";
 import { FaPencilAlt } from "react-icons/fa";
 import ModalEditarApontamento from "../components/ModalEditarApontamento";
 import { listarProjetos } from "../services/projectService";
+
 type Log = {
 	id: number;
 	projeto: string;
@@ -17,6 +18,7 @@ type Log = {
 	status: "PENDENTE" | "APROVADO" | "REPROVADO";
 	justificativa?: string;
 };
+
 export default function TelaLogProfissional() {
 	const [logs, setLogs] = useState<Log[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -28,49 +30,67 @@ export default function TelaLogProfissional() {
 	const itensPorPagina = 15;
 	const [logSelecionado, setLogSelecionado] = useState<Log | null>(null);
 	const [modalAberto, setModalAberto] = useState(false);
-	useEffect(() => {
-		const fetchLogs = async () => {
-			if (!id) return;
-			try {
-				setLoading(true);
-				setErro(null);
-				const [apontamentos, respostaProjetos, respostaItens] = await Promise.all([
-					listarApontamentosUsuarios(id),
-					listarProjetos(),
-					listarItensPorProfissional(id)
-				]);
-				const projetos = Array.isArray(respostaProjetos) ? respostaProjetos : (respostaProjetos?.data || []);
-				const itens = Array.isArray(respostaItens) ? respostaItens : (respostaItens?.data || []);
-				const logsCompletos: Log[] = apontamentos.map((a: any) => {
-					const item = itens.find((i: any) => String(i.id) === String(a.itemId));
-					const idProjetoAlvo = item?.id_projeto || item?.projetoId || item?.projeto?.id;
-					const projetoEncontrado = projetos.find((p: any) => String(p.id) === String(idProjetoAlvo));
-					return {
-						id: a.id,
-						projeto: projetoEncontrado?.nomeProjeto ||
-							projetoEncontrado?.nome_projeto ||
-							projetoEncontrado?.projeto?.nomeProjeto ||
-							"Sem projeto",
-						atividade: a.itemDescricao || a.observacao || item?.descricao || "Sem atividade",
-						nivel: item?.nivelAtividade || a.nivel || "UNDEFINED",
-						data: a.dataApontamento || a.data || "",
-						inicio: a.horaInicio || a.inicio || "",
-						fim: a.horaFim || a.fim || "",
-						status: a.status_apontamento || a.status || "PENDENTE",
-						justificativa: a.justificativa_rejeicao || a.justificativa || "-",
-					};
-				});
-				const logsOrdenados = logsCompletos.sort(
-					(a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
+
+	const fetchLogs = async () => {
+		if (!id) return;
+
+		try {
+			setLoading(true);
+			setErro(null);
+
+			const [apontamentos, respostaProjetos, respostaItens] = await Promise.all([
+				listarApontamentosUsuarios(id),
+				listarProjetos(),
+				listarItensPorProfissional(id)
+			]);
+
+			const projetos = Array.isArray(respostaProjetos)
+				? respostaProjetos
+				: (respostaProjetos?.data || []);
+
+			const itens = Array.isArray(respostaItens)
+				? respostaItens
+				: (respostaItens?.data || []);
+
+			const logsCompletos: Log[] = apontamentos.map((a: any) => {
+				const item = itens.find((i: any) => String(i.id) === String(a.itemId));
+				const idProjetoAlvo = item?.id_projeto || item?.projetoId || item?.projeto?.id;
+
+				const projetoEncontrado = projetos.find(
+					(p: any) => String(p.id) === String(idProjetoAlvo)
 				);
-				setLogs(logsOrdenados);
-			} catch (error) {
-				console.error("Erro na requisição:", error);
-				setErro("Não foi possível carregar seus apontamentos no momento.");
-			} finally {
-				setLoading(false);
-			}
-		};
+
+				return {
+					id: a.id,
+					projeto:
+						projetoEncontrado?.nomeProjeto ||
+						projetoEncontrado?.nome_projeto ||
+						projetoEncontrado?.projeto?.nomeProjeto ||
+						"Sem projeto",
+					atividade: a.itemDescricao || a.observacao || item?.descricao || "Sem atividade",
+					nivel: item?.nivelAtividade || a.nivel || "UNDEFINED",
+					data: a.dataApontamento || a.data || "",
+					inicio: a.horaInicio || a.inicio || "",
+					fim: a.horaFim || a.fim || "",
+					status: a.status_apontamento || a.status || "PENDENTE",
+					justificativa: a.justificativa_rejeicao || a.observacao || "-",
+				};
+			});
+
+			const logsOrdenados = logsCompletos.sort(
+				(a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()
+			);
+
+			setLogs(logsOrdenados);
+		} catch (error) {
+			console.error("Erro na requisição:", error);
+			setErro("Não foi possível carregar seus apontamentos no momento.");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
 		fetchLogs();
 	}, [id]);
 	const handleEditar = (id: number) => {
@@ -79,7 +99,8 @@ export default function TelaLogProfissional() {
 		setLogSelecionado(log);
 		setModalAberto(true);
 	};
-	// lógica da paginação da tela
+
+	// paginação
 	const inicio = (paginaAtual - 1) * itensPorPagina;
 	const fim = inicio + itensPorPagina;
 	const logsPaginamento = logs.slice(inicio, fim);
@@ -143,9 +164,8 @@ export default function TelaLogProfissional() {
 												<td className="align-middle">
 													{(() => {
 														const texto = justificativaLimpa(row.justificativa);
-														if (!texto) {
-															return <span className="text-gray-400">-</span>;
-														}
+														if (!texto) return <span className="text-gray-400">-</span>;
+
 														return (
 															<span
 																className="cursor-pointer underline block"
@@ -157,14 +177,11 @@ export default function TelaLogProfissional() {
 													})()}
 												</td>
 												<td className="text-center">
-													<div
-														className="tooltip"
-														data-tip={
-															isEditavel
-																? "Editar apontamento"
-																: "Este apontamento já foi revisado e não pode mais ser editado"
-														}
-													>
+													<div className="tooltip" data-tip={
+														isEditavel
+															? "Editar apontamento"
+															: "Este apontamento já foi revisado e não pode mais ser editado"
+													}>
 														<button
 															className={`btn btn-sm btn-circle ${isEditavel
 																? "btn-ghost hover:bg-base-300"
@@ -203,9 +220,7 @@ export default function TelaLogProfissional() {
 						<div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
 							<div className="bg-gray-100 p-6 rounded-lg max-w-md w-full shadow-lg">
 								<h2 className="text-lg font-semibold mb-4">Justificativa</h2>
-								<p className="mb-4 break-words">
-									{justificativaSelecionada}
-								</p>
+								<p className="mb-4 break-words">{justificativaSelecionada}</p>
 								<div className="flex justify-end">
 									<button
 										className="btn btn-sm"
@@ -220,7 +235,10 @@ export default function TelaLogProfissional() {
 					{modalAberto && logSelecionado && (
 						<ModalEditarApontamento
 							isOpen={modalAberto}
-							onClose={() => setModalAberto(false)}
+							onClose={() => {
+								setModalAberto(false);
+								fetchLogs();
+							}}
 							apontamento={logSelecionado}
 							onSave={(apontamentoAtualizado: Log) => {
 								setLogs((prev) =>
@@ -230,6 +248,7 @@ export default function TelaLogProfissional() {
 								);
 								setSucesso("Apontamento atualizado com sucesso!");
 								setModalAberto(false);
+								fetchLogs();
 							}}
 						/>
 					)}
@@ -252,6 +271,7 @@ export default function TelaLogProfissional() {
 							</button>
 						</div>
 					</div>
+
 				</div>
 			</div>
 		</div>

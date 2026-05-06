@@ -15,7 +15,8 @@ export async function listarItens(id: number) {
 
 export async function listarItensPorProfissional(id: string) {
   const response = await instance.get(`/gestao/itens/usuario/${id}`);
-  return response.data;
+  const data = response.data;
+  return Array.isArray(data) ? data : data?.content ?? [];
 }
 
 export async function vincularProfissionalItem(data: any) {
