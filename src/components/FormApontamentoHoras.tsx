@@ -59,7 +59,7 @@ export default function FormularioApontamento() {
             try {
                 setLoading(true);
                 const response = await instance.get(`/gestao/itens/projeto/${idParaBusca}`);
-                setItens(response.data);
+                setItens(Array.isArray(response.data) ? response.data : []);
             } catch (error) {
                 console.error(error);
                 setErro("Erro ao carregar itens deste projeto.");

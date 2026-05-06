@@ -86,7 +86,6 @@ export default function FormCadastroItem() {
     if (!projetoIdEstado) return "Selecione um projeto.";
     if (!titulo.trim()) return "O título é obrigatório.";
     if (!descricao.trim()) return "A descrição é obrigatória.";
-    if (usuariosSelecionados.length === 0) return "Selecione pelo menos um profissional.";
     return "";
   };
 
