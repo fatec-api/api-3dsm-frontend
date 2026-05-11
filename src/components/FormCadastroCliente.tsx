@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios"; // Certifique-se de instalar: npm install axios
+import axios from "axios"; 
 import { MdBusiness } from "react-icons/md";
 import { HiOutlineMail } from "react-icons/hi";
 import { FaRegIdCard } from "react-icons/fa";
@@ -33,7 +33,6 @@ export default function CadastroCliente() {
 
     const cnpjLimpo = cnpj.replace(/\D/g, "");
     
-    // O backend espera 'razaoSocial' conforme ClienteModel.java
     const dados = { 
       razaoSocial: nomeEmpresa, 
       email: email, 
@@ -41,13 +40,12 @@ export default function CadastroCliente() {
     };
 
     try {
-      // Rota baseada no Gateway (porta 8080) e no prefixo do serviço de gestão
       const response = await axios.post("http://localhost:8080/gestao/clientes", dados);
 
       if (response.status === 201 || response.status === 200) {
         setSucesso(true);
         setAlerta("Cliente cadastrado com sucesso!");
-        handleLimpar(); // Limpa campos após sucesso
+        handleLimpar(); 
       }
     } catch (error) {
       setSucesso(false);
@@ -62,7 +60,6 @@ export default function CadastroCliente() {
     setNomeEmpresa("");
     setEmail("");
     setCnpj("");
-    // Não limpamos o alerta aqui para o usuário ver a mensagem de sucesso/erro após o submit
   };
 
   return (
