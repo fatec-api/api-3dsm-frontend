@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import Input from "../shared/components/Input";
 import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
+import { listarItensPorProfissional } from "../services/ItemService";
 
 import { FiClock, FiCalendar } from "react-icons/fi";
 import { listarProjetos } from "../services/projectService";
@@ -37,39 +38,29 @@ export default function FormularioApontamento() {
 
     useEffect(() => {
         const loadData = async () => {
+            const usuario = getUsuario();
+            if (!usuario?.id) return;
             try {
-                const listaProjetos = await listarProjetos();
-                setProjetos(listaProjetos);
+                const itensUsuario = await listarItensPorProfissional(usuario.id);
+                setItens(Array.isArray(itensUsuario) ? itensUsuario : []);
+
+                const projetosUnicos = itensUsuario.reduce((acc: any[], item: any) => {
+                    if (!acc.some(p => p.id === item.projetoId)) {
+                        acc.push({
+                            id: item.projetoId,
+                            nomeProjeto: item.projetoNome
+                        });
+                    }
+                    return acc;
+                }, []);
+
+                setProjetos(projetosUnicos);
             } catch (error) {
-                console.error("Erro ao carregar dados", error);
+                console.error("Erro ao carregar itens do usuário", error);
             }
         };
         loadData();
     }, []);
-
-    useEffect(() => {
-        async function itensPorProjeto() {
-            const idParaBusca = projetoSelecionado?.id;
-
-            if (!idParaBusca) {
-                setItens([]);
-                return;
-            }
-
-            try {
-                setLoading(true);
-                const response = await instance.get(`/gestao/itens/projeto/${idParaBusca}`);
-                setItens(response.data);
-            } catch (error) {
-                console.error(error);
-                setErro("Erro ao carregar itens deste projeto.");
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        itensPorProjeto();
-    }, [projetoSelecionado]);
 
     function parseHora(h: string) {
         const apenasHora = h.includes("T") ? h.split("T")[1] : h;
@@ -148,6 +139,10 @@ export default function FormularioApontamento() {
         return response.data;
     }
 
+    const itensFiltrados = Array.isArray(itens)
+        ? itens.filter((i: any) => i.projetoId === projetoSelecionado?.id)
+        : [];
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         setErro("");
@@ -208,6 +203,8 @@ export default function FormularioApontamento() {
                                 setProjeto(nome);
                                 const projObj = projetos.find(p => p.nomeProjeto === nome);
                                 setProjetoSelecionado(projObj);
+                                setItem("");
+                                setItemSelecionado(null);
                             }}
                             options={projetos.map(p => p.nomeProjeto)}
                             widthPx={300}
@@ -220,13 +217,13 @@ export default function FormularioApontamento() {
                                 const valorSelecionado = e.target.value;
                                 setItem(valorSelecionado);
 
-                                const objetoItem = itens.find(
+                                const objetoItem = itensFiltrados.find(
                                     (i: any) => i.codigo === valorSelecionado
                                 );
 
                                 setItemSelecionado(objetoItem);
                             }}
-                            options={itens.map((i: any) => i.codigo)}
+                            options={itensFiltrados.map((i: any) => i.codigo)}
                             widthPx={300}
                         />
 

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../shared/components/Card";
+import { useParams } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarItens, type NivelAtividade, vincularProfissionalItem } from "../services/ItemService";
 import PaginaAlocacao from "./TelaDevAllocationTest";
 import ModalAlocarFuncionarioItem, { type Profissional } from "../components/ModalAlocarFuncionarioItem";
 import { listarEquipeProjeto, listarProjetoId } from "../services/projectService";
-import { getApontamentosAprovadosPorProjeto, type MetricasAtividade, } from "../services/apontamentoService";
+import { listarApontamentos, type MetricasAtividade } from "../services/apontamentoService";
 import IndicadorProgresso from "../components/IndicadorProgresso";
 import Botao from "../shared/components/Botao";
 
@@ -47,6 +48,48 @@ export default function DescricaoProjeto() {
         );
     });
 
+    const calcularMetricas = async (projetoId: number) => {
+        const [itens, apontamentos] = await Promise.all([
+            listarItens(projetoId),
+            listarApontamentos()
+        ]);
+
+        const resultado: Record<string, any> = {};
+
+        itens.forEach((item: any) => {
+            const nivel = item.nivelAtividade.toUpperCase();
+
+            if (!resultado[nivel]) {
+                resultado[nivel] = {
+                    nivelAtividade: nivel,
+                    horasPrevistasAtiv: 0,
+                    horasRealizadasAtiv: 0
+                };
+            }
+
+            resultado[nivel].horasPrevistasAtiv += item.previsaoHoras;
+
+            const horasItem = apontamentos
+                .filter((ap: any) =>
+                    ap.itemId === item.id && ap.status === "APROVADO"
+                )
+                .reduce((sum: number, ap: any) => sum + ap.horasLiquidas, 0);
+
+            resultado[nivel].horasRealizadasAtiv += horasItem;
+        });
+
+        return Object.values(resultado).map((m: any) => ({
+            ...m,
+            percentual: m.horasPrevistasAtiv
+                ? (m.horasRealizadasAtiv / m.horasPrevistasAtiv) * 100
+                : 0
+        }));
+    };
+
+
+    const { id } = useParams();
+
+
     const itensFiltrados = itens.filter(item => {
         const termo = buscaItem.toLowerCase();
         return (
@@ -58,21 +101,21 @@ export default function DescricaoProjeto() {
     });
 
     const carregarDadosProjeto = async () => {
-        if (!projetoState?.id) return;
+        if (!id) return;
+
         try {
-            const projeto = await listarProjetoId(projetoState.id);
+            const projeto = await listarProjetoId(id);
             setProjeto(projeto);
 
-            const listaItens = await listarItens(projetoState.id);
-            // setItens(listaItens)
-            setItens(Array.isArray(listaItens) ? listaItens : []);
+            const listaItens = await listarItens(id);
+            setItens(Array.isArray(listaItens) ? [...listaItens] : []);
 
-            const listaEquipe = await listarEquipeProjeto(projetoState.id);
-            setListaDeProfissionais(listaEquipe);
+            const listaEquipe = await listarEquipeProjeto(id);
+            setListaDeProfissionais([...listaEquipe]);
 
             setLoadingMetricas(true);
-            const dadosMetricas = await getApontamentosAprovadosPorProjeto(projetoState.id);
-            setMetricas(dadosMetricas || []);
+            const dadosMetricas = await calcularMetricas(Number(id));
+            setMetricas([...dadosMetricas]);
         } catch (error) {
             console.error("Erro ao carregar dados do projeto", error);
         } finally {
@@ -81,17 +124,22 @@ export default function DescricaoProjeto() {
     };
 
     useEffect(() => {
-        if (!projetoState?.id) {
+        if (!id) {
             navigate("/lista-projetos");
             return;
         }
         carregarDadosProjeto();
-    }, [projetoState?.id]);
+    }, [id]);
 
     const handleFecharModal = () => {
         setPopupItem(null);
         setSelectedProfList([]);
         setModalMessage(null);
+    };
+
+    const formatarData = (data?: string) => {
+        if (!data) return "-";
+        return new Date(data).toLocaleDateString("pt-BR");
     };
 
     const handleSelectProfissional = (p: Profissional) => {
@@ -147,8 +195,13 @@ export default function DescricaoProjeto() {
                             <h1 className="text-3xl font-bold">{projeto.nomeProjeto}</h1>
                             <span className="badge badge-warning">{projeto.status}</span>
                         </div>
-                        <div className="text-right text-sm text-base-content/60">
+                        <div className="text-right text-sm text-base-content/60 flex flex-col items-end">
                             <p>{projeto.tipoProjeto}</p>
+
+                            <div className="mt-2 text-xs">
+                                <p><strong>Início:</strong> {formatarData(projeto.dataInicio)}</p>
+                                <p><strong>Fim:</strong> {formatarData(projeto.dataFim)}</p>
+                            </div>
                         </div>
                     </div>
                 </div>

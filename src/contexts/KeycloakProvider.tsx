@@ -50,7 +50,12 @@ export const KeycloakProvider = ({ children }: KeycloakProviderProps) => {
   const getToken = (): string | undefined => keycloak.token;
   
   const temPermissao = (role: string): boolean => {
-    return keycloak.hasRealmRole(role);
+   if (!keycloak.tokenParsed) return false;
+
+  const isRealmRole = keycloak.hasRealmRole(role);
+  const isClientRole = keycloak.hasResourceRole(role);
+
+  return isRealmRole || isClientRole;
   };
   
   const getUsuario = (): UsuarioPerfil | null => {
@@ -59,7 +64,7 @@ export const KeycloakProvider = ({ children }: KeycloakProviderProps) => {
     return {
       nome: (keycloak.tokenParsed.name || keycloak.tokenParsed.preferred_username) as string,
       email: keycloak.tokenParsed.email as string,
-      id: keycloak.subject
+      id: keycloak.tokenParsed.sub as string
     };
   };
 
