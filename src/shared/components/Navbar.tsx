@@ -40,6 +40,8 @@ export default function Navbar() {
                                             <li><Link to="/cadastroprojeto">Cadastro de Projeto</Link></li>
                                             <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
                                             <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                            <li><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
+
                                         </>
                                     )}
                                     <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
@@ -82,6 +84,7 @@ export default function Navbar() {
                                             <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
                                             <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
                                             <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                            <li><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
                                         </>
                                     )}
                                     <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
