@@ -1,7 +1,8 @@
+import instance from "../api/instance";
 import api from "./api";
 
 // LISTAR CLIENTES
-export function listarClientes() {
+export function listarClientes(): Promise<any[]> {
     return Promise.resolve([
         {
             id: 1,
@@ -10,7 +11,6 @@ export function listarClientes() {
             dataCadastro: new Date().toISOString(),
             email: "contato@turingcorp.com",
             nomeEmpresa: "Turing Corp",
-            nomeResponsavel: "Alan Turing"
         },
         {
             id: 2,
@@ -19,7 +19,6 @@ export function listarClientes() {
             dataCadastro: new Date().toISOString(),
             email: "contato@lovelaceinc.com",
             nomeEmpresa: "Lovelace Inc",
-            nomeResponsavel: "Ada Lovelace"
         },
         {
             id: 3,
@@ -28,7 +27,6 @@ export function listarClientes() {
             dataCadastro: new Date().toISOString(),
             email: "contato@linuxsystems.com",
             nomeEmpresa: "Linux Systems",
-            nomeResponsavel: "Linus Torvalds"
         },
         {
             id: 4,
@@ -37,7 +35,6 @@ export function listarClientes() {
             dataCadastro: new Date().toISOString(),
             email: "contato@gracecompiler.com",
             nomeEmpresa: "Grace Compiler",
-            nomeResponsavel: "Grace Hopper"
         },
         {
             id: 5,
@@ -46,7 +43,19 @@ export function listarClientes() {
             dataCadastro: new Date().toISOString(),
             email: "contato@hopperanalytics.com",
             nomeEmpresa: "Hopper Analytics",
-            nomeResponsavel: "Tim Hopper"
         }
     ])
 }
+
+
+// para integrar com back
+// export async function listarClientes() {
+//     try {
+//         const response = await instance.get("/gestao/clientes/listar");
+//         return response.data;
+//     } catch (error) {
+//         console.error({ event: "API_ERROR", action: "listarClientes", error });
+//         throw error;
+//     }
+// }
+
