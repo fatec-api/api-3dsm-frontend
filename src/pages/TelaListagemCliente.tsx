@@ -20,8 +20,43 @@ export default function TelaListagemCliente() {
     const [paginaAtual, setPaginaAtual] = useState(1)
     const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
     const [modalAberto, setModalAberto] = useState(false);
+    const [busca, setBusca] = useState("");
+    const [filtroStatus, setFiltroStatus] = useState("Todos");
+
 
     const itensPorPagina = 15
+
+    const clientesFiltrados = clientes.filter((cliente) => {
+        const termo = busca.toLowerCase()
+
+        const termoLimpo = termo.replace(/\D/g, "")
+
+        const correspondeBusca =
+            cliente.nomeEmpresa.toLowerCase().includes(termo) ||
+            cliente.cnpj.includes(termoLimpo) ||
+            cliente.email.toLowerCase().includes(termo)
+
+        const correspondeStatus =
+            filtroStatus === "Todos" ||
+            (filtroStatus === "Ativo" ? cliente.ativo === true : cliente.ativo === false)
+
+        return correspondeBusca && correspondeStatus;
+    });
+
+    const indiceInicial = (paginaAtual - 1) * itensPorPagina;
+
+    const clientesPaginados = clientesFiltrados.slice(
+        indiceInicial,
+        indiceInicial + itensPorPagina
+    );
+
+    const formatarCNPJ = (cnpj: string) => {
+        const apenasNumeros = cnpj.replace(/\D/g, "");
+        return apenasNumeros.replace(
+            /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+            "$1.$2.$3/$4-$5"
+        );
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -36,7 +71,8 @@ export default function TelaListagemCliente() {
         }
 
         fetchData();
-    }, []);
+        setPaginaAtual(1)
+    }, [busca, filtroStatus]);
 
     function abrirEdicao(cliente: Cliente) {
         setClienteSelecionado(cliente);
@@ -47,73 +83,137 @@ export default function TelaListagemCliente() {
         <>
             <Navbar />
             <Header />
+            <section className="flex justify-center px-6 pb-12">
+                <main className="w-full max-w-7xl rounded-2xl p-8 shadow-md">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+                        <h1 className="text-2xl font-bold text-base-content">
+                            Listagem dos Clientes
+                        </h1>
+                        <section className="flex flex-col md:flex-row gap-4 md:items-center">
+                            <input
+                                type="text"
+                                placeholder="Pesquisar por cliente, email ou cnpj"
+                                className="input w-full md:w-80"
+                                value={busca}
+                                onChange={(e) => setBusca(e.target.value)}
+                            />
 
-            <h1 className="text-2xl font-semibold text-gray-800 text-center pb-8">
-                Listagem dos Clientes
-            </h1>
-            <div className="overflow-x-auto">
-                <table className="table table-zebra table-fixed w-full">
-                    <thead>
-                        <tr>
-                            <th className="w-[20%]">Cliente</th>
-                            <th className="w-[25%]">Email</th>
-                            <th className="w-[20%]">CNPJ</th>
-                            <th className="w-[23%]">Projetos</th>
-                            <th className="w-[15%]">Status</th>
-                            <th className="w-[10%]">Editar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {carregando ? (
-                            <tr>
-                                <td colSpan={6}>Carregando...</td>
-                            </tr>
-                        ) : (
-                            clientes.map((cliente) => {
-                                const projetosVisiveis = cliente.projetos.slice(0, 2)
-                                const projetosRestantes = cliente.projetos.slice(2)
-                                const tooltipProjetos = projetosRestantes.map((projeto) => projeto.nomeProjeto).join(', ')
+                            <select
+                                className="select select-bordered w-full md:w-52"
+                                value={filtroStatus}
+                                onChange={(e) => setFiltroStatus(e.target.value)}
+                            >
+                                <option value="Todos">Todos</option>
+                                <option value="Ativo">Ativo</option>
+                                <option value="Inativo">Inativo</option>
+                            </select>
+                        </section>
+                    </div>
 
-                                return (
-                                    <tr key={cliente.id}>
-                                        <td>{cliente.nomeEmpresa}</td>
-                                        <td>{cliente.email}</td>
-                                        <td>{cliente.cnpj}</td>
-                                        <td>{projetosVisiveis.map((projeto) => (
-                                            <span className="badge  badge-outline badge-primary mr-1.5">
-                                                {projeto.nomeProjeto}
-                                            </span>
-                                        ))}
-                                            {projetosRestantes.length > 0 && (
-                                                <section className="tooltip" data-tip={tooltipProjetos}>
-                                                    <span className="badge  badge-outline badge-primary ml-1.5">
-                                                        +{projetosRestantes.length}
-                                                    </span>
-                                                </section>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <span className={`badge badge-outline ${cliente.ativo ? 'badge-success' : 'badge-error'}`}>
-                                                {cliente.ativo ? "Ativo" : "Inativo"}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button
-                                                onClick={() => abrirEdicao(cliente)}
-                                                className="btn btn-ghost btn-sm"
-                                            >
-                                                <FiEdit />
-                                            </button>
+                    <div className="overflow-x-auto">
+                        <table className="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th className="w-[20%]">Cliente</th>
+                                    <th className="w-[25%]">Email</th>
+                                    <th className="w-[20%]">CNPJ</th>
+                                    <th className="w-[23%]">Projetos</th>
+                                    <th className="w-[15%]">Status</th>
+                                    <th className="w-[10%]">Editar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {clientesPaginados.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={9} className="text-center py-8 text-base-content/70">
+                                            Nenhum usuário encontrado.
                                         </td>
                                     </tr>
-                                )
-                            })
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                ) : (
+                                    clientesPaginados.map((cliente) => {
+                                        const projetosVisiveis = cliente.projetos.slice(0, 2)
+                                        const projetosRestantes = cliente.projetos.slice(2)
+                                        const tooltipProjetos = projetosRestantes.map((projeto) => projeto.nomeProjeto).join(', ')
+
+                                        return (
+                                            <tr key={cliente.id}>
+                                                <td>{cliente.nomeEmpresa}</td>
+                                                <td>{cliente.email}</td>
+                                                <td>{formatarCNPJ(cliente.cnpj)}</td>
+                                                <td>
+                                                    {cliente.projetos.length === 0 ? (
+                                                        <span className="text-gray-400 italic text-sm">
+                                                            <span className="badge badge-primary badge-sm font-semibold">
+                                                                n/a
+                                                            </span>
+                                                        </span>
+                                                    ) : (
+                                                        <>
+                                                            {projetosVisiveis.map((projeto) => (
+                                                                <span key={projeto.id} className="badge badge-sm badge-primary mr-1.5">
+                                                                    {projeto.nomeProjeto}
+                                                                </span>
+                                                            ))}
+
+                                                            {projetosRestantes.length > 0 && (
+                                                                <section className="tooltip" data-tip={tooltipProjetos}>
+                                                                    <span className="badge badge-sm badge-primary ml-1.5">
+                                                                        +{projetosRestantes.length}
+                                                                    </span>
+                                                                </section>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    <span className={`badge badge-sm ${cliente.ativo ? 'badge-success' : 'badge-error'}`}>
+                                                        {cliente.ativo ? "Ativo" : "Inativo"}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        onClick={() => abrirEdicao(cliente)}
+                                                        className="btn btn-ghost btn-sm"
+                                                    >
+                                                        <FiEdit />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+
+                        <div className="flex justify-center mt-6">
+                            <div className="join">
+                                <button
+                                    className="join-item btn btn-sm"
+                                    onClick={() =>
+                                        setPaginaAtual((prev) => Math.max(prev - 1, 1))
+                                    }
+                                >
+                                    «
+                                </button>
+
+                                <button className="join-item btn btn-sm btn-active">
+                                    Página {paginaAtual}
+                                </button>
+
+                                <button
+                                    className="join-item btn btn-sm"
+                                    disabled={indiceInicial + itensPorPagina >= clientesFiltrados.length}
+                                    onClick={() => setPaginaAtual((prev) => prev + 1)}
+                                >
+                                    »
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </section>
+
         </>
     );
 }
-
 

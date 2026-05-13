@@ -38,7 +38,7 @@ export function listaClientes(): Promise<Cliente[]> {
         },
         {
             id: 2,
-            ativo: true,
+            ativo: false,
             cnpj: "23456789000102",
             dataCadastro: new Date().toISOString(),
             email: "contato@lovelaceinc.com",
@@ -99,6 +99,141 @@ export function listaClientes(): Promise<Cliente[]> {
                     id: 8,
                     nomeProjeto: 'Proj8'
                 }
+            ]
+        },
+        {
+            id: 6,
+            ativo: false,
+            cnpj: "67890123000106",
+            dataCadastro: new Date().toISOString(),
+            email: "suporte@vonneumann.io",
+            nomeEmpresa: "Von Neumann Architecture",
+            projetos: [
+                { id: 9, nomeProjeto: 'EDVAC' },
+                { id: 10, nomeProjeto: 'IAS Machine' }
+            ]
+        },
+        {
+            id: 7,
+            ativo: true,
+            cnpj: "78901234000107",
+            dataCadastro: new Date().toISOString(),
+            email: "hello@ritchieclabs.com",
+            nomeEmpresa: "Ritchie C Labs",
+            projetos: [
+                { id: 11, nomeProjeto: 'Unix Core' },
+                { id: 12, nomeProjeto: 'Compiler B' },
+                { id: 13, nomeProjeto: 'Standard I/O' },
+                { id: 14, nomeProjeto: 'Threads Lib' }
+            ]
+        },
+        {
+            id: 8,
+            ativo: true,
+            cnpj: "89012345000108",
+            dataCadastro: new Date().toISOString(),
+            email: "contact@knuthalgorithms.net",
+            nomeEmpresa: "Knuth Algorithms",
+            projetos: [
+                { id: 15, nomeProjeto: 'TeX System' }
+            ]
+        },
+        {
+            id: 9,
+            ativo: false,
+            cnpj: "90123456000109",
+            dataCadastro: new Date().toISOString(),
+            email: "admin@dijkstrashortest.org",
+            nomeEmpresa: "Dijkstra Pathfinders",
+            projetos: []
+        },
+        {
+            id: 10,
+            ativo: true,
+            cnpj: "01234567000110",
+            dataCadastro: new Date().toISOString(),
+            email: "dev@shannoninfo.com",
+            nomeEmpresa: "Shannon Information",
+            projetos: [
+                { id: 16, nomeProjeto: 'Binary Logic' },
+                { id: 17, nomeProjeto: 'Entropy App' },
+                { id: 18, nomeProjeto: 'Signal Process' }
+            ]
+        },
+        {
+            id: 11,
+            ativo: true,
+            cnpj: "11223344000111",
+            dataCadastro: new Date().toISOString(),
+            email: "ceo@bernerslee-web.uk",
+            nomeEmpresa: "Tim World Wide",
+            projetos: [
+                { id: 19, nomeProjeto: 'HTTP Protocol' },
+                { id: 20, nomeProjeto: 'HTML Builder' }
+            ]
+        },
+        {
+            id: 12,
+            ativo: false,
+            cnpj: "22334455000122",
+            dataCadastro: new Date().toISOString(),
+            email: "legal@stallmanfree.org",
+            nomeEmpresa: "Stallman Foundation",
+            projetos: [
+                { id: 21, nomeProjeto: 'GNU Compiler' },
+                { id: 22, nomeProjeto: 'Emacs Editor' },
+                { id: 23, nomeProjeto: 'GPL License' },
+                { id: 24, nomeProjeto: 'Freedom Soft' },
+                { id: 25, nomeProjeto: 'Kernel Mod' }
+            ]
+        },
+        {
+            id: 13,
+            ativo: true,
+            cnpj: "33445566000133",
+            dataCadastro: new Date().toISOString(),
+            email: "info@torvaldsgit.fi",
+            nomeEmpresa: "Linus & Friends",
+            projetos: [
+                { id: 26, nomeProjeto: 'Git Version' },
+                { id: 27, nomeProjeto: 'Linux Kernel' }
+            ]
+        },
+        {
+            id: 14,
+            ativo: true,
+            cnpj: "44556677000144",
+            dataCadastro: new Date().toISOString(),
+            email: "jobs@wozniakgarage.com",
+            nomeEmpresa: "Wozniak Garage",
+            projetos: [
+                { id: 28, nomeProjeto: 'Apple I' },
+                { id: 29, nomeProjeto: 'Apple II' }
+            ]
+        },
+        {
+            id: 15,
+            ativo: true,
+            cnpj: "55667788000155",
+            dataCadastro: new Date().toISOString(),
+            email: "contact@lamport-clocks.com",
+            nomeEmpresa: "Lamport Systems",
+            projetos: [
+                { id: 30, nomeProjeto: 'LaTeX Engine' },
+                { id: 31, nomeProjeto: 'Paxos Protocol' }
+            ]
+        },
+        
+        {
+            id: 16,
+            ativo: true,
+            cnpj: "55667788000155",
+            dataCadastro: new Date().toISOString(),
+            email: "contact@lamport-clocks.com",
+            nomeEmpresa: "Lamport Systems",
+            projetos: [
+                { id: 30, nomeProjeto: 'LaTeX Engine' },
+                { id: 31, nomeProjeto: 'Paxos Protocol' }
             ]
         }
     ])
