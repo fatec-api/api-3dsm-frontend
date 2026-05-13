@@ -1,6 +1,8 @@
 import Navbar from "../shared/components/Navbar";
 import Header from "../shared/components/Header";
 import { useState } from "react";
+import { FiEdit } from "react-icons/fi";
+
 
 
 type Experiencia = "Júnior" | "Pleno" | "Sênior";
@@ -175,34 +177,35 @@ export default function ListagemUsuarios() {
 
   const usuarioAtual = usuarios.find((u) => u.id === usuarioLogadoId);
 
- const [paginaAtual, setPaginaAtual] = useState(1);
-const [busca, setBusca] = useState("");
-const [filtroStatus, setFiltroStatus] = useState("Todos");
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("Todos");
 
-const ITENS_POR_PAGINA = 5;
+  // quantos itens serão exibidos na tabela
+  const ITENS_POR_PAGINA = 15;
 
-// FILTRO
-const usuariosFiltrados = usuarios.filter((usuario) => {
-  const termo = busca.toLowerCase();
+  // filtro
+  const usuariosFiltrados = usuarios.filter((usuario) => {
+    const termo = busca.toLowerCase();
 
-  const correspondeBusca =
-    usuario.nome.toLowerCase().includes(termo) ||
-    usuario.experiencia.toLowerCase().includes(termo);
+    const correspondeBusca =
+      usuario.nome.toLowerCase().includes(termo) ||
+      usuario.experiencia.toLowerCase().includes(termo);
 
-  const correspondeStatus =
-    filtroStatus === "Todos" ||
-    usuario.status === filtroStatus;
+    const correspondeStatus =
+      filtroStatus === "Todos" ||
+      usuario.status === filtroStatus;
 
-  return correspondeBusca && correspondeStatus;
-});
+    return correspondeBusca && correspondeStatus;
+  });
 
 
-const indiceInicial = (paginaAtual - 1) * ITENS_POR_PAGINA;
+  const indiceInicial = (paginaAtual - 1) * ITENS_POR_PAGINA;
 
-const usuariosPaginados = usuariosFiltrados.slice(
-  indiceInicial,
-  indiceInicial + ITENS_POR_PAGINA
-);
+  const usuariosPaginados = usuariosFiltrados.slice(
+    indiceInicial,
+    indiceInicial + ITENS_POR_PAGINA
+  );
 
   return (
     <>
@@ -290,20 +293,7 @@ const usuariosPaginados = usuariosFiltrados.slice(
                           );
                         }}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a4 4 0 01-2.828 1.172H7v-2a4 4 0 011.172-2.828z"
-                          />
-                        </svg>
+                        <FiEdit className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>
