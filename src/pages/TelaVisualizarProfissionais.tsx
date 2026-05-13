@@ -176,48 +176,80 @@ export default function ListagemUsuarios() {
   const usuarioAtual = usuarios.find((u) => u.id === usuarioLogadoId);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("Todos");
 
-  return (
-    <>
+  const usuariosFiltrados = usuarios.filter((usuario) => {
+    const termo = busca.toLowerCase();
 
-      <Navbar />
-      <Header />
+    // filtros de busca dos cenários
+    const correspondeBusca =
+      usuario.nome.toLowerCase().includes(termo) ||
+      usuario.experiencia.toLowerCase().includes(termo);
 
+    const correspondeStatus =
+      filtroStatus === "Todos" ||
+      usuario.status === filtroStatus;
 
-      <main className="px-6 py-8 max-w-screen-xl mx-auto">
+    return correspondeBusca && correspondeStatus;
+  });
 
-        <h1 className="text-2xl font-bold mb-6 text-base-content">
-          Listagem de Usuários
-        </h1>
+ return (
+  <>
+    <Navbar />
+    <Header />
 
+    <main className="px-6 py-8 max-w-screen-xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6 text-base-content">
+        Listagem de Usuários
+      </h1>
 
-        <div className="overflow-x-auto rounded-lg shadow">
-          <table className="table table-zebra w-full">
+      {/* PESQUISA E FILTRO */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="Pesquisar por nome ou experiência..."
+          className="input input-bordered w-full md:w-80"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
 
-            <thead>
-              <tr>
-                <th>Usuário</th>
-                <th>Cargo</th>
-                <th>Email</th>
-                <th>Experiência</th>
-                <th>Valor/Hora</th>
-                <th>Criado em</th>
-                <th>Projetos Alocado</th>
-                <th>Status</th>
-                <th>Editar</th>
-              </tr>
-            </thead>
+        <select
+          className="select select-bordered w-full md:w-52"
+          value={filtroStatus}
+          onChange={(e) => setFiltroStatus(e.target.value)}
+        >
+          <option value="Todos">Todos</option>
+          <option value="Ativo">Ativo</option>
+          <option value="Inativo">Inativo</option>
+        </select>
+      </div>
 
-            <tbody>
-              {usuarios.map((usuario) => (
+      <div className="overflow-x-auto rounded-lg shadow">
+        <table className="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>Usuário</th>
+              <th>Cargo</th>
+              <th>Email</th>
+              <th>Experiência</th>
+              <th>Valor/Hora</th>
+              <th>Criado em</th>
+              <th>Projetos Alocado</th>
+              <th>Status</th>
+              <th>Editar</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {usuariosFiltrados.length > 0 ? (
+              usuariosFiltrados.map((usuario) => (
                 <tr key={usuario.id}>
-
                   <td className="font-medium">{usuario.nome}</td>
 
                   <td>{usuario.cargo}</td>
 
                   <td>{usuario.email}</td>
-
 
                   <td>{usuario.experiencia}</td>
 
@@ -265,33 +297,45 @@ export default function ListagemUsuarios() {
                     </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={9}
+                  className="text-center py-8 text-base-content/70"
+                >
+                  Nenhum usuário encontrado.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex justify-center mt-6">
+        <div className="join">
+          <button
+            className="join-item btn btn-sm"
+            onClick={() =>
+              setPaginaAtual((prev) => Math.max(prev - 1, 1))
+            }
+          >
+            «
+          </button>
+
+          <button className="join-item btn btn-sm btn-active">
+            Página {paginaAtual}
+          </button>
+
+          <button
+            className="join-item btn btn-sm"
+            onClick={() => setPaginaAtual((prev) => prev + 1)}
+          >
+            »
+          </button>
         </div>
-
-        <div className="flex justify-center mt-6">
-          <div className="join">
-            <button
-              className="join-item btn btn-sm"
-              onClick={() => setPaginaAtual((prev) => Math.max(prev - 1, 1))}
-            >
-              «
-            </button>
-
-            <button className="join-item btn btn-sm btn-active">
-              Página {paginaAtual}
-            </button>
-
-            <button
-              className="join-item btn btn-sm"
-              onClick={() => setPaginaAtual((prev) => prev + 1)}
-            >
-              »
-            </button>
-          </div>
-        </div>
-      </main>
-    </>
-  );
+      </div>
+    </main>
+  </>
+);
 }
