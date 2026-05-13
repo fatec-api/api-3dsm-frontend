@@ -1,6 +1,6 @@
 import Navbar from "../shared/components/Navbar";
 import Header from "../shared/components/Header";
-
+import { useState } from "react";
 
 
 type Experiencia = "Júnior" | "Pleno" | "Sênior";
@@ -161,9 +161,8 @@ function BadgesProjetos({ projetos }: { projetos: Projeto[] }) {
 function BadgeStatus({ status }: { status: StatusUsuario }) {
   return (
     <span
-      className={`badge badge-sm font-semibold ${
-        status === "Ativo" ? "badge-success" : "badge-error"
-      }`}
+      className={`badge badge-sm font-semibold ${status === "Ativo" ? "badge-success" : "badge-error"
+        }`}
     >
       {status}
     </span>
@@ -176,7 +175,7 @@ export default function ListagemUsuarios() {
 
   const usuarioAtual = usuarios.find((u) => u.id === usuarioLogadoId);
 
-
+  const [paginaAtual, setPaginaAtual] = useState(1);
 
   return (
     <>
@@ -186,15 +185,15 @@ export default function ListagemUsuarios() {
 
 
       <main className="px-6 py-8 max-w-screen-xl mx-auto">
-   
+
         <h1 className="text-2xl font-bold mb-6 text-base-content">
           Listagem de Usuários
         </h1>
 
-       
+
         <div className="overflow-x-auto rounded-lg shadow">
           <table className="table table-zebra w-full">
-           
+
             <thead>
               <tr>
                 <th>Usuário</th>
@@ -212,14 +211,14 @@ export default function ListagemUsuarios() {
             <tbody>
               {usuarios.map((usuario) => (
                 <tr key={usuario.id}>
-               
+
                   <td className="font-medium">{usuario.nome}</td>
 
                   <td>{usuario.cargo}</td>
-                
+
                   <td>{usuario.email}</td>
 
-             
+
                   <td>{usuario.experiencia}</td>
 
                   <td>
@@ -243,8 +242,10 @@ export default function ListagemUsuarios() {
                       className="btn btn-ghost btn-sm"
                       aria-label={`Editar ${usuario.nome}`}
                       onClick={() => {
-                        // Navegar para tela de edição passando o ID do usuário
-                        console.log(`Editar usuário ID: ${usuario.id}`);
+                        window.open(
+                          `http://localhost:8081/admin/java-the-hutt/console/#/java-the-hutt/users/${usuario.id}/settings`,
+                          "_blank"
+                        );
                       }}
                     >
                       <svg
@@ -271,9 +272,23 @@ export default function ListagemUsuarios() {
 
         <div className="flex justify-center mt-6">
           <div className="join">
-            <button className="join-item btn btn-sm">«</button>
-            <button className="join-item btn btn-sm btn-active">Page 22</button>
-            <button className="join-item btn btn-sm">»</button>
+            <button
+              className="join-item btn btn-sm"
+              onClick={() => setPaginaAtual((prev) => Math.max(prev - 1, 1))}
+            >
+              «
+            </button>
+
+            <button className="join-item btn btn-sm btn-active">
+              Página {paginaAtual}
+            </button>
+
+            <button
+              className="join-item btn btn-sm"
+              onClick={() => setPaginaAtual((prev) => prev + 1)}
+            >
+              »
+            </button>
           </div>
         </div>
       </main>
