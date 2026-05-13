@@ -9,6 +9,8 @@ export default function Navbar() {
     const { getUsuario, temPermissao } = useContext(KeycloakContext);
     const navigate = useNavigate();
     const usuario = getUsuario();
+    const KEYCLOAK_ADD_USER =
+        "http://localhost:8081/admin/java-the-hutt/console/#/java-the-hutt/users/add-user";
 
     return (
         <>
@@ -38,7 +40,11 @@ export default function Navbar() {
                                     {temPermissao('GESTOR') && (
                                         <>
                                             <li><Link to="/cadastroprojeto">Cadastro de Projeto</Link></li>
-                                            <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
+                                            <li>
+                                                <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
+                                                    Cadastro de Usuário
+                                                </a>
+                                            </li>
                                             <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
                                             <li><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
 
@@ -82,7 +88,11 @@ export default function Navbar() {
                                     {temPermissao('GESTOR') && (
                                         <>
                                             <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
-                                            <li><Link to="/cadastro-usuario">Cadastro de Usuário</Link></li>
+                                             <li>
+                                                <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
+                                                    Cadastro de Usuário
+                                                </a>
+                                            </li>
                                             <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
                                             <li><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
                                         </>
