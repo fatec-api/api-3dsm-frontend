@@ -207,35 +207,75 @@ export default function ListagemUsuarios() {
     indiceInicial + ITENS_POR_PAGINA
   );
 
+  function BadgesProjetos({ projetos }: { projetos: Projeto[] }) {
+    const visiveis = projetos.slice(0, MAX_BADGES_VISIVEIS);
+    const extras = projetos.slice(MAX_BADGES_VISIVEIS);
+
+    if (projetos.length === 0) {
+      return (
+        <span className="badge badge-ghost badge-sm font-semibold">
+          N/A
+        </span>
+      );
+    }
+
+    return (
+      <div className="flex flex-wrap gap-1 items-center">
+        {visiveis.map((p) => (
+          <span
+            key={p.id}
+            className={`badge badge-sm font-semibold ${corBadge[p.cor]}`}
+          >
+            {p.nome}
+          </span>
+        ))}
+
+        {extras.length > 0 && (
+          <span
+            className="badge badge-sm badge-neutral font-bold cursor-pointer"
+            title={extras.map((p) => p.nome).join(", ")}
+          >
+            +{extras.length}
+          </span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <>
       <Navbar />
       <Header />
 
       <main className="px-6 py-8 max-w-screen-xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6 text-base-content">
-          Listagem de Usuários
-        </h1>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
 
-        {/* filtro */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <input
-            type="text"
-            placeholder="Pesquisar por nome ou experiência..."
-            className="input input-bordered w-full md:w-80"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
+          
+          <h1 className="text-2xl font-bold text-base-content">
+            Listagem de Usuários
+          </h1>
 
-          <select
-            className="select select-bordered w-full md:w-52"
-            value={filtroStatus}
-            onChange={(e) => setFiltroStatus(e.target.value)}
-          >
-            <option value="Todos">Todos</option>
-            <option value="Ativo">Ativo</option>
-            <option value="Inativo">Inativo</option>
-          </select>
+
+          <div className="flex flex-col md:flex-row gap-4 md:items-center">
+            <input
+              type="text"
+              placeholder="Pesquisar por nome ou experiência..."
+              className="input input-bordered w-full md:w-80"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
+
+            <select
+              className="select select-bordered w-full md:w-52"
+              value={filtroStatus}
+              onChange={(e) => setFiltroStatus(e.target.value)}
+            >
+              <option value="Todos">Todos</option>
+              <option value="Ativo">Ativo</option>
+              <option value="Inativo">Inativo</option>
+            </select>
+          </div>
+
         </div>
 
         <div className="overflow-x-auto rounded-lg shadow">
