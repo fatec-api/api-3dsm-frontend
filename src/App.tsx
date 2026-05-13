@@ -19,7 +19,7 @@ import TelaTeste from './pages/TelaTeste'
 import TelaCadastroCliente from './pages/TelaCadastroCliente'
 
 import PrivateRoute from './routes/PrivateRoutes'
-import ListagemUsuarios from './pages/TelaVisualizarProfissionais'
+import ListagemUsuarios from './pages/TelaVisualizarUsuários'
 
 const router = createBrowserRouter(
  createRoutesFromElements(
@@ -39,7 +39,7 @@ const router = createBrowserRouter(
       <Route path='/apontamentos-gestor' element={<ListaApontamentosGestor/>}/>
       <Route path='/teste-k' element={<TelaTeste />}/>
       <Route path='/cadastro-cliente' element={<TelaCadastroCliente />}/>
-      <Route path='/visualizar-profissionais' element={<ListagemUsuarios />} />
+      <Route path='/visualizar-usuarios' element={<ListagemUsuarios />} />
     </Route>
   </>
  )
