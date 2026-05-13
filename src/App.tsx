@@ -19,7 +19,7 @@ import TelaTeste from './pages/TelaTeste'
 import TelaCadastroCliente from './pages/TelaCadastroCliente'
 
 import PrivateRoute from './routes/PrivateRoutes'
-import ListagemUsuarios from './pages/TelaVisualizarUsuários'
+import ListagemUsuarios from './pages/TelaVisualizarUsuarios'
 
 const router = createBrowserRouter(
  createRoutesFromElements(
