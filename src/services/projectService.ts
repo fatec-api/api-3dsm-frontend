@@ -97,6 +97,16 @@ export async function listarUsuariosAtivos() {
     }
 }
 
+export async function listarUsuarios() {
+    try {
+        const response = await instance.get("/gestao/usuarios");
+        return response.data;
+    } catch (error) {
+        console.error({ event: "API_ERROR", action: "listarUsuarios", error });
+        throw error;
+    }
+}
+
 export function listarClientes() {
     return Promise.resolve([
         { nomeCliente: "Caio" },
