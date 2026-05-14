@@ -105,6 +105,18 @@ export default function Navbar() {
                             <li><Link to="/tela-historico">Histórico</Link></li>
                             <li><Link to="/apontamentos-gestor">Gestão de apontamentos</Link></li>
                         </>)}
+                        <li>
+                            {temPermissao('GESTOR') && (
+                                <>
+                                    <details>
+                                        <summary>Clientes</summary>
+                                        <ul className="p-2 bg-base-100 w-52 z-1">
+                                            <li><Link to="/listagem-clientes">Lista dos Clientes</Link></li>
+                                        </ul>
+                                    </details>
+                                </>
+                            )}
+                        </li>
                     </ul>
                 </div>
                 <div className="navbar-end"></div>
