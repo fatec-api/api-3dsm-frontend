@@ -1,10 +1,11 @@
-import { listaClientes, type Projeto } from "../services/clienteService";
+import { listarClientes, type Projeto } from "../services/clienteService";
 import Header from "../shared/components/Header";
 import Navbar from "../shared/components/Navbar";
 import { useEffect, useState } from "react";
 import { FiEdit } from "react-icons/fi";
 
 import FormCadastroCliente from "../components/FormCadastroCliente"
+import { listarProjetos } from "../services/projectService";
 
 type Cliente = {
     id: number;
@@ -35,12 +36,27 @@ export default function TelaListagemCliente() {
     const itensPorPagina = 15;
 
     const carregarClientes = async () => {
+        setCarregando(true);
         try {
-            const dados = await listaClientes();
+            const [dadosClientes, dadosProjetos] = await Promise.all([
+                listarClientes(),
+                listarProjetos()
+            ]);
 
-            setClientes(dados as Cliente[]);
+            const clientesComProjetos = (dadosClientes as Cliente[]).map(cliente => {
+                const projetosDoCliente = dadosProjetos.filter((proj: any) =>
+                    proj.nomeCliente === cliente.nomeEmpresa
+                );
+
+                return {
+                    ...cliente,
+                    projetos: projetosDoCliente || []
+                };
+            });
+
+            setClientes(clientesComProjetos);
         } catch (error) {
-            console.error("Erro ao buscar clientes:", error);
+            console.error("Erro ao realizar join de clientes e projetos:", error);
         } finally {
             setCarregando(false);
         }
@@ -48,6 +64,9 @@ export default function TelaListagemCliente() {
 
     useEffect(() => {
         carregarClientes();
+    }, []);
+
+    useEffect(() => {
         setPaginaAtual(1);
     }, [busca, filtroStatus]);
 
@@ -56,14 +75,15 @@ export default function TelaListagemCliente() {
 
         const termoLimpo = termo.replace(/\D/g, "");
 
-        const correspondeBusca =
-            cliente.nomeEmpresa
-                .toLowerCase()
-                .includes(termo) ||
-            cliente.cnpj.includes(termoLimpo) ||
-            cliente.email
-                .toLowerCase()
-                .includes(termo);
+        const ehBuscaNumerica = termoLimpo.length > 0 &&
+            (termoLimpo.length >= termo.length * 0.5); 
+
+        const correspondeCnpj = ehBuscaNumerica && cliente.cnpj.includes(termoLimpo);
+
+        const correspondeNome = cliente.nomeEmpresa.toLowerCase().includes(termo);
+        const correspondeEmail = cliente.email.toLowerCase().includes(termo);
+
+        const correspondeBusca = correspondeNome || correspondeEmail || correspondeCnpj;
 
         const correspondeStatus =
             filtroStatus === "Todos" ||
@@ -166,12 +186,8 @@ export default function TelaListagemCliente() {
                                     </tr>
                                 ) : (
                                     clientesPaginados.map((cliente) => {
-
-                                        const projetosVisiveis =
-                                            cliente.projetos.slice(0, 2);
-
-                                        const projetosRestantes =
-                                            cliente.projetos.slice(2);
+                                        const projetosVisiveis = cliente.projetos?.slice(0, 2) || []
+                                        const projetosRestantes = cliente.projetos?.slice(2) || []
 
                                         const tooltipProjetos =
                                             projetosRestantes
@@ -197,7 +213,7 @@ export default function TelaListagemCliente() {
 
                                                 <td>
 
-                                                    {cliente.projetos.length === 0 ? (
+                                                    {cliente.projetos.length === 0 || !cliente.projetos ? (
                                                         <span className="badge badge-primary badge-sm">
                                                             n/a
                                                         </span>
@@ -237,8 +253,8 @@ export default function TelaListagemCliente() {
                                                 <td>
                                                     <span
                                                         className={`badge badge-sm ${cliente.ativo
-                                                                ? "badge-success"
-                                                                : "badge-error"
+                                                            ? "badge-success"
+                                                            : "badge-error"
                                                             }`}
                                                     >
                                                         {cliente.ativo
