@@ -12,6 +12,19 @@ export interface ProjetoPayload {
     gestorResponsavel: string;
 }
 
+export interface ProjetoUpdatePayload {
+  nomeProjeto?: string;
+  tipoProjeto?: string;
+  valorOrcamento?: number;
+  dataInicio?: string;
+  dataFim?: string;
+  status?: string;
+  gestorId?: string;
+  clienteId?: number;
+  profissionalAlocadoId?: string[];
+}
+
+
 const MOCK_PROJETOS = [
     { "id": "1", "nomeProjeto": "Projeto A", "gestorId": "Ana Costa", "tipoProjeto": "Alocacao", "status": "Andamento", "cliente": "Hopper Analytics", "horasPrevistasTotal": 200, "horasRealizadasTotal": 50, "horasPendentesTotal": 150 },
     { "id": "2", "nomeProjeto": "Projeto B", "gestorId": "Ana Costa", "tipoProjeto": "Hora Fechada", "status": "Desenvolvimento", "cliente": "Linux Systems", "horasPrevistasTotal": 200, "horasRealizadasTotal": 205, "horasPendentesTotal": -5 },
@@ -36,6 +49,17 @@ export const criarProjeto = async (dados: ProjetoPayload) => {
         throw error;
     }
 };
+
+export const editarProjeto = async (id: number, dados: ProjetoUpdatePayload) => {
+  try {
+    const response = await instance.patch(`/gestao/projetos/${id}`, dados);
+    return response.data;
+  } catch (error) {
+    console.error({ event: "API_ERROR", action: "editarProjeto", error });
+    throw error;
+  }
+};
+
 
 export async function listarProjetos() {
     try {

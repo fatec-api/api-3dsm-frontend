@@ -1,0 +1,20 @@
+### Login com Username ada e senha 123456
+# @name login
+POST http://localhost:8081/realms/java-the-hutt/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password
+&client_id=bruno-client
+&username=ada
+&password=123456
+
+### Váriaveís dos tokens para depois aplicar no Authorization: Bearer {{token}}
+@accessToken = {{login.response.body.access_token}}
+
+### Listando projetos atrávez do Gateway
+GET http://localhost:8080/gestao/projetos/listar
+Authorization: Bearer {{accessToken}}
+
+### Lista
+GET http://localhost:8080/auditoria/auditorias
+Authorization: Bearer {{accessToken}}
