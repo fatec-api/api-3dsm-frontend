@@ -4,75 +4,94 @@ import Navbar from "../shared/components/Navbar";
 import { useEffect, useState } from "react";
 import { FiEdit } from "react-icons/fi";
 
+import FormCadastroCliente from "../components/FormCadastroCliente"
+
 type Cliente = {
-    id: number
-    nomeEmpresa: string
-    cnpj: string
-    email: string
-    ativo: boolean
-    dataCadastro: string
-    projetos: Projeto[]
+    id: number;
+    nomeEmpresa: string;
+    cnpj: string;
+    email: string;
+    ativo: boolean;
+    dataCadastro: string;
+    projetos: Projeto[];
 };
 
 export default function TelaListagemCliente() {
-    const [clientes, setClientes] = useState<Cliente[]>([])
-    const [carregando, setCarregando] = useState(true)
-    const [paginaAtual, setPaginaAtual] = useState(1)
-    const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
+    const [clientes, setClientes] = useState<Cliente[]>([]);
+    const [carregando, setCarregando] = useState(true);
+
+    const [paginaAtual, setPaginaAtual] = useState(1);
+
+    const [clienteSelecionado, setClienteSelecionado] =
+        useState<Cliente | null>(null);
+
     const [modalAberto, setModalAberto] = useState(false);
+
     const [busca, setBusca] = useState("");
-    const [filtroStatus, setFiltroStatus] = useState("Todos");
 
+    const [filtroStatus, setFiltroStatus] =
+        useState("Todos");
 
-    const itensPorPagina = 15
+    const itensPorPagina = 15;
+
+    const carregarClientes = async () => {
+        try {
+            const dados = await listaClientes();
+
+            setClientes(dados as Cliente[]);
+        } catch (error) {
+            console.error("Erro ao buscar clientes:", error);
+        } finally {
+            setCarregando(false);
+        }
+    };
+
+    useEffect(() => {
+        carregarClientes();
+        setPaginaAtual(1);
+    }, [busca, filtroStatus]);
 
     const clientesFiltrados = clientes.filter((cliente) => {
-        const termo = busca.toLowerCase()
+        const termo = busca.toLowerCase();
 
-        const termoLimpo = termo.replace(/\D/g, "")
+        const termoLimpo = termo.replace(/\D/g, "");
 
         const correspondeBusca =
-            cliente.nomeEmpresa.toLowerCase().includes(termo) ||
+            cliente.nomeEmpresa
+                .toLowerCase()
+                .includes(termo) ||
             cliente.cnpj.includes(termoLimpo) ||
-            cliente.email.toLowerCase().includes(termo)
+            cliente.email
+                .toLowerCase()
+                .includes(termo);
 
         const correspondeStatus =
             filtroStatus === "Todos" ||
-            (filtroStatus === "Ativo" ? cliente.ativo === true : cliente.ativo === false)
+            (filtroStatus === "Ativo"
+                ? cliente.ativo === true
+                : cliente.ativo === false);
 
         return correspondeBusca && correspondeStatus;
     });
 
-    const indiceInicial = (paginaAtual - 1) * itensPorPagina;
+    const indiceInicial =
+        (paginaAtual - 1) * itensPorPagina;
 
-    const clientesPaginados = clientesFiltrados.slice(
-        indiceInicial,
-        indiceInicial + itensPorPagina
-    );
+    const clientesPaginados =
+        clientesFiltrados.slice(
+            indiceInicial,
+            indiceInicial + itensPorPagina
+        );
 
     const formatarCNPJ = (cnpj: string) => {
-        const apenasNumeros = cnpj.replace(/\D/g, "");
+        const apenasNumeros =
+            cnpj.replace(/\D/g, "");
+
         return apenasNumeros.replace(
             /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
             "$1.$2.$3/$4-$5"
         );
     };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const dados = await listaClientes()
-                setClientes(dados as Cliente[])
-            } catch (error) {
-                console.error("Erro ao buscar clientes:", error)
-            } finally {
-                setCarregando(false)
-            }
-        }
-
-        fetchData();
-        setPaginaAtual(1)
-    }, [busca, filtroStatus]);
 
     function abrirEdicao(cliente: Cliente) {
         setClienteSelecionado(cliente);
@@ -82,26 +101,36 @@ export default function TelaListagemCliente() {
     return (
         <>
             <Navbar />
+
             <Header />
+
             <section className="flex justify-center px-6 pb-12">
                 <main className="w-full max-w-7xl rounded-2xl p-8 shadow-md">
+
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+
                         <h1 className="text-2xl font-bold text-base-content">
                             Listagem dos Clientes
                         </h1>
+
                         <section className="flex flex-col md:flex-row gap-4 md:items-center">
+
                             <input
                                 type="text"
                                 placeholder="Pesquisar por cliente, email ou cnpj"
                                 className="input w-full md:w-80"
                                 value={busca}
-                                onChange={(e) => setBusca(e.target.value)}
+                                onChange={(e) =>
+                                    setBusca(e.target.value)
+                                }
                             />
 
                             <select
                                 className="select select-bordered w-full md:w-52"
                                 value={filtroStatus}
-                                onChange={(e) => setFiltroStatus(e.target.value)}
+                                onChange={(e) =>
+                                    setFiltroStatus(e.target.value)
+                                }
                             >
                                 <option value="Todos">Todos</option>
                                 <option value="Ativo">Ativo</option>
@@ -112,85 +141,139 @@ export default function TelaListagemCliente() {
 
                     <div className="overflow-x-auto">
                         <table className="table table-zebra w-full">
+
                             <thead>
                                 <tr>
-                                    <th className="w-[20%]">Cliente</th>
-                                    <th className="w-[25%]">Email</th>
-                                    <th className="w-[20%]">CNPJ</th>
-                                    <th className="w-[23%]">Projetos</th>
-                                    <th className="w-[15%]">Status</th>
-                                    <th className="w-[10%]">Editar</th>
+                                    <th>Cliente</th>
+                                    <th>Email</th>
+                                    <th>CNPJ</th>
+                                    <th>Projetos</th>
+                                    <th>Status</th>
+                                    <th>Editar</th>
                                 </tr>
                             </thead>
+
                             <tbody>
+
                                 {clientesPaginados.length === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="text-center py-8 text-base-content/70">
-                                            Nenhum usuário encontrado.
+                                        <td
+                                            colSpan={6}
+                                            className="text-center py-8"
+                                        >
+                                            Nenhum cliente encontrado.
                                         </td>
                                     </tr>
                                 ) : (
                                     clientesPaginados.map((cliente) => {
-                                        const projetosVisiveis = cliente.projetos.slice(0, 2)
-                                        const projetosRestantes = cliente.projetos.slice(2)
-                                        const tooltipProjetos = projetosRestantes.map((projeto) => projeto.nomeProjeto).join(', ')
+
+                                        const projetosVisiveis =
+                                            cliente.projetos.slice(0, 2);
+
+                                        const projetosRestantes =
+                                            cliente.projetos.slice(2);
+
+                                        const tooltipProjetos =
+                                            projetosRestantes
+                                                .map(
+                                                    (projeto) =>
+                                                        projeto.nomeProjeto
+                                                )
+                                                .join(", ");
 
                                         return (
                                             <tr key={cliente.id}>
-                                                <td>{cliente.nomeEmpresa}</td>
-                                                <td>{cliente.email}</td>
-                                                <td>{formatarCNPJ(cliente.cnpj)}</td>
                                                 <td>
+                                                    {cliente.nomeEmpresa}
+                                                </td>
+
+                                                <td>
+                                                    {cliente.email}
+                                                </td>
+
+                                                <td>
+                                                    {formatarCNPJ(cliente.cnpj)}
+                                                </td>
+
+                                                <td>
+
                                                     {cliente.projetos.length === 0 ? (
-                                                        <span className="text-gray-400 italic text-sm">
-                                                            <span className="badge badge-primary badge-sm font-semibold">
-                                                                n/a
-                                                            </span>
+                                                        <span className="badge badge-primary badge-sm">
+                                                            n/a
                                                         </span>
                                                     ) : (
                                                         <>
-                                                            {projetosVisiveis.map((projeto) => (
-                                                                <span key={projeto.id} className="badge badge-sm badge-primary mr-1.5">
-                                                                    {projeto.nomeProjeto}
-                                                                </span>
-                                                            ))}
-
-                                                            {projetosRestantes.length > 0 && (
-                                                                <section className="tooltip" data-tip={tooltipProjetos}>
-                                                                    <span className="badge badge-sm badge-primary ml-1.5">
-                                                                        +{projetosRestantes.length}
+                                                            {projetosVisiveis.map(
+                                                                (projeto) => (
+                                                                    <span
+                                                                        key={projeto.id}
+                                                                        className="badge badge-sm badge-primary mr-1.5"
+                                                                    >
+                                                                        {projeto.nomeProjeto}
                                                                     </span>
-                                                                </section>
+                                                                )
                                                             )}
+
+                                                            {projetosRestantes.length >
+                                                                0 && (
+                                                                    <section
+                                                                        className="tooltip"
+                                                                        data-tip={
+                                                                            tooltipProjetos
+                                                                        }
+                                                                    >
+                                                                        <span className="badge badge-sm badge-primary ml-1.5">
+                                                                            +
+                                                                            {
+                                                                                projetosRestantes.length
+                                                                            }
+                                                                        </span>
+                                                                    </section>
+                                                                )}
                                                         </>
                                                     )}
                                                 </td>
+
                                                 <td>
-                                                    <span className={`badge badge-sm ${cliente.ativo ? 'badge-success' : 'badge-error'}`}>
-                                                        {cliente.ativo ? "Ativo" : "Inativo"}
+                                                    <span
+                                                        className={`badge badge-sm ${cliente.ativo
+                                                                ? "badge-success"
+                                                                : "badge-error"
+                                                            }`}
+                                                    >
+                                                        {cliente.ativo
+                                                            ? "Ativo"
+                                                            : "Inativo"}
                                                     </span>
                                                 </td>
+
                                                 <td>
                                                     <button
-                                                        onClick={() => abrirEdicao(cliente)}
+                                                        onClick={() =>
+                                                            abrirEdicao(cliente)
+                                                        }
                                                         className="btn btn-ghost btn-sm"
                                                     >
                                                         <FiEdit />
                                                     </button>
                                                 </td>
                                             </tr>
-                                        )
+                                        );
                                     })
                                 )}
                             </tbody>
                         </table>
 
                         <div className="flex justify-center mt-6">
+
                             <div className="join">
+
                                 <button
                                     className="join-item btn btn-sm"
                                     onClick={() =>
-                                        setPaginaAtual((prev) => Math.max(prev - 1, 1))
+                                        setPaginaAtual((prev) =>
+                                            Math.max(prev - 1, 1)
+                                        )
                                     }
                                 >
                                     «
@@ -202,8 +285,16 @@ export default function TelaListagemCliente() {
 
                                 <button
                                     className="join-item btn btn-sm"
-                                    disabled={indiceInicial + itensPorPagina >= clientesFiltrados.length}
-                                    onClick={() => setPaginaAtual((prev) => prev + 1)}
+                                    disabled={
+                                        indiceInicial +
+                                        itensPorPagina >=
+                                        clientesFiltrados.length
+                                    }
+                                    onClick={() =>
+                                        setPaginaAtual(
+                                            (prev) => prev + 1
+                                        )
+                                    }
                                 >
                                     »
                                 </button>
@@ -213,7 +304,38 @@ export default function TelaListagemCliente() {
                 </main>
             </section>
 
+            {modalAberto && (
+                <dialog className="modal modal-open">
+
+                    <div className="modal-box bg-transparent shadow-none place-items-center">
+
+                        <FormCadastroCliente
+                            cliente={clienteSelecionado}
+                            onClose={() => {
+                                setModalAberto(false);
+                                setClienteSelecionado(null);
+                            }}
+                            onSuccess={() => {
+                                carregarClientes();
+                            }}
+                        />
+                    </div>
+
+                    <form
+                        method="dialog"
+                        className="modal-backdrop"
+                    >
+                        <button
+                            onClick={() => {
+                                setModalAberto(false);
+                                setClienteSelecionado(null);
+                            }}
+                        >
+                            close
+                        </button>
+                    </form>
+                </dialog>
+            )}
         </>
     );
 }
-
