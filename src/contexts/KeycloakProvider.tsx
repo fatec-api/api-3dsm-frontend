@@ -1,5 +1,4 @@
-// src/contexts/KeycloakProvider.tsx
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useState, useEffect, type ReactNode } from 'react';
 import keycloak from '../config/keycloakConfig';
 
 export interface UsuarioPerfil {
@@ -34,7 +33,7 @@ export const KeycloakProvider = ({ children }: KeycloakProviderProps) => {
         setCarregando(false);
       })
       .catch((err) => {
-        console.error("Falha ao inicializar o Keycloak", err);
+        console.error("[Keycloak] Erro na inicialização do serviço de autenticação:", err);
         setCarregando(false);
       });
 
@@ -44,18 +43,23 @@ export const KeycloakProvider = ({ children }: KeycloakProviderProps) => {
   }, []);
 
   const login = () => { keycloak.login(); };
-  
   const logout = () => { keycloak.logout(); };
-  
   const getToken = (): string | undefined => keycloak.token;
   
   const temPermissao = (role: string): boolean => {
-   if (!keycloak.tokenParsed) return false;
+    if (!keycloak.tokenParsed) return false;
 
-  const isRealmRole = keycloak.hasRealmRole(role);
-  const isClientRole = keycloak.hasResourceRole(role);
+    const realmRoles: string[] = keycloak.tokenParsed.realm_access?.roles || [];
+    const resourceAccess = keycloak.tokenParsed.resource_access || {};
+    const clientRoles = Object.values(resourceAccess).flatMap(
+      (resource: any) => resource.roles || []
+    );
 
-  return isRealmRole || isClientRole;
+    const todasAsRoles = [...realmRoles, ...clientRoles];
+
+    return todasAsRoles.some(
+      (r) => r.toLowerCase() === role.toLowerCase()
+    );
   };
   
   const getUsuario = (): UsuarioPerfil | null => {
@@ -68,7 +72,9 @@ export const KeycloakProvider = ({ children }: KeycloakProviderProps) => {
     };
   };
 
-  if (carregando) return <div>Conectando ao servidor de segurança...</div>;
+  if (carregando) {
+    return <div>Conectando ao servidor de segurança...</div>;
+  }
 
   return (
     <KeycloakContext.Provider value={{ 

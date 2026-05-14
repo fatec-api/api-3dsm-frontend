@@ -26,22 +26,25 @@ const router = createBrowserRouter(
  createRoutesFromElements(
    <>
     <Route element={<PrivateRoute/>}>
-      <Route path="/" element={<ListaProjetos />}>
-      <Route path='/telafuncionarios' element={<TelaFuncionarios/>}/></Route>
-      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
-      <Route path='/cadastro-projeto' element={<CadastroProjeto/>}/>
+      <Route path="/" element={<ListaProjetos />} />
       <Route path='/lista-projetos' element={<ListaProjetos/>}/>
       <Route path='/apontamento-horas' element={<ApontamentoHoras/>}/>
       <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
       <Route path="/descricao-projeto/:id" element={<DescricaoProjeto />} />
+      <Route path='/tela-historico' element={<Historico/>}/>
+      <Route path='/teste-k' element={<TelaTeste />}/>
+    </Route>
+
+    <Route element={<PrivateRoute roleRequirida="Gestor"/>}>
+      <Route path='/tela-funcionarios' element={<TelaFuncionarios/>}/>
+      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
+      <Route path='/cadastro-projeto' element={<CadastroProjeto/>}/>
       <Route path='/cadastro-item' element={<CadastroItem />} />
       <Route path='/log-profissional/:id' element={<TelaLogProfissional/>}/>
-      <Route path='/tela-historico' element={<Historico/>}/>
       <Route path='/apontamentos-gestor' element={<ListaApontamentosGestor/>}/>
-      <Route path='/teste-k' element={<TelaTeste />}/>
+      <Route path='/visualizar-usuarios' element={<ListagemUsuarios />} />
       <Route path='/listagem-clientes' element={<TelaListagemCliente />}/>
       <Route path='/cadastro-cliente' element={<TelaCadastroCliente />}/>
-      <Route path='/visualizar-usuarios' element={<ListagemUsuarios />} />
     </Route>
   </>
  )

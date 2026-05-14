@@ -1,18 +1,27 @@
 import { useContext, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { KeycloakContext } from '../contexts/KeycloakProvider';
 
-export default function PrivateRoute() {
-  const { autenticado, login } = useContext(KeycloakContext);
+interface PrivateRouteProps {
+  roleRequirida?: string;
+}
+
+export default function PrivateRoute({ roleRequirida }: PrivateRouteProps) {
+  const { autenticado, login, temPermissao } = useContext(KeycloakContext);
 
   useEffect(() => {
     if (!autenticado) {
       login();
     }
-  }, [autenticado]);
+  }, [autenticado, login]);
 
   if (!autenticado) {
     return <div>Redirecionando para login...</div>;
+  }
+
+  if (roleRequirida && !temPermissao(roleRequirida)) {
+    console.warn(`[Security] Acesso negado à rota protegida. Role exigida: ${roleRequirida}`);
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
