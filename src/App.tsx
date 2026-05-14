@@ -1,9 +1,4 @@
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
-import Input from './shared/components/Input'
-import Header from './shared/components/Header'
-import Home from './pages/TelaHome'
-import TelaLogin from './pages/TelaLogin'
-import Dropdown from './shared/components/Dropdown'
 import CadastroUsuario from "./pages/TelaCadastroUsuario"
 import CadastroProjeto from './pages/TelaCadastroProjeto'
 import ListaProjetos from './pages/TelaListaProjetos'
@@ -20,26 +15,45 @@ import TelaCadastroCliente from './pages/TelaCadastroCliente'
 
 import PrivateRoute from './routes/PrivateRoutes'
 import ListagemUsuarios from './pages/TelaVisualizarUsuarios'
+import RoleRoute from './routes/RoleRoute'
+import { AcessoNegado } from './pages/AcessoNegado'
 
 const router = createBrowserRouter(
  createRoutesFromElements(
    <>
+    <Route path='/acesso-negado' element={<AcessoNegado />} />
     <Route element={<PrivateRoute/>}>
+
+      {/* Livre para todos autenticados */}
       <Route path="/" element={<ListaProjetos />}>
-      <Route path='/telafuncionarios' element={<TelaFuncionarios/>}/></Route>
-      <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
-      <Route path='/cadastro-projeto' element={<CadastroProjeto/>}/>
-      <Route path='/lista-projetos' element={<ListaProjetos/>}/>
       <Route path='/apontamento-horas' element={<ApontamentoHoras/>}/>
-      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
-      <Route path="/descricao-projeto/:id" element={<DescricaoProjeto />} />
-      <Route path='/cadastro-item' element={<CadastroItem />} />
-      <Route path='/log-profissional/:id' element={<TelaLogProfissional/>}/>
       <Route path='/tela-historico' element={<Historico/>}/>
-      <Route path='/apontamentos-gestor' element={<ListaApontamentosGestor/>}/>
+      <Route path='/log-profissional/:id' element={<TelaLogProfissional/>}/>
+      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
       <Route path='/teste-k' element={<TelaTeste />}/>
-      <Route path='/cadastro-cliente' element={<TelaCadastroCliente />}/>
       <Route path='/visualizar-usuarios' element={<ListagemUsuarios />} />
+
+      {/* GESTOR e FINANCEIRO */}
+      <Route element={<RoleRoute roles={['GESTOR', 'FINANCEIRO']} />}>
+        <Route path='/lista-projetos' element={<ListaProjetos/>}/>
+        <Route path='/cadastro-projeto' element={<CadastroProjeto/>}/>
+        <Route path="/descricao-projeto/:id" element={<DescricaoProjeto />} />
+        <Route path='/cadastro-item' element={<CadastroItem />} />
+        <Route path='/telafuncionarios' element={<TelaFuncionarios/>}/></Route>
+        <Route path='/cadastro-cliente' element={<TelaCadastroCliente />}/>
+      </Route>
+
+      {/* Só GESTOR */}
+      <Route element={<RoleRoute roles={['GESTOR']} />}>
+        <Route path='/apontamentos-gestor' element={<ListaApontamentosGestor/>}/>
+        <Route path='/cadastro-usuario' element={<CadastroUsuario/>}/>
+      </Route>
+
+      {/* Só FINANCEIRO */}
+      <Route element={<RoleRoute roles={['FINANCEIRO']} />}>
+        
+      </Route>
+
     </Route>
   </>
  )

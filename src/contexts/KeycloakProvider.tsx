@@ -13,7 +13,7 @@ interface KeycloakContextType {
   login: () => void;
   logout: () => void;
   getToken: () => string | undefined;
-  temPermissao: (role: string) => boolean;
+  temPermissao: (role: string | string[], requireAll?: boolean) => boolean;
   getUsuario: () => UsuarioPerfil | null;
 }
 
@@ -49,13 +49,17 @@ export const KeycloakProvider = ({ children }: KeycloakProviderProps) => {
   
   const getToken = (): string | undefined => keycloak.token;
   
-  const temPermissao = (role: string): boolean => {
-   if (!keycloak.tokenParsed) return false;
+  const temPermissao = (role: string | string[], requireAll = false): boolean => {
+    if (!keycloak.tokenParsed) return false;
 
-  const isRealmRole = keycloak.hasRealmRole(role);
-  const isClientRole = keycloak.hasResourceRole(role);
+    const roles = Array.isArray(role) ? role : [role];
 
-  return isRealmRole || isClientRole;
+    const checkRole = (r: string) => keycloak.hasRealmRole(r) || keycloak.hasResourceRole(r);
+
+    if (requireAll) {
+      return roles.every(r => checkRole(r));
+    }
+    return roles.some(r => checkRole(r));
   };
   
   const getUsuario = (): UsuarioPerfil | null => {
