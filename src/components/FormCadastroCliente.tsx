@@ -6,6 +6,7 @@ import { FaRegIdCard } from "react-icons/fa";
 
 import Input from "../shared/components/Input";
 import Botao from "../shared/components/Botao";
+import { atualizarCliente, cadastrarCliente } from "../services/clienteService";
 
 type Cliente = {
   id: number;
@@ -153,27 +154,22 @@ export default function FormCadastroCliente({
     }
 
     const dados = {
-      razaoSocial: nomeEmpresa,
+      nomeEmpresa: nomeEmpresa,
       email,
-      cnpj: cnpjLimpo,
+      // cnpj: cnpjLimpo,
+      cnpj: cnpj,
       ativo,
     };
 
     try {
       if (modoEdicao && cliente) {
-        await axios.put(
-          `http://localhost:8080/gestao/clientes/${cliente.id}`,
-          dados
-        );
+        await atualizarCliente(cliente.id,dados)
 
         setAlerta(
           "Cliente atualizado com sucesso!"
         );
       } else {
-        await axios.post(
-          "http://localhost:8080/gestao/clientes",
-          dados
-        );
+        await cadastrarCliente(dados)
 
         setAlerta(
           "Cliente cadastrado com sucesso!"
@@ -210,7 +206,7 @@ export default function FormCadastroCliente({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-base-100 shadow-xl rounded-2xl p-8 max-w-[550px] flex flex-col gap-8"
+      className="bg-base-100 shadow-xl rounded-2xl p-8 max-w-[550px] flex flex-col gap-8 max-h-[90vh] overflow-y-auto scrollbar-thin"
     >
       <h1 className="text-2xl font-bold text-center">
         {modoEdicao
