@@ -8,6 +8,8 @@ import { KeycloakContext } from '../contexts/KeycloakProvider';
 import { listarApontamentos } from "../services/apontamentoService";
 import { listarItens } from "../services/ItemService";
 import ModalEditarProjeto from "../components/ModalEditarProjeto";
+import type { Profissional } from "../components/ModalAlocarFuncionarioItem";
+import { allocationService } from "../api/AllocationService";
 
 export interface Projeto {
     id: number;
@@ -27,6 +29,7 @@ export default function ListaProjetos() {
     const id = usuario?.id;
     const [projetos, setProjetos] = useState<Projeto[]>([]);
     const [projetoEditando, setProjetoEditando] = useState<Projeto | null>(null);
+    const [todosProfissionais, setTodosProfissionais] = useState<Profissional[]>([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(false);
     const [filtros, setFiltros] = useState({
@@ -130,6 +133,12 @@ export default function ListaProjetos() {
         loadData();
     }, [id, loadData]);
 
+    useEffect(() => {
+        allocationService.getProfessionalsByProject()
+            .then(setTodosProfissionais)
+            .catch(err => console.error("Erro ao carregar profissionais:", err));
+    }, []);
+
     // regra de cor baseada no percentual
     const getCor = (projeto: Projeto) => {
         if (!projeto.horasPrevistasTotal) return "bg-base-300";
@@ -221,6 +230,7 @@ export default function ListaProjetos() {
                 onClose={() => setProjetoEditando(null)}
                 projetoId={projetoEditando?.id ?? 0}
                 dadosAtuais={projetoEditando ?? undefined}
+                todosProfissionais={todosProfissionais}
                 onSucesso={loadData}
             />
         </div>

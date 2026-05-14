@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Search, Users, CheckCircle2 } from 'lucide-react';
 import Botao from '../shared/components/Botao';
 import { editarProjeto } from '../services/projectService';
+import instance from '../api/instance';
 
 const TIPOS_PROJETO = ['Alocacao', 'Hora_Fechada'];
 const STATUS_PROJETO = ['Andamento', 'Desenvolvimento', 'Concluida'];
+
+interface Profissional {
+    id: string;
+    nomeUsuario: string;
+    email: string;
+}
 
 interface ModalEditarProjetoProps {
     isOpen: boolean;
@@ -18,11 +25,12 @@ interface ModalEditarProjetoProps {
         dataFim?: string;
         status?: string;
     };
+    todosProfissionais: Profissional[]; // lista geral vinda do pai
     onSucesso?: () => void;
 }
 
 export default function ModalEditarProjeto({
-    isOpen, onClose, projetoId, dadosAtuais, onSucesso
+    isOpen, onClose, projetoId, dadosAtuais, todosProfissionais, onSucesso
 }: ModalEditarProjetoProps) {
     const [nomeProjeto, setNomeProjeto] = useState('');
     const [tipoProjeto, setTipoProjeto] = useState('');
@@ -30,11 +38,19 @@ export default function ModalEditarProjeto({
     const [dataInicio, setDataInicio] = useState('');
     const [dataFim, setDataFim] = useState('');
     const [status, setStatus] = useState('');
+
+    const [selectedProfissionais, setSelectedProfissionais] = useState<Profissional[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingAlocados, setIsLoadingAlocados] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+    // Preenche campos e carrega profissionais já alocados ao abrir
     useEffect(() => {
-        if (isOpen && dadosAtuais) {
+        if (!isOpen) return;
+
+        if (dadosAtuais) {
             setNomeProjeto(dadosAtuais.nomeProjeto ?? '');
             setTipoProjeto(dadosAtuais.tipoProjeto ?? '');
             setValorOrcamento(dadosAtuais.valorOrcamento?.toString() ?? '');
@@ -43,9 +59,39 @@ export default function ModalEditarProjeto({
             setStatus(dadosAtuais.status ?? '');
             setMessage(null);
         }
-    }, [isOpen, dadosAtuais]);
+
+        const carregarAlocados = async () => {
+            try {
+                setIsLoadingAlocados(true);
+                const res = await instance.get(`/gestao/alocacoes/projeto/${projetoId}`);
+                setSelectedProfissionais(res.data ?? []);
+            } catch (error) {
+                console.error('Erro ao carregar profissionais alocados:', error);
+            } finally {
+                setIsLoadingAlocados(false);
+            }
+        };
+
+        carregarAlocados();
+    }, [isOpen, dadosAtuais, projetoId]);
 
     if (!isOpen) return null;
+
+    // Profissionais disponíveis para adicionar (filtrados pela busca e sem os já selecionados)
+    const profissionaisDisponiveis = todosProfissionais.filter(p =>
+        (p.nomeUsuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.email?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        !selectedProfissionais.some(s => s.id === p.id)
+    );
+
+    const handleSelectProfissional = (p: Profissional) => {
+        setSelectedProfissionais(prev => [...prev, p]);
+        setSearchTerm('');
+    };
+
+    const handleRemoveProfissional = (id: string) => {
+        setSelectedProfissionais(prev => prev.filter(p => p.id !== id));
+    };
 
     // Validações
     const erroOrcamento =
@@ -75,6 +121,9 @@ export default function ModalEditarProjeto({
             if (dataFim) payload.dataFim = dataFim;
             if (status) payload.status = status;
 
+            // Sempre envia a lista de profissionais (substitui a lista atual)
+            payload.profissionalAlocadoIds = selectedProfissionais.map(p => p.id);
+
             await editarProjeto(projetoId, payload);
 
             setMessage({ type: 'success', text: 'Projeto atualizado com sucesso!' });
@@ -83,12 +132,10 @@ export default function ModalEditarProjeto({
                 try { onSucesso?.(); } catch (_) { }
             }, 1500);
         } catch (error: any) {
-            const status = error?.response?.status;
-            if (status && status >= 400) {
-                const msg = error?.response?.data?.message || 'Erro ao atualizar o projeto.';
-                setMessage({ type: 'error', text: msg });
+            const httpStatus = error?.response?.status;
+            if (httpStatus && httpStatus >= 400) {
+                setMessage({ type: 'error', text: error?.response?.data?.message || 'Erro ao atualizar o projeto.' });
             } else {
-                // Resposta sem body ou parse error — provavelmente sucesso
                 setMessage({ type: 'success', text: 'Projeto atualizado com sucesso!' });
                 setTimeout(() => {
                     onClose();
@@ -102,7 +149,7 @@ export default function ModalEditarProjeto({
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-[999]">
-            <div className="bg-base-100 rounded-[2.5rem] p-10 relative shadow-2xl w-full max-w-lg mx-4">
+            <div className="bg-base-100 rounded-[2.5rem] p-10 relative shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
                     className="absolute right-8 top-8 text-base-content/40 hover:text-base-content transition-colors"
@@ -152,9 +199,7 @@ export default function ModalEditarProjeto({
                             value={valorOrcamento}
                             onChange={(e) => setValorOrcamento(e.target.value)}
                         />
-                        {erroOrcamento && (
-                            <p className="text-error text-xs mt-1">{erroOrcamento}</p>
-                        )}
+                        {erroOrcamento && <p className="text-error text-xs mt-1">{erroOrcamento}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -177,9 +222,7 @@ export default function ModalEditarProjeto({
                             />
                         </div>
                     </div>
-                    {erroData && (
-                        <p className="text-error text-xs -mt-2">{erroData}</p>
-                    )}
+                    {erroData && <p className="text-error text-xs -mt-2">{erroData}</p>}
 
                     <div className="flex flex-col gap-1">
                         <label className="text-sm font-medium text-base-content/70">Status</label>
@@ -195,6 +238,70 @@ export default function ModalEditarProjeto({
                         </select>
                     </div>
 
+                    {/* Seção de profissionais */}
+                    <div className="divider text-xs text-base-content/40 uppercase">Profissionais Alocados</div>
+
+                    <div className="flex flex-col gap-1">
+                        <label className="text-sm font-medium text-base-content/70">Adicionar profissional</label>
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 z-10" size={18} />
+                            <input
+                                className="input input-bordered w-full pl-11"
+                                placeholder="Filtrar por nome ou e-mail..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Lista sempre visível, filtrável */}
+                        <ul className="w-full bg-base-200 border border-base-content/10 rounded-xl max-h-40 overflow-auto p-2">
+                            {profissionaisDisponiveis.length > 0 ? (
+                                profissionaisDisponiveis.map(p => (
+                                    <li
+                                        key={p.id}
+                                        onClick={() => handleSelectProfissional(p)}
+                                        className="p-3 hover:bg-base-100 rounded-lg cursor-pointer flex justify-between text-base-content"
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-sm">{p.nomeUsuario}</span>
+                                            <span className="text-xs text-base-content/50">{p.email}</span>
+                                        </div>
+                                        <CheckCircle2 size={18} className="text-base-content/20" />
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="text-sm text-base-content/50 text-center p-3">
+                                    {isLoadingAlocados ? 'Carregando...' : 'Nenhum profissional disponível.'}
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+
+                    <div className="p-4 bg-base-200 rounded-xl border border-dashed border-base-content/20 min-h-[72px]">
+                        <p className="text-xs font-black text-base-content/40 mb-2 flex items-center gap-2 uppercase">
+                            {isLoadingAlocados
+                                ? <span className="loading loading-spinner loading-xs" />
+                                : <Users size={14} />
+                            }
+                            Selecionados ({selectedProfissionais.length})
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            {selectedProfissionais.map(p => (
+                                <div
+                                    key={p.id}
+                                    className="bg-base-100 border border-base-content/10 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm text-base-content shadow-sm"
+                                >
+                                    <span className="font-medium">{p.nomeUsuario}</span>
+                                    <X
+                                        size={14}
+                                        className="cursor-pointer text-red-400 hover:text-red-600"
+                                        onClick={() => handleRemoveProfissional(p.id)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
                     {message && (
                         <div className={`alert py-3 rounded-xl border ${message.type === 'success'
                             ? 'bg-green-50 border-green-200 text-green-800'
@@ -205,11 +312,7 @@ export default function ModalEditarProjeto({
                     )}
 
                     <div className="flex justify-center pt-2">
-                        <Botao
-                            type="button"
-                            disabled={!podeSalvar}
-                            onClick={handleSalvar}
-                        >
+                        <Botao type="button" disabled={!podeSalvar} onClick={handleSalvar}>
                             {isLoading
                                 ? <span className="loading loading-spinner loading-sm"></span>
                                 : 'Salvar alterações'}
