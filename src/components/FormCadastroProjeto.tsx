@@ -4,7 +4,8 @@ import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
 import { PiHandCoins } from "react-icons/pi";
 import { GoProject } from "react-icons/go";
-import { listarProfissionaisAtivos, listarClientes, criarProjeto, listarUsuariosAtivos } from "../services/projectService";
+import { listarProfissionaisAtivos, criarProjeto, listarUsuariosAtivos } from "../services/projectService";
+import { listarClientes } from "../services/clienteService";
 
 export default function FormCadastroProjeto() {
   const [alerta, setAlerta] = useState("");
@@ -19,7 +20,7 @@ export default function FormCadastroProjeto() {
   const [profissionalAlocado, setProfissionalAlocado] = useState<string[]>([]);
   const [gestorResponsavel, setGestorResponsavel] = useState("");
   const [profissionais, setProfissionais] = useState<{ id: string; nomeUsuario: string; cargo: string }[]>([]);
-  const [clientes, setClientes] = useState<string[]>([]);
+  const [clientes, setClientes] = useState<{ label: string; value: string }[]>([]);
   const [gestores, setGestores] = useState<{ label: string; value: string }[]>([]);
 
   const regex = /^[A-Z]{3}\d{4}$/;
@@ -35,8 +36,14 @@ export default function FormCadastroProjeto() {
             .filter((p: any) => p.cargo === "Gestor")
             .map((p: any) => ({ label: p.nomeUsuario, value: String(p.id) }))
         );
-        const listaClientes = await listarClientes();
-        setClientes(listaClientes.map((c: { nomeCliente: string }) => c.nomeCliente));
+        const listaClientes = await listarClientes()
+        // const listaClientes = await listarClientes();
+        setClientes(
+          listaClientes.map((c: any) => ({
+            label: c.nomeEmpresa,
+            value: c.id 
+          }))
+        );
       } catch (error) {
         console.error("Erro ao carregar dados", error);
       }
@@ -82,6 +89,7 @@ export default function FormCadastroProjeto() {
         status: statusProjeto,
         profissionaisIds: profissionalAlocado,
         gestorId: gestorResponsavel,
+        clienteId: cliente,
       };
       console.log(payload);
       await criarProjeto(payload);
@@ -191,7 +199,7 @@ export default function FormCadastroProjeto() {
             <div className="flex flex-col gap-1">
               <label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Profissionais</label>
               <div className="flex items-center border-2 border-gray-300 dark:border-gray-600 rounded-xl px-3 bg-white dark:bg-gray-700 focus-within:border-blue-500 transition duration-200">
-                    <a
+                <a
                   href="#modal-profissional"
                   className="flex-1 outline-none bg-transparent text-gray-700 dark:text-gray-200 cursor-pointer py-2.5"
                 >

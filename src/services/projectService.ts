@@ -106,14 +106,3 @@ export async function listarUsuarios() {
         throw error;
     }
 }
-
-export function listarClientes() {
-    return Promise.resolve([
-        { nomeCliente: "Caio" },
-        { nomeCliente: "Guilherme" },
-        { nomeCliente: "Isaura" },
-        { nomeCliente: "Daniel" },
-        { nomeCliente: "Emmanuel" },
-        { nomeCliente: "Claudio" }
-    ]);
-}
