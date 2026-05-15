@@ -1,9 +1,10 @@
 import Navbar from "../shared/components/Navbar";
 import Header from "../shared/components/Header";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import instance from "../api/instance";
 import { listarUsuarios } from "../services/projectService";
+import { KeycloakContext } from "../contexts/KeycloakProvider";
 
 
 
@@ -195,6 +196,10 @@ export default function ListagemUsuarios() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [carregando, setCarregando] = useState(true)
 
+  const { temPermissao } = useContext(KeycloakContext);
+
+  const PermissaoGestor = temPermissao("GESTOR");
+
   useEffect(() => {
     async function carregarUsuarios() {
       try {
@@ -247,6 +252,16 @@ export default function ListagemUsuarios() {
         <span className="badge badge-ghost badge-sm font-semibold">
           N/A
         </span>
+      );
+    }
+
+    if (!PermissaoGestor) {
+      return (
+        <div className="flex h-screen items-center justify-center">
+          <p className="text-lg font-semibold text-red-500">
+            Acesso negado.
+          </p>
+        </div>
       );
     }
 
