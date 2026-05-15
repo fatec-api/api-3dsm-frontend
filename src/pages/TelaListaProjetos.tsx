@@ -27,6 +27,7 @@ export default function ListaProjetos() {
     const [projetos, setProjetos] = useState<Projeto[]>([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(false);
+    const [visualizacaoFinanceira, setVisualizacaoFinanceira] = useState(false);
     const [filtros, setFiltros] = useState({
         nome: "", // Adicionado
         progresso: "",
@@ -154,56 +155,101 @@ export default function ListaProjetos() {
         console.warn("Exibindo dados mockados");
     }
 
-    return (
-        <div className="flex flex-col h-screen bg-white">
-            <Header />
-            <FiltrosListagemProjetos
-                projetos={projetos}
-                onFilterChange={handleFilterChange}
-            />
-            <div className="flex gap-6 w-full justify-center flex-wrap">
-                {projetosFiltrados.length === 0 ? (
-                    <div role="alert" className="alert alert-info alert-soft h-15">
-                        <p className="text-lg">Nenhum projeto encontrado.</p>
-                    </div>
-                ) : (
-                    projetosFiltrados.map((projeto) => {
-                        const cor = getCor(projeto);
+   return (
+    <div className="flex flex-col h-screen bg-white">
+        <Header />
 
-                        return (
-                            <div
-                                key={projeto.id}
-                                className="cursor-pointer"
-                                onClick={() => navigate(`/descricao-projeto/${projeto.id}`)}
-                            >
-                                <div className="w-80 h-44 bg-white rounded-2xl shadow-md border border-gray-200 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
-                                    <div className={`w-3 ${cor}`} />
-                                    <div className="p-4 flex flex-col justify-between w-full">
-                                        <div className="flex justify-between items-center">
-                                            <h2 className="text-lg font-semibold">
-                                                {projeto.nomeProjeto}
-                                            </h2>
-                                            <FaChevronRight className="text-gray-400 group-hover:text-gray-600 transition" />
-                                        </div>
+        
+        <div className="w-full flex justify-end px-8 mt-4">
+            <div className="flex items-center gap-3 whitespace-nowrap">
+                <span className="text-sm font-medium text-gray-600">
+                    Saúde do Projeto
+                </span>
 
-                                        <div className="text-sm space-y-1">
-                                            <p>
-                                                <b>Tipo:</b> {projeto.tipoProjeto}
-                                            </p>
-                                            <p>
-                                                <b>Cliente:</b> {projeto.nomeCliente}
-                                            </p>
-                                            <p>
-                                                <b>Status:</b> {projeto.status}
-                                            </p>
-                                        </div>
+                <button
+                    onClick={() =>
+                        setVisualizacaoFinanceira(
+                            !visualizacaoFinanceira
+                        )
+                    }
+                    className={`
+                        relative w-14 h-7 rounded-full transition-all duration-300
+                        ${
+                            visualizacaoFinanceira
+                                ? "bg-gray-300"
+                                : "bg-black"
+                        }
+                    `}
+                >
+                    <div
+                        className={`
+                            absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md
+                            transition-all duration-300 transform
+                            ${
+                                visualizacaoFinanceira
+                                    ? "translate-x-0"
+                                    : "translate-x-7"
+                            }
+                        `}
+                    />
+                </button>
+
+                <span className="text-sm font-medium text-gray-600">
+                    Saúde Financeira
+                </span>
+            </div>
+        </div>
+
+        <FiltrosListagemProjetos
+            projetos={projetos}
+            onFilterChange={handleFilterChange}
+        />
+
+        <div className="flex gap-6 w-full justify-center flex-wrap">
+            {projetosFiltrados.length === 0 ? (
+                <div role="alert" className="alert alert-info alert-soft h-15">
+                    <p className="text-lg">Nenhum projeto encontrado.</p>
+                </div>
+            ) : (
+                projetosFiltrados.map((projeto) => {
+                    const cor = getCor(projeto);
+
+                    return (
+                        <div
+                            key={projeto.id}
+                            className="cursor-pointer"
+                            onClick={() =>
+                                navigate(`/descricao-projeto/${projeto.id}`)
+                            }
+                        >
+                            <div className="w-80 h-44 bg-white rounded-2xl shadow-md border border-gray-200 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
+                                <div className={`w-3 ${cor}`} />
+                                <div className="p-4 flex flex-col justify-between w-full">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-lg font-semibold">
+                                            {projeto.nomeProjeto}
+                                        </h2>
+                                        <FaChevronRight className="text-gray-400 group-hover:text-gray-600 transition" />
+                                    </div>
+
+                                    <div className="text-sm space-y-1">
+                                        <p>
+                                            <b>Tipo:</b> {projeto.tipoProjeto}
+                                        </p>
+                                        <p>
+                                            <b>Cliente:</b> {projeto.nomeCliente}
+                                        </p>
+                                        <p>
+                                            <b>Status:</b> {projeto.status}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-                        );
-                    })
-                )}
-            </div>
+                        </div>
+                    );
+                })
+            )}
         </div>
-    );
+    </div>
+);
 }
