@@ -27,7 +27,6 @@ export default function ListaProjetos() {
     const [projetos, setProjetos] = useState<Projeto[]>([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(false);
-    const [visualizacaoFinanceira, setVisualizacaoFinanceira] = useState(false);
     const [filtros, setFiltros] = useState({
         nome: "", // Adicionado
         progresso: "",
@@ -160,45 +159,7 @@ export default function ListaProjetos() {
         <Header />
 
         
-        <div className="w-full flex justify-end px-8 mt-4">
-            <div className="flex items-center gap-3 whitespace-nowrap">
-                <span className="text-sm font-medium text-gray-600">
-                    Saúde do Projeto
-                </span>
-
-                <button
-                    onClick={() =>
-                        setVisualizacaoFinanceira(
-                            !visualizacaoFinanceira
-                        )
-                    }
-                    className={`
-                        relative w-14 h-7 rounded-full transition-all duration-300
-                        ${
-                            visualizacaoFinanceira
-                                ? "bg-gray-300"
-                                : "bg-black"
-                        }
-                    `}
-                >
-                    <div
-                        className={`
-                            absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md
-                            transition-all duration-300 transform
-                            ${
-                                visualizacaoFinanceira
-                                    ? "translate-x-0"
-                                    : "translate-x-7"
-                            }
-                        `}
-                    />
-                </button>
-
-                <span className="text-sm font-medium text-gray-600">
-                    Saúde Financeira
-                </span>
-            </div>
-        </div>
+        
 
         <FiltrosListagemProjetos
             projetos={projetos}
@@ -250,6 +211,6 @@ export default function ListaProjetos() {
                 })
             )}
         </div>
-    </div>
+    </div>  
 );
 }
