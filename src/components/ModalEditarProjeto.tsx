@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { X, Search, Users, CheckCircle2 } from 'lucide-react';
 import Botao from '../shared/components/Botao';
 import { editarProjeto } from '../services/projectService';
+import { listarGestores, type Usuario } from '../services/usuarioService';
+import { listarClientesAtivos, type Cliente } from '../services/clienteService';
 import instance from '../api/instance';
 
 const TIPOS_PROJETO = ['Alocacao', 'Hora_Fechada'];
@@ -24,8 +26,10 @@ interface ModalEditarProjetoProps {
         dataInicio?: string;
         dataFim?: string;
         status?: string;
+        nomeGestor?: string;
+        nomeCliente?: string;
     };
-    todosProfissionais: Profissional[]; // lista geral vinda do pai
+    todosProfissionais: Profissional[];
     onSucesso?: () => void;
 }
 
@@ -38,7 +42,11 @@ export default function ModalEditarProjeto({
     const [dataInicio, setDataInicio] = useState('');
     const [dataFim, setDataFim] = useState('');
     const [status, setStatus] = useState('');
+    const [gestorId, setGestorId] = useState('');
+    const [clienteId, setClienteId] = useState('');
 
+    const [gestores, setGestores] = useState<Usuario[]>([]);
+    const [clientes, setClientes] = useState<Cliente[]>([]);
     const [selectedProfissionais, setSelectedProfissionais] = useState<Profissional[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -46,7 +54,6 @@ export default function ModalEditarProjeto({
     const [isLoadingAlocados, setIsLoadingAlocados] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-    // Preenche campos e carrega profissionais já alocados ao abrir
     useEffect(() => {
         if (!isOpen) return;
 
@@ -57,27 +64,34 @@ export default function ModalEditarProjeto({
             setDataInicio(dadosAtuais.dataInicio ?? '');
             setDataFim(dadosAtuais.dataFim ?? '');
             setStatus(dadosAtuais.status ?? '');
+            setGestorId('');
+            setClienteId('');
             setMessage(null);
         }
 
-        const carregarAlocados = async () => {
+        const carregarDados = async () => {
             try {
                 setIsLoadingAlocados(true);
-                const res = await instance.get(`/gestao/alocacoes/projeto/${projetoId}`);
-                setSelectedProfissionais(res.data ?? []);
+                const [alocados, gestoresData, clientesData] = await Promise.all([
+                    instance.get(`/gestao/alocacoes/projeto/${projetoId}`).then(r => r.data ?? []),
+                    listarGestores(),
+                    listarClientesAtivos(),
+                ]);
+                setSelectedProfissionais(alocados);
+                setGestores(gestoresData);
+                setClientes(clientesData);
             } catch (error) {
-                console.error('Erro ao carregar profissionais alocados:', error);
+                console.error('Erro ao carregar dados do modal:', error);
             } finally {
                 setIsLoadingAlocados(false);
             }
         };
 
-        carregarAlocados();
+        carregarDados();
     }, [isOpen, dadosAtuais, projetoId]);
 
     if (!isOpen) return null;
 
-    // Profissionais disponíveis para adicionar (filtrados pela busca e sem os já selecionados)
     const profissionaisDisponiveis = todosProfissionais.filter(p =>
         (p.nomeUsuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
             p.email?.toLowerCase().includes(searchTerm.toLowerCase())) &&
@@ -93,7 +107,6 @@ export default function ModalEditarProjeto({
         setSelectedProfissionais(prev => prev.filter(p => p.id !== id));
     };
 
-    // Validações
     const erroOrcamento =
         valorOrcamento !== '' && parseFloat(valorOrcamento) < 0
             ? 'O orçamento não pode ser negativo.'
@@ -120,8 +133,8 @@ export default function ModalEditarProjeto({
             if (dataInicio) payload.dataInicio = dataInicio;
             if (dataFim) payload.dataFim = dataFim;
             if (status) payload.status = status;
-
-            // Sempre envia a lista de profissionais (substitui a lista atual)
+            if (gestorId) payload.gestorId = gestorId;
+            if (clienteId) payload.clienteId = parseInt(clienteId);
             payload.profissionalAlocadoIds = selectedProfissionais.map(p => p.id);
 
             await editarProjeto(projetoId, payload);
@@ -224,6 +237,41 @@ export default function ModalEditarProjeto({
                     </div>
                     {erroData && <p className="text-error text-xs -mt-2">{erroData}</p>}
 
+                    {/* Gestor e Cliente lado a lado */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-medium text-base-content/70">Gestor</label>
+                            <select
+                                className="select select-bordered w-full"
+                                value={gestorId}
+                                onChange={(e) => setGestorId(e.target.value)}
+                            >
+                                <option value="">
+                                    {dadosAtuais?.nomeGestor ?? 'Selecione...'}
+                                </option>
+                                {gestores.map(g => (
+                                    <option key={g.id} value={g.id}>{g.nomeUsuario}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            <label className="text-sm font-medium text-base-content/70">Cliente</label>
+                            <select
+                                className="select select-bordered w-full"
+                                value={clienteId}
+                                onChange={(e) => setClienteId(e.target.value)}
+                            >
+                                <option value="">
+                                    {dadosAtuais?.nomeCliente ?? 'Selecione...'}
+                                </option>
+                                {clientes.map(c => (
+                                    <option key={c.id} value={c.id}>{c.nomeEmpresa}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
                     <div className="flex flex-col gap-1">
                         <label className="text-sm font-medium text-base-content/70">Status</label>
                         <select
@@ -253,7 +301,6 @@ export default function ModalEditarProjeto({
                             />
                         </div>
 
-                        {/* Lista sempre visível, filtrável */}
                         <ul className="w-full bg-base-200 border border-base-content/10 rounded-xl max-h-40 overflow-auto p-2">
                             {profissionaisDisponiveis.length > 0 ? (
                                 profissionaisDisponiveis.map(p => (
