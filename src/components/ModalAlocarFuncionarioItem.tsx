@@ -12,9 +12,9 @@ interface ModalAlocarFuncionarioItemProps {
   onClose: () => void;
   itemName: string;
   profissionais: Profissional[];
-  selectedList: Profissional[];       // era: selectedId: string
-  onSelect: (p: Profissional) => void; // era: onSelect: (id: string) => void
-  onRemove: (id: string) => void;     // novo
+  selectedList: Profissional[];
+  onSelect: (p: Profissional) => void;
+  onRemove: (id: string) => void;
   onSave: () => void;
   isLoading: boolean;
   message: { type: 'success' | 'error'; text: string } | null;

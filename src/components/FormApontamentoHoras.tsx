@@ -187,9 +187,9 @@ export default function FormularioApontamento() {
         <>
             <form
                 onSubmit={handleSubmit}
-                className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-[700px] flex flex-col gap-10"
+                className="bg-base-100 shadow-lg rounded-2xl p-10 w-full max-w-[700px] flex flex-col gap-10"
             >
-                <h1 className="text-2xl font-semibold text-gray-800 text-center">
+                <h1 className="text-2xl font-semibold text-base-content text-center">
                     Apontamento de Horas
                 </h1>
 

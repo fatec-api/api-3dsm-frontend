@@ -2,11 +2,14 @@ import { useCallback, useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarProjetosPorGestor } from "../services/projectService";
-import { FaChevronRight } from "react-icons/fa";
+import { FaChevronRight, FaPencilAlt } from "react-icons/fa";
 import FiltrosListagemProjetos from "../components/FiltrosListagemProjetos";
 import { KeycloakContext } from '../contexts/KeycloakProvider';
 import { listarApontamentos } from "../services/apontamentoService";
 import { listarItens } from "../services/ItemService";
+import ModalEditarProjeto from "../components/ModalEditarProjeto";
+import type { Profissional } from "../components/ModalAlocarFuncionarioItem";
+import { allocationService } from "../api/AllocationService";
 
 export interface Projeto {
     id: number;
@@ -21,10 +24,12 @@ export interface Projeto {
 }
 
 export default function ListaProjetos() {
-    const { getUsuario } = useContext(KeycloakContext);
+    const { getUsuario, temPermissao } = useContext(KeycloakContext);
     const usuario = getUsuario();
     const id = usuario?.id;
     const [projetos, setProjetos] = useState<Projeto[]>([]);
+    const [projetoEditando, setProjetoEditando] = useState<Projeto | null>(null);
+    const [todosProfissionais, setTodosProfissionais] = useState<Profissional[]>([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(false);
     const [filtros, setFiltros] = useState({
@@ -94,46 +99,49 @@ export default function ListaProjetos() {
             nomeCliente: novosFiltros.nomeCliente
         });
     }, []);
+
+
+    const loadData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await listarProjetosPorGestor(id!);
+            const data = response?.data ?? response;
+
+            if (!Array.isArray(data)) {
+                setProjetos([]);
+                return;
+            }
+
+            const projetosComHoras = await Promise.all(
+                data.map(async (proj: Projeto) => {
+                    const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
+                    return { ...proj, horasRealizadasTotal: horasRealizadas };
+                })
+            );
+
+            setProjetos(projetosComHoras);
+        } catch (error) {
+            console.error("Erro ao carregar projetos", error);
+            setErro(true);
+        } finally {
+            setLoading(false);
+        }
+    }, [id]);
+
     useEffect(() => {
         if (!id) return;
-
-        const loadData = async () => {
-            try {
-                const response = await listarProjetosPorGestor(id);
-                const data = response?.data ?? response;
-
-                if (!Array.isArray(data)) {
-                    setProjetos([]);
-                    return;
-                }
-
-                const projetosComHoras = await Promise.all(
-                    data.map(async (proj: Projeto) => {
-                        const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
-
-                        return {
-                            ...proj,
-                            horasRealizadasTotal: horasRealizadas
-                        };
-                    })
-                );
-
-                setProjetos(projetosComHoras);
-
-            } catch (error) {
-                console.error("Erro ao carregar projetos", error);
-                setErro(true);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         loadData();
-    }, [id]);
+    }, [id, loadData]);
+
+    useEffect(() => {
+        allocationService.getProfessionalsByProject()
+            .then(setTodosProfissionais)
+            .catch(err => console.error("Erro ao carregar profissionais:", err));
+    }, []);
 
     // regra de cor baseada no percentual
     const getCor = (projeto: Projeto) => {
-        if (!projeto.horasPrevistasTotal) return "bg-gray-300";
+        if (!projeto.horasPrevistasTotal) return "bg-base-300";
 
         const percentualConsumo =
             (projeto.horasRealizadasTotal / projeto.horasPrevistasTotal) * 100;
@@ -154,63 +162,77 @@ export default function ListaProjetos() {
         console.warn("Exibindo dados mockados");
     }
 
-   return (
-    <div className="flex flex-col h-screen bg-white">
-        <Header />
+    return (
+        <div className="flex flex-col h-screen bg-base-100">
+            <Header />
+            <FiltrosListagemProjetos
+                projetos={projetos}
+                onFilterChange={handleFilterChange}
+            />
+            <div className="flex gap-6 w-full justify-center flex-wrap">
+                {projetosFiltrados.length === 0 ? (
+                    <div role="alert" className="alert alert-info alert-soft h-15">
+                        <p className="text-lg">Nenhum projeto encontrado.</p>
+                    </div>
+                ) : (
+                    projetosFiltrados.map((projeto) => {
+                        const cor = getCor(projeto);
 
-        
-        
+                        return (
+                            <div
+                                key={projeto.id}
+                                className="cursor-pointer"
+                                onClick={() => navigate(`/descricao-projeto/${projeto.id}`)}
+                            >
+                                <div className="w-80 h-44 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
+                                    <div className={`w-3 ${cor}`} />
+                                    <div className="p-4 flex flex-col justify-between w-full">
+                                        <div className="flex justify-between items-start">
+                                            <h2 className="text-lg font-semibold">
+                                                {projeto.nomeProjeto}
+                                            </h2>
+                                            <div className="flex flex-row items-center gap-8">
+                                                {temPermissao('GESTOR') && (
+                                                    <div
+                                                        className="p-2 -m-2 cursor-pointer text-base-content/40 hover:text-base-content transition"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setProjetoEditando(projeto);
+                                                        }}
+                                                    >
+                                                        <FaPencilAlt size={14} />
+                                                    </div>
+                                                )}
+                                                <FaChevronRight className="text-base-content/40 transition" />
+                                            </div>
+                                        </div>
 
-        <FiltrosListagemProjetos
-            projetos={projetos}
-            onFilterChange={handleFilterChange}
-        />
-
-        <div className="flex gap-6 w-full justify-center flex-wrap">
-            {projetosFiltrados.length === 0 ? (
-                <div role="alert" className="alert alert-info alert-soft h-15">
-                    <p className="text-lg">Nenhum projeto encontrado.</p>
-                </div>
-            ) : (
-                projetosFiltrados.map((projeto) => {
-                    const cor = getCor(projeto);
-
-                    return (
-                        <div
-                            key={projeto.id}
-                            className="cursor-pointer"
-                            onClick={() =>
-                                navigate(`/descricao-projeto/${projeto.id}`)
-                            }
-                        >
-                            <div className="w-80 h-44 bg-white rounded-2xl shadow-md border border-gray-200 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
-                                <div className={`w-3 ${cor}`} />
-                                <div className="p-4 flex flex-col justify-between w-full">
-                                    <div className="flex justify-between items-center">
-                                        <h2 className="text-lg font-semibold">
-                                            {projeto.nomeProjeto}
-                                        </h2>
-                                        <FaChevronRight className="text-gray-400 group-hover:text-gray-600 transition" />
-                                    </div>
-
-                                    <div className="text-sm space-y-1">
-                                        <p>
-                                            <b>Tipo:</b> {projeto.tipoProjeto}
-                                        </p>
-                                        <p>
-                                            <b>Cliente:</b> {projeto.nomeCliente}
-                                        </p>
-                                        <p>
-                                            <b>Status:</b> {projeto.status}
-                                        </p>
+                                        <div className="text-sm space-y-1">
+                                            <p>
+                                                <b>Tipo:</b> {projeto.tipoProjeto}
+                                            </p>
+                                            <p>
+                                                <b>Cliente:</b> {projeto.nomeCliente}
+                                            </p>
+                                            <p>
+                                                <b>Status:</b> {projeto.status}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })
-            )}
+                        );
+                    })
+                )}
+            </div>
+            <ModalEditarProjeto
+                isOpen={!!projetoEditando}
+                onClose={() => setProjetoEditando(null)}
+                projetoId={projetoEditando?.id ?? 0}
+                dadosAtuais={projetoEditando ?? undefined}
+                todosProfissionais={todosProfissionais}
+                onSucesso={loadData}
+            />
         </div>
-    </div>  
-);
+    );
 }
