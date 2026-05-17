@@ -1,4 +1,3 @@
-import Navbar from "../shared/components/Navbar";
 import Header from "../shared/components/Header";
 import { useEffect, useState } from "react";
 import { FiEdit } from "react-icons/fi";
@@ -274,7 +273,6 @@ export default function ListagemUsuarios() {
   }
   return (
     <>
-      <Navbar />
       <Header />
 
       <section className="flex justify-center px-6 pb-12">

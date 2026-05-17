@@ -25,22 +25,22 @@ const router = createBrowserRouter(
     <Route element={<PrivateRoute/>}>
 
       {/* Livre para todos autenticados */}
-      <Route path="/" element={<ListaProjetos />}>
+      <Route path="/" element={<ListaProjetos />} />
       <Route path='/apontamento-horas' element={<ApontamentoHoras/>}/>
-      <Route path='/tela-historico' element={<Historico/>}/>
       <Route path='/log-profissional/:id' element={<TelaLogProfissional/>}/>
-      <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
-      <Route path='/teste-k' element={<TelaTeste />}/>
-      <Route path='/visualizar-usuarios' element={<ListagemUsuarios />} />
 
       {/* GESTOR e FINANCEIRO */}
       <Route element={<RoleRoute roles={['GESTOR', 'FINANCEIRO']} />}>
-        <Route path='/lista-projetos' element={<ListaProjetos/>}/>
+        {/* <Route path='/lista-projetos' element={<ListaProjetos/>}/> */}
         <Route path='/cadastro-projeto' element={<CadastroProjeto/>}/>
         <Route path="/descricao-projeto/:id" element={<DescricaoProjeto />} />
         <Route path='/cadastro-item' element={<CadastroItem />} />
-        <Route path='/telafuncionarios' element={<TelaFuncionarios/>}/></Route>
+        <Route path='/telafuncionarios' element={<TelaFuncionarios/>}/>
         <Route path='/cadastro-cliente' element={<TelaCadastroCliente />}/>
+        <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
+        <Route path='/tela-historico' element={<Historico/>}/>
+        <Route path='/teste-k' element={<TelaTeste />}/>
+        <Route path='/visualizar-usuarios' element={<ListagemUsuarios />} />
       </Route>
 
       {/* Só GESTOR */}
