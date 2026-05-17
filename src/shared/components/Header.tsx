@@ -1,4 +1,3 @@
-import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import logo from "../../assets/gsw-logo-colorida.png";
@@ -13,7 +12,7 @@ export default function Header() {
     const usuario = getUsuario();
     return (
         <>
-            <div className="navbar fixed top-0 left-0 w-full z-50 bg-base-100 shadow-sm">
+            <div className="navbar sticky top-0 left-0 w-full z-50 bg-base-100 shadow-sm">
                 <div className="flex-1">
                    <a className="btn btn-ghost text-xl">
                       <img
@@ -58,12 +57,8 @@ export default function Header() {
                 </div>
             </div>
 
-            <div className="fixed top-16 left-0 w-full z-40 ">
+            <div className="sticky top-16 left-0 w-full z-40">
                 <Navbar />
-            </div>
-            {/* pode ser necessário para o bom funcionamento correto da navbar */}
-            <div className="pt-32 flex flex-col">
-                <Outlet />
             </div>
 
         </>
