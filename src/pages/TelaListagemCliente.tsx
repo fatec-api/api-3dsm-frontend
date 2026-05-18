@@ -120,7 +120,6 @@ export default function TelaListagemCliente() {
 
     return (
         <>
-            <Navbar />
 
             <Header />
 

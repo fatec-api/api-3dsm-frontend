@@ -39,9 +39,7 @@ const router = createBrowserRouter(
         <Route path='/cadastro-item' element={<CadastroItem />} />  
         <Route path='/telafuncionarios' element={<TelaFuncionarios/>}/>
         <Route path='/cadastro-cliente' element={<TelaCadastroCliente />}/>
-        <Route path='/teste-alocacao' element={<DevAllocationTest />}/>
         <Route path='/tela-historico' element={<Historico/>}/>
-        <Route path='/teste-k' element={<TelaTeste />}/>
         <Route path='/listagem-clientes' element={<TelaListagemCliente />}/>
         <Route path='/visualizar-usuarios' element={<ListagemUsuarios />} />
       </Route>
