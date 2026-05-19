@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../shared/components/Card";
 import { useParams } from "react-router-dom";
@@ -10,6 +10,8 @@ import { listarEquipeProjeto, listarProjetoId } from "../services/projectService
 import { listarApontamentos, type MetricasAtividade } from "../services/apontamentoService";
 import IndicadorProgresso from "../components/IndicadorProgresso";
 import Botao from "../shared/components/Botao";
+import { KeycloakContext } from "../contexts/KeycloakProvider";
+import { FaMoneyBillWave, FaHandHoldingUsd } from "react-icons/fa";
 
 const NIVEIS_BASE = ['ANALISE', 'DESENVOLVIMENTO', 'TESTE'];
 const NOMES_ATIVIDADES: Record<string, string> = {
@@ -18,6 +20,98 @@ const NOMES_ATIVIDADES: Record<string, string> = {
     'TESTE': 'Teste'
 };
 
+function formatarMoeda(valor: number): string {
+    return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function CircularProgressFinanceiro({ percentualSaldo }: { percentualSaldo: number }) {
+    const raio = 28;
+    const circunferencia = 2 * Math.PI * raio;
+    const percentualVisual = Math.min(Math.max(percentualSaldo, 0), 100);
+    const offset = circunferencia - (percentualVisual / 100) * circunferencia;
+
+    const cor =
+        percentualSaldo > 20 ? "#22c55e"
+        : percentualSaldo >= 1 ? "#eab308"
+        : "#ef4444";
+
+    return (
+        <div className="relative flex items-center justify-center w-16 h-16">
+            <svg width="64" height="64" viewBox="0 0 64 64" className="-rotate-90">
+                <circle cx="32" cy="32" r={raio} fill="none" stroke="#e5e7eb" strokeWidth="6" />
+                <circle
+                    cx="32" cy="32" r={raio}
+                    fill="none"
+                    stroke={cor}
+                    strokeWidth="6"
+                    strokeDasharray={circunferencia}
+                    strokeDashoffset={offset}
+                    strokeLinecap="round"
+                />
+            </svg>
+            <span className="absolute text-xs font-semibold" style={{ color: cor }}>
+                {Math.round(percentualSaldo)}%
+            </span>
+        </div>
+    );
+}
+
+function CardsFinanceiros({ projeto }: { projeto: any }) {
+    const orcamentoPrevisto: number = projeto?.valorOrcamento ?? 0;
+    const custoRealAcumulado: number = projeto?.custoRealAcumulado ?? 0;
+
+    const saldoDisponivel = orcamentoPrevisto - custoRealAcumulado;
+    const percentualSaldo = orcamentoPrevisto
+        ? (saldoDisponivel / orcamentoPrevisto) * 100
+        : 0;
+
+    return (
+        <div className="flex gap-6 flex-wrap">
+            <div className="flex-1 min-w-[200px] card bg-base-100 border border-base-content/10 shadow-sm">
+                <div className="card-body flex flex-row justify-between items-center py-4 px-5">
+                    <div>
+                        <p className="text-sm text-base-content/50 font-medium leading-tight">
+                            Total do Orçamento <br /> Previsto
+                        </p>
+                        <p className="text-lg font-bold mt-1">
+                            {formatarMoeda(orcamentoPrevisto)}
+                        </p>
+                    </div>
+                    <FaMoneyBillWave className="text-base-content/20 text-4xl" />
+                </div>
+            </div>
+
+            <div className="flex-1 min-w-[200px] card bg-base-100 border border-base-content/10 shadow-sm">
+                <div className="card-body flex flex-row justify-between items-center py-4 px-5">
+                    <div>
+                        <p className="text-sm text-base-content/50 font-medium leading-tight">
+                            Total do Custo Real <br /> Acumulado
+                        </p>
+                        <p className="text-lg font-bold mt-1">
+                            {formatarMoeda(custoRealAcumulado)}
+                        </p>
+                    </div>
+                    <FaHandHoldingUsd className="text-base-content/20 text-4xl" />
+                </div>
+            </div>
+
+            <div className="flex-1 min-w-[200px] card bg-base-100 border border-base-content/10 shadow-sm">
+                <div className="card-body flex flex-row justify-between items-center py-4 px-5">
+                    <div>
+                        <p className="text-sm text-base-content/50 font-medium leading-tight">
+                            Saldo Disponível
+                        </p>
+                        <p className="text-lg font-bold mt-1">
+                            {formatarMoeda(saldoDisponivel)}
+                        </p>
+                    </div>
+                    <CircularProgressFinanceiro percentualSaldo={percentualSaldo} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function DescricaoProjeto() {
     const { state } = useLocation();
     const navigate = useNavigate();
@@ -25,8 +119,10 @@ export default function DescricaoProjeto() {
     const [projeto, setProjeto] = useState<any>(projetoState);
     const [popupItem, setPopupItem] = useState<any | null>(null);
 
-    const [selectedProfList, setSelectedProfList] = useState<Profissional[]>([]);
+    const { temPermissao } = useContext(KeycloakContext);
+    const temAcessoFinanceiro = temPermissao("FINANCEIRO");
 
+    const [selectedProfList, setSelectedProfList] = useState<Profissional[]>([]);
     const [itens, setItens] = useState<{ id?: string; codigo: string; descricao: string; nivelAtividade: NivelAtividade, usuarioNomes: string[] }[]>([]);
     const [listaDeProfissionais, setListaDeProfissionais] = useState<Profissional[]>([]);
     const [metricas, setMetricas] = useState<MetricasAtividade[]>([]);
@@ -86,9 +182,7 @@ export default function DescricaoProjeto() {
         }));
     };
 
-
     const { id } = useParams();
-
 
     const itensFiltrados = itens.filter(item => {
         const termo = buscaItem.toLowerCase();
@@ -178,7 +272,6 @@ export default function DescricaoProjeto() {
         }
     };
 
-
     const isGestor = true;
 
     if (!projeto) return null;
@@ -197,7 +290,6 @@ export default function DescricaoProjeto() {
                         </div>
                         <div className="text-right text-sm text-base-content/60 flex flex-col items-end">
                             <p>{projeto.tipoProjeto}</p>
-
                             <div className="mt-2 text-xs">
                                 <p><strong>Início:</strong> {formatarData(projeto.dataInicio)}</p>
                                 <p><strong>Fim:</strong> {formatarData(projeto.dataFim)}</p>
@@ -205,6 +297,10 @@ export default function DescricaoProjeto() {
                         </div>
                     </div>
                 </div>
+
+                {temAcessoFinanceiro && (
+                    <CardsFinanceiros projeto={projeto} />
+                )}
 
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-row justify-between items-center gap-4">
