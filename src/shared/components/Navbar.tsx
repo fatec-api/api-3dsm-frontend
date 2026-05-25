@@ -75,43 +75,42 @@ export default function Navbar() {
                 {/* menu tela grande */}
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
-                        {/* <li><Link to="/">Home</Link></li> */}
                         {temPermissao('GESTOR') && (
-                            <li><Link to="/lista-projetos">Projetos</Link></li>
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/lista-projetos">Projetos</Link></li>
                         )}
-                        <li><Link to={`/log-profissional/${usuario?.id}`}>Apontamento</Link></li>
+                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to={`/log-profissional/${usuario?.id}`}>Apontamento</Link></li>
 
-                        <li>
+                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
                             <details>
                                 <summary>Criação</summary>
-                                <ul className="p-2 bg-base-100 w-52 z-1">
+                                <ul className="text-black p-2 bg-base-100 w-52 z-1">
                                     {temPermissao('GESTOR') && (
                                         <>
-                                            <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
-                                             <li>
+                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
+                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg">
                                                 <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
                                                     Cadastro de Usuário
                                                 </a>
                                             </li>
-                                            <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
-                                            <li><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
+                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
                                         </>
                                     )}
-                                    <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
+                                    <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
                                 </ul>
                             </details>
                         </li>
                         {temPermissao('GESTOR') && (<>
-                            <li><Link to="/tela-historico">Histórico</Link></li>
-                            <li><Link to="/apontamentos-gestor">Gestão de apontamentos</Link></li>
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/tela-historico">Histórico</Link></li>
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/apontamentos-gestor">Gestão de apontamentos</Link></li>
                         </>)}
-                        <li>
+                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
                             {temPermissao('GESTOR') && (
                                 <>
                                     <details>
                                         <summary>Clientes</summary>
-                                        <ul className="p-2 bg-base-100 w-52 z-1">
-                                            <li><Link to="/listagem-clientes">Lista dos Clientes</Link></li>
+                                        <ul className="text-black p-2 bg-base-100 w-52 z-1">
+                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/listagem-clientes">Lista dos Clientes</Link></li>
                                         </ul>
                                     </details>
                                 </>

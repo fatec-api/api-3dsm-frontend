@@ -4,7 +4,7 @@ import type { Projeto } from "../pages/TelaListaProjetos";
 interface FiltrosListagemProjetosProps {
     projetos: Projeto[];
     onFilterChange: (filtros: {
-        nome: string; // Adicionado
+        nome: string;
         progresso: string;
         statusProjeto: string;
         tipoProjeto: string;
@@ -50,7 +50,7 @@ export default function FiltrosListagemProjetos({ projetos, onFilterChange }: Fi
     }, [projetos]);
 
     const clientes = useMemo(() => {
-        return [...new Set(projetos.map(p => p.cliente).filter(Boolean))];
+        return [...new Set(projetos.map(p => p.nomeCliente).filter(Boolean))];
     }, [projetos]);
 
     useEffect(() => {
