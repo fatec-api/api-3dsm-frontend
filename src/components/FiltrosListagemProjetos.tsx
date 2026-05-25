@@ -4,11 +4,12 @@ import type { Projeto } from "../pages/TelaListaProjetos";
 interface FiltrosListagemProjetosProps {
     projetos: Projeto[];
     onFilterChange: (filtros: {
-        nome: string; // Adicionado
+        nome: string;
         progresso: string;
         statusProjeto: string;
         tipoProjeto: string;
         cliente: string;
+        visualizacaoFinanceira: boolean; // 1. Adicionado no contrato da função
     }) => void;
 }
 
@@ -50,12 +51,14 @@ export default function FiltrosListagemProjetos({ projetos, onFilterChange }: Fi
     }, [projetos]);
 
     const clientes = useMemo(() => {
-        return [...new Set(projetos.map(p => p.cliente).filter(Boolean))];
+        // Corrigido para p.nomeCliente para bater com a interface do seu arquivo principal
+        return [...new Set(projetos.map(p => p.nomeCliente).filter(Boolean))];
     }, [projetos]);
 
+    // 2. Adicionado 'visualizacaoFinanceira' na lista de dependências e no envio do objeto
     useEffect(() => {
-        onFilterChange({ nome, progresso, statusProjeto, tipoProjeto, cliente });
-    }, [nome, progresso, statusProjeto, tipoProjeto, cliente, onFilterChange]);
+        onFilterChange({ nome, progresso, statusProjeto, tipoProjeto, cliente, visualizacaoFinanceira });
+    }, [nome, progresso, statusProjeto, tipoProjeto, cliente, visualizacaoFinanceira, onFilterChange]);
 
     return (
         <div className="flex flex-col md:flex-row items-center justify-center p-5 mb-4 gap-4">
@@ -124,6 +127,7 @@ export default function FiltrosListagemProjetos({ projetos, onFilterChange }: Fi
             <div className="flex items-center gap-4 ml-2">
 
                 <button
+                    type="button"
                     onClick={limparFiltros}
                     disabled={!temFiltroAtivo}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
@@ -135,30 +139,30 @@ export default function FiltrosListagemProjetos({ projetos, onFilterChange }: Fi
                     Limpar Filtros
                 </button>
 
-                {/* TOGGLE SIMPLIFICADO */}
+                {/* 3. TOGGLE CORRIGIDO (Alinhamento visual de cores e movimento da bolinha) */}
                 <div className="flex items-center gap-3">
-
-                    <span className="text-sm font-medium text-base-content/70">
+                    <span className={`text-sm font-medium transition-colors ${!visualizacaoFinanceira ? "text-base-content font-bold" : "text-base-content/50"}`}>
                         Projeto
                     </span>
 
                     <button
+                        type="button"
                         onClick={() => setVisualizacaoFinanceira(!visualizacaoFinanceira)}
                         className={`relative w-14 h-7 rounded-full transition-all duration-300
-                        ${visualizacaoFinanceira ? "bg-base-300" : "bg-base-content"}`}
+                        ${visualizacaoFinanceira ? "bg-primary" : "bg-base-300"}`}
                     >
                         <div
                             className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md
                             transition-transform duration-300
-                            ${visualizacaoFinanceira ? "translate-x-0" : "translate-x-7"}`}
+                            ${visualizacaoFinanceira ? "translate-x-7" : "translate-x-0"}`}
                         />
                     </button>
 
-                    <span className="text-sm font-medium text-base-content/70">
+                    <span className={`text-sm font-medium transition-colors ${visualizacaoFinanceira ? "text-base-content font-bold" : "text-base-content/50"}`}>
                         Financeiro
                     </span>
-
                 </div>
+
             </div>
         </div>
     );
