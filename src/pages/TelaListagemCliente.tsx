@@ -10,6 +10,9 @@ import { listarProjetos } from "../services/projectService";
 type Cliente = {
     id: number;
     nomeEmpresa: string;
+    telefoneEmpresa: string,
+    pessoaResponsavel: string,
+    telefoneResponsavel: string,
     cnpj: string;
     email: string;
     ativo: boolean;
@@ -164,6 +167,9 @@ export default function TelaListagemCliente() {
                             <thead>
                                 <tr>
                                     <th>Cliente</th>
+                                    <th>Telefone Cliente</th>
+                                    <th>Responsável</th>
+                                    <th>Telefone Responsável</th>
                                     <th>Email</th>
                                     <th>CNPJ</th>
                                     <th>Projetos</th>
@@ -200,6 +206,18 @@ export default function TelaListagemCliente() {
                                             <tr key={cliente.id}>
                                                 <td>
                                                     {cliente.nomeEmpresa}
+                                                </td>
+
+                                                <td>
+                                                    {cliente.telefoneEmpresa}
+                                                </td>
+
+                                                <td>
+                                                    {cliente.pessoaResponsavel}
+                                                </td>
+
+                                                <td>
+                                                    {cliente.telefoneResponsavel}
                                                 </td>
 
                                                 <td>

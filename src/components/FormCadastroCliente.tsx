@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { MdBusiness } from "react-icons/md";
-import { HiOutlineMail } from "react-icons/hi";
-import { FaRegIdCard } from "react-icons/fa";
+import { HiOutlineMail, HiPhone } from "react-icons/hi";
+import { FaRegIdCard, FaUser } from "react-icons/fa";
 
 import Input from "../shared/components/Input";
 import Botao from "../shared/components/Botao";
@@ -11,6 +11,9 @@ import { atualizarCliente, cadastrarCliente } from "../services/clienteService";
 type Cliente = {
   id: number;
   nomeEmpresa: string;
+  telefoneEmpresa: string,
+  pessoaResponsavel: string,
+  telefoneResponsavel: string,
   email: string;
   cnpj: string;
   ativo: boolean;
@@ -28,6 +31,9 @@ export default function FormCadastroCliente({
   onSuccess,
 }: Props) {
   const [nomeEmpresa, setNomeEmpresa] = useState("");
+  const [telefoneEmpresa, setTelefoneEmpresa] = useState("")
+  const [pessoaResponsavel, setPessoaResponsavel] = useState("")
+  const [telefoneResponsavel, setTelefoneResponsavel] = useState("")
   const [email, setEmail] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [ativo, setAtivo] = useState(true);
@@ -43,11 +49,17 @@ export default function FormCadastroCliente({
       const cnpjFormatado = formatarCNPJ(cliente.cnpj);
 
       setNomeEmpresa(cliente.nomeEmpresa);
+      setTelefoneEmpresa(cliente.telefoneEmpresa)
+      setPessoaResponsavel(cliente.pessoaResponsavel)
+      setTelefoneResponsavel(cliente.telefoneResponsavel)
       setEmail(cliente.email);
       setCnpj(cnpjFormatado);
       setAtivo(cliente.ativo);
     } else {
       setNomeEmpresa("");
+      setTelefoneEmpresa("")
+      setPessoaResponsavel("")
+      setTelefoneResponsavel("")
       setEmail("");
       setCnpj("");
       setAtivo(true);
@@ -125,8 +137,19 @@ export default function FormCadastroCliente({
       .slice(0, 18);
   };
 
+  const formatarTelefone = (value: string) => {
+    let v = value.replace(/\D/g, "");
+    v = v.slice(0, 11);
+    v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
+    v = v.replace(/(\d{4,5})(\d{4})$/, "$1-$2");
+    return v
+  };
+
   const handleLimpar = () => {
     setNomeEmpresa("");
+    setTelefoneEmpresa("")
+    setPessoaResponsavel("")
+    setTelefoneResponsavel("")
     setEmail("");
     setCnpj("");
     setAtivo(true);
@@ -155,6 +178,9 @@ export default function FormCadastroCliente({
 
     const dados = {
       nomeEmpresa: nomeEmpresa,
+      telefoneEmpresa,
+      pessoaResponsavel,
+      telefoneResponsavel,
       email,
       // cnpj: cnpjLimpo,
       cnpj: cnpj,
@@ -163,7 +189,7 @@ export default function FormCadastroCliente({
 
     try {
       if (modoEdicao && cliente) {
-        await atualizarCliente(cliente.id,dados)
+        await atualizarCliente(cliente.id, dados)
 
         setAlerta(
           "Cliente atualizado com sucesso!"
@@ -237,6 +263,63 @@ export default function FormCadastroCliente({
 
         <div className="flex flex-col gap-2 w-full text-left">
           <label className="font-medium">
+            Telefone Empresa
+          </label>
+
+          <Input
+            type="text"
+            placeholder="(12) 99999-9999"
+            value={telefoneEmpresa}
+            onChange={(e) =>
+              setTelefoneEmpresa(formatarTelefone(e.target.value))
+            }
+            icon={<HiPhone size={20} />}
+            disabled={carregando}
+            required
+            className="w-full text-left"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 w-full text-left">
+          <label className="font-medium">
+            Pessoa Responsável
+          </label>
+
+          <Input
+            type="text"
+            placeholder="Digite o nome da pessoa responsável da empresa"
+            value={pessoaResponsavel}
+            onChange={(e) =>
+              setPessoaResponsavel(e.target.value)
+            }
+            icon={<FaUser size={20} />}
+            disabled={carregando}
+            required
+            className="w-full text-left"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 w-full text-left">
+          <label className="font-medium">
+            Telefone da Pessoa Responsável
+          </label>
+
+          <Input
+            type="text"
+            placeholder="(12) 99999-9999"
+            value={telefoneResponsavel}
+            onChange={(e) =>
+              setTelefoneResponsavel(formatarTelefone(e.target.value))
+            }
+            icon={<HiPhone size={20} />}
+            disabled={carregando}
+            required
+            className="w-full text-left"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 w-full text-left">
+          <label className="font-medium">
             E-mail
           </label>
 
@@ -290,11 +373,10 @@ export default function FormCadastroCliente({
 
             <div className="flex items-center gap-3">
               <span
-                className={`text-sm font-medium ${
-                  ativo
-                    ? "text-success"
-                    : "text-content"
-                }`}
+                className={`text-sm font-medium ${ativo
+                  ? "text-success"
+                  : "text-content"
+                  }`}
               >
                 {ativo ? "Ativo" : "Inativo"}
               </span>
@@ -316,11 +398,10 @@ export default function FormCadastroCliente({
       {alerta && (
         <div
           role="alert"
-          className={`alert ${
-            sucesso
-              ? "alert-success"
-              : "alert-error"
-          }`}
+          className={`alert ${sucesso
+            ? "alert-success"
+            : "alert-error"
+            }`}
         >
           <span>{alerta}</span>
         </div>
@@ -335,8 +416,8 @@ export default function FormCadastroCliente({
           {carregando
             ? "Salvando..."
             : modoEdicao
-            ? "Salvar Alterações"
-            : "Cadastrar"}
+              ? "Salvar Alterações"
+              : "Cadastrar"}
         </Botao>
 
         <Botao
