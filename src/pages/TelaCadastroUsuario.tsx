@@ -3,8 +3,8 @@ import FormularioCadastro from "../components/FormCadastroUsuario";
 
 export default function CadastroUsuario() {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
-      <Header titulo="Cadastro de Usuário" />
+    <div className="min-h-screen flex flex-col dark:bg-gray-900">
+      <Header/>
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <FormularioCadastro />
       </div>

@@ -92,7 +92,7 @@ export default function ListaApontamentosGestor() {
         <>
             <Header />
             {}
-            <div className="flex justify-between items-center border rounded-xl p-3 my-5 mx-15 gap-3 bg-white shadow-sm overflow-hidden">
+            <div className="flex justify-between items-center border rounded-xl p-3 my-5 mx-15 gap-3  shadow-sm overflow-hidden">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex-1 truncate min-w-0">
                     APROVAÇÃO DOS APONTAMENTOS
                 </h1>

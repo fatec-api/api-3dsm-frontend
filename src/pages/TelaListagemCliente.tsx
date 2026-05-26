@@ -76,7 +76,7 @@ export default function TelaListagemCliente() {
         const termoLimpo = termo.replace(/\D/g, "");
 
         const ehBuscaNumerica = termoLimpo.length > 0 &&
-            (termoLimpo.length >= termo.length * 0.5); 
+            (termoLimpo.length >= termo.length * 0.5);
 
         const correspondeCnpj = ehBuscaNumerica && cliente.cnpj.includes(termoLimpo);
 
@@ -123,8 +123,8 @@ export default function TelaListagemCliente() {
 
             <Header />
 
-            <section className="flex justify-center px-6 pb-12">
-                <main className="w-full max-w-7xl rounded-2xl p-8 shadow-md">
+            <section className="flex justify-center px-6 pb-12 gsw-page">
+                <main className="w-full max-w-7xl rounded-2xl p-8 shadow-md bg-base-200">
 
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
 

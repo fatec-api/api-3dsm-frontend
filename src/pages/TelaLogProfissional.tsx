@@ -112,7 +112,7 @@ export default function TelaLogProfissional() {
 		return t;
 	};
 	return (
-		<div className="min-h-screen bg-base-100">
+		<div className="min-h-screen">
 			<Header />
 			<div className="flex justify-center mt-24 px-6 pb-12">
 				<div className="w-full max-w-7xl bg-base-200 rounded-2xl p-8 shadow-md">

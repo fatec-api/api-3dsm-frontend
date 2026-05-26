@@ -86,17 +86,17 @@ export default function Navbar() {
                                 <ul className="text-black p-2 bg-base-100 w-52 z-1">
                                     {temPermissao('GESTOR') && (
                                         <>
-                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
-                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg">
+                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
+                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg">
                                                 <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
                                                     Cadastro de Usuário
                                                 </a>
                                             </li>
-                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
-                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
+                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
                                         </>
                                     )}
-                                    <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
+                                    <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
                                 </ul>
                             </details>
                         </li>
@@ -110,7 +110,7 @@ export default function Navbar() {
                                     <details>
                                         <summary>Clientes</summary>
                                         <ul className="text-black p-2 bg-base-100 w-52 z-1">
-                                            <li className="hover:bg-[#D97924] hover:text-white hover:rounded-lg"><Link to="/listagem-clientes">Lista dos Clientes</Link></li>
+                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/listagem-clientes">Lista dos Clientes</Link></li>
                                         </ul>
                                     </details>
                                 </>

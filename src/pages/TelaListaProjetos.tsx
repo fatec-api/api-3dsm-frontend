@@ -163,7 +163,7 @@ export default function ListaProjetos() {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-base-100">
+        <div className="flex flex-col h-screen">
             <Header />
             <FiltrosListagemProjetos
                 projetos={projetos}
