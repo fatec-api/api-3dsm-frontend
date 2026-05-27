@@ -109,11 +109,11 @@ export default function Historico() {
 	return (
 		<div className="min-h-screen">
 			<Header />
-			<div className="flex justify-center mt-10 px-6 pb-12">
+			<div className="flex justify-center my-10 px-6">
 				<div className="w-full max-w-7xl bg-base-200 rounded-2xl p-4 md:p-6 lg:p-8 shadow-md">
 					<div className="mb-8 bg-base-200 rounded-lg p-4">
 						<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-							<label className="text-xl md:text-2xl font-bold flex-shrink-0">Histórico</label>
+							<label className="text-xl md:text-2xl font-bold shrink-0">Histórico</label>
 							<Input
 								type="text"
 								placeholder="Buscar por usuário, ação ou data..."

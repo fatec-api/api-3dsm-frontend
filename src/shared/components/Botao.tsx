@@ -34,7 +34,7 @@ export default function Botao({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`${base} ${variants[variant]} disabled:opacity-50 disabled:cursor-not-allowed`}
+      className={`${base} ${variants[variant]} disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
     >
       {children}
     </button>
