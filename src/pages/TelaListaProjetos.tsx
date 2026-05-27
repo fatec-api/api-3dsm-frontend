@@ -92,12 +92,13 @@ export default function ListaProjetos() {
 
 
     const handleFilterChange = useCallback((novosFiltros: any) => {
+        console.log("Filtros recebidos do componente:", novosFiltros);
         setFiltros({
             nome: novosFiltros.nome,
             progresso: novosFiltros.progresso,
             status: novosFiltros.statusProjeto,
             tipoProjeto: novosFiltros.tipoProjeto,
-            nomeCliente: novosFiltros.nomeCliente,
+            nomeCliente: novosFiltros.cliente,
             visualizacaoFinanceira: novosFiltros.visualizacaoFinanceira
         });
     }, []);
