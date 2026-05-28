@@ -33,15 +33,16 @@ export default function FormCadastroProjeto() {
         const listaUsuarios = await listarUsuariosAtivos();
         setGestores(
           listaUsuarios
-            .filter((p: any) => p.cargo === "Gestor")
+            .filter((p: any) => p.cargos && p.cargos.includes("GESTOR"))
             .map((p: any) => ({ label: p.nomeUsuario, value: String(p.id) }))
-        );
+        )
+        
         const listaClientes = await listarClientes()
         // const listaClientes = await listarClientes();
         setClientes(
           listaClientes.map((c: any) => ({
             label: c.nomeEmpresa,
-            value: c.id 
+            value: c.id
           }))
         );
       } catch (error) {
