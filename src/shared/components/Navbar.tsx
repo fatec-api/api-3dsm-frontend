@@ -97,10 +97,14 @@ export default function Navbar() {
                                 <li>
                                     <Link to="/visualizar-usuarios">Funcionários</Link>
                                 </li>
-                                <li>
-                                    <Link to="/log-profissional/:id">Apontamento de Horas</Link>
-                                </li>
                             </>
+                        )}
+                        {temPermissao('PROFISSIONAL') && (
+                            <li>
+                                <Link to="/log-profissional/:id">
+                                    Apontamento de Horas
+                                </Link>
+                            </li>
                         )}
                         <li>
                             <details>
