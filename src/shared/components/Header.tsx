@@ -38,37 +38,27 @@ export default function Header() {
                             <li onClick={logout}><a>Logout</a></li>
                         </ul>
 
-                        <Link to="/" className="btn btn-ghost text-xl">
-                            <img
-                                src={logo}
-                                alt="Logo GSW"
-                                className="h-8 w-auto"
-                            />
-                        </Link>
-
                     </div>
-                    <div className="flex gap-2">
+                    {!autenticado ? (
+                        <button className="w-10 btn btn-ghost" onClick={login} >Login
+                        </button>
+                    ) : (
+                        <div className="flex items-center gap-2 text-[#F5BC51]">
+                            <span>Olá, {usuario?.nome}</span>
 
-                        {!autenticado ? (
-                            <button className="w-10 btn btn-ghost" onClick={login} >Login
+                            <button onClick={logout} className="w-10 btn btn-ghost btn-circle avatar">
+                                <FiLogOut className="w-6 h-6" />
                             </button>
-                        ) : (
-                            <div className="flex items-center gap-2 text-[#F5BC51]">
-                                <span>Olá, {usuario?.nome}</span>
+                        </div>
+                    )}
 
-                                <button onClick={logout} className="w-10 btn btn-ghost btn-circle avatar">
-                                    <FiLogOut className="w-6 h-6" />
-                                </button>
-                            </div>
-                        )}
-
-                    </div>
-                </div>
-
-                <div className="sticky top-16 left-0 w-full z-40">
-                    <Navbar />
                 </div>
             </div>
+
+            <div className="sticky top-16 left-0 w-full z-40">
+                <Navbar />
+            </div>
+
         </>
     )
 }
