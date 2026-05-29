@@ -12,7 +12,7 @@ type Cliente = {
   id: number;
   nomeEmpresa: string;
   telefoneEmpresa: string,
-  pessoaResponsavel: string,
+  nomeResponsavel: string,
   telefoneResponsavel: string,
   email: string;
   cnpj: string;
@@ -32,7 +32,7 @@ export default function FormCadastroCliente({
 }: Props) {
   const [nomeEmpresa, setNomeEmpresa] = useState("");
   const [telefoneEmpresa, setTelefoneEmpresa] = useState("")
-  const [pessoaResponsavel, setPessoaResponsavel] = useState("")
+  const [nomeResponsavel, setNomeResponsavel] = useState("")
   const [telefoneResponsavel, setTelefoneResponsavel] = useState("")
   const [email, setEmail] = useState("");
   const [cnpj, setCnpj] = useState("");
@@ -50,7 +50,7 @@ export default function FormCadastroCliente({
 
       setNomeEmpresa(cliente.nomeEmpresa);
       setTelefoneEmpresa(cliente.telefoneEmpresa)
-      setPessoaResponsavel(cliente.pessoaResponsavel)
+      setNomeResponsavel(cliente.nomeResponsavel)
       setTelefoneResponsavel(cliente.telefoneResponsavel)
       setEmail(cliente.email);
       setCnpj(cnpjFormatado);
@@ -58,7 +58,7 @@ export default function FormCadastroCliente({
     } else {
       setNomeEmpresa("");
       setTelefoneEmpresa("")
-      setPessoaResponsavel("")
+      setNomeResponsavel("")
       setTelefoneResponsavel("")
       setEmail("");
       setCnpj("");
@@ -124,6 +124,14 @@ export default function FormCadastroCliente({
     );
   };
 
+  const validarTelefone = (telefone: string) => {
+    const numeros = telefone.replace(/\D/g, "")
+    if (numeros.length !== 10 && numeros.length !== 11) return false
+    if (/^(\d)\1+$/.test(numeros)) return false
+    
+    return true
+  }
+
   const formatarCNPJ = (value: string) => {
     return value
       .replace(/\D/g, "")
@@ -148,7 +156,7 @@ export default function FormCadastroCliente({
   const handleLimpar = () => {
     setNomeEmpresa("");
     setTelefoneEmpresa("")
-    setPessoaResponsavel("")
+    setNomeResponsavel("")
     setTelefoneResponsavel("")
     setEmail("");
     setCnpj("");
@@ -165,6 +173,8 @@ export default function FormCadastroCliente({
     setAlerta("");
 
     const cnpjLimpo = cnpj.replace(/\D/g, "");
+    const telefoneEmpresaLimpo = telefoneEmpresa.replace(/\D/g, "");
+    const telefoneResponsavelLimpo = telefoneResponsavel.replace(/\D/g, "");
 
     if (!validarCNPJ(cnpjLimpo)) {
       setSucesso(false);
@@ -176,14 +186,33 @@ export default function FormCadastroCliente({
       return;
     }
 
+    if (!validarTelefone(telefoneEmpresaLimpo)) {
+      setSucesso(false);
+
+      setAlerta("telefone da empresa inválido.");
+
+      setCarregando(false);
+
+      return;
+    }
+
+    if (!validarTelefone(telefoneResponsavelLimpo)) {
+      setSucesso(false);
+
+      setAlerta("telefone do responsável inválido.");
+
+      setCarregando(false);
+
+      return;
+    }
+
     const dados = {
       nomeEmpresa: nomeEmpresa,
-      telefoneEmpresa,
-      pessoaResponsavel,
-      telefoneResponsavel,
+      telefoneEmpresa: telefoneEmpresaLimpo,
+      nomeResponsavel,
+      telefoneResponsavel: telefoneResponsavelLimpo,
       email,
-      // cnpj: cnpjLimpo,
-      cnpj: cnpj,
+      cnpj: cnpjLimpo,
       ativo,
     };
 
@@ -288,9 +317,9 @@ export default function FormCadastroCliente({
           <Input
             type="text"
             placeholder="Digite o nome da pessoa responsável da empresa"
-            value={pessoaResponsavel}
+            value={nomeResponsavel}
             onChange={(e) =>
-              setPessoaResponsavel(e.target.value)
+              setNomeResponsavel(e.target.value)
             }
             icon={<FaUser size={20} />}
             disabled={carregando}

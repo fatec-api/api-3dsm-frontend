@@ -11,7 +11,7 @@ type Cliente = {
     id: number;
     nomeEmpresa: string;
     telefoneEmpresa: string,
-    pessoaResponsavel: string,
+    nomeResponsavel: string,
     telefoneResponsavel: string,
     cnpj: string;
     email: string;
@@ -116,6 +116,19 @@ export default function TelaListagemCliente() {
         );
     };
 
+    const formatarTelefone = (telefone: string) => {
+        if (!telefone) return ""
+        const apenasNumeros = telefone.replace(/\D/g, "")
+        if (apenasNumeros.length === 11) {
+            return apenasNumeros.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3")
+        }
+        if (apenasNumeros.length === 10) {
+            return apenasNumeros.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3")
+        }
+        
+        return telefone
+    }
+
     function abrirEdicao(cliente: Cliente) {
         setClienteSelecionado(cliente);
         setModalAberto(true);
@@ -209,15 +222,15 @@ export default function TelaListagemCliente() {
                                                 </td>
 
                                                 <td>
-                                                    {cliente.telefoneEmpresa}
+                                                    {formatarTelefone(cliente.telefoneEmpresa)}
                                                 </td>
 
                                                 <td>
-                                                    {cliente.pessoaResponsavel}
+                                                    {cliente.nomeResponsavel}
                                                 </td>
 
                                                 <td>
-                                                    {cliente.telefoneResponsavel}
+                                                    {formatarTelefone(cliente.telefoneResponsavel)}
                                                 </td>
 
                                                 <td>
