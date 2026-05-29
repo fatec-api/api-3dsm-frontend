@@ -13,6 +13,8 @@ type InputProps = {
   heightPx?: number;
   maxLength?: number;
   required?: boolean;
+  disabled?: boolean;
+  className?: string;
 };
 
 export default function Input({
@@ -26,7 +28,8 @@ export default function Input({
   rightElement,
   widthPx = 320,
   heightPx = 48,
-  required = true
+  required = true,
+  disabled = false,
 
 }: InputProps) {
   return (
@@ -58,6 +61,7 @@ export default function Input({
             onChange={onChange}
             className="flex-1 outline-none bg-transparent placeholder-gray-400"
             required={required}
+            disabled={disabled}
           />
           
           {rightElement && (

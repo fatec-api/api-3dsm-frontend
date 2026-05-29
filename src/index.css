@@ -1,2 +1,355 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @plugin "daisyui";
+
+@layer base {
+    :root {
+        --color-navy: #071A40;
+        --color-slate: #1E3859;
+        --color-amber: #F5BC51;
+        --color-copper: #D97924;
+        --color-offwhite: #f3f1f5;
+        --color-surface: #ffffff;
+        --color-border: #E2E6EA;
+        --color-text: #0D1B2A;
+        --color-text-muted: #607080;
+        --shadow-card: 0 2px 12px 0 rgba(7, 26, 64, 0.08);
+        --shadow-card-hover: 0 8px 28px 0 rgba(7, 26, 64, 0.14);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: var(--color-offwhite);
+        color: var(--color-text);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .navbar {
+        background-color: var(--color-navy) !important;
+        color: white !important;
+    }
+
+    .btn-primary {
+        background-color: var(--color-amber) !important;
+        border-color: var(--color-amber) !important;
+        color: var(--color-navy) !important;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-copper) !important;
+        border-color: var(--color-copper) !important;
+    }
+
+    .btn-ghost {
+        color: white !important;
+    }
+
+    .btn-ghost:hover {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none !important;
+        border-color: var(--color-amber) !important;
+        box-shadow: 0 0 0 2px rgba(245, 188, 81, 0.20) !important;
+    }
+
+    table thead tr {
+        background-color: var(--color-slate) !important;
+    }
+
+    table thead th {
+        color: white !important;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    table tbody tr:nth-child(even) {
+        background-color: rgba(7, 26, 64, 0.025);
+    }
+
+    table tbody tr:hover {
+        background-color: rgba(245, 188, 81, 0.08) !important;
+    }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--color-offwhite);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-slate);
+    }
+}
+
+.gsw-card {
+    background: var(--color-surface);
+    border-radius: 1rem;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.gsw-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+}
+
+.gsw-section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    letter-spacing: -0.01em;
+}
+
+.gsw-nav-link {
+    color: rgba(255, 255, 255, 0.80);
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: color 0.18s, background 0.18s;
+}
+
+.gsw-nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.gsw-nav-link.active {
+    color: var(--color-amber);
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+    letter-spacing: 0.02em;
+}
+
+.status-pendente {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.status-aprovado {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.status-reprovado {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.status-normal {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.status-critico {
+    background: #FEF9C3;
+    color: #854D0E;
+}
+
+.status-atrasado {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.gsw-page {
+    min-height: calc(100vh - 8rem);
+    background: var(--color-offwhite);
+    padding: 2rem 1.5rem;
+}
+
+.gsw-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.875rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-card);
+}
+
+.gsw-filter-select {
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.875rem;
+    background: var(--color-offwhite);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color 0.15s;
+    min-width: 9rem;
+}
+
+.gsw-filter-select:focus {
+    border-color: var(--color-amber) !important;
+    box-shadow: 0 0 0 2px rgba(245, 188, 81, 0.20);
+}
+
+.gsw-search-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    background: var(--color-offwhite);
+    transition: border-color 0.15s;
+}
+
+.gsw-search-input:focus-within {
+    border-color: var(--color-amber) !important;
+    box-shadow: 0 0 0 2px rgba(245, 188, 81, 0.20);
+}
+
+.gsw-search-input input {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 0.875rem;
+    min-width: 10rem;
+    color: var(--color-text) !important;
+}
+
+.gsw-search-input input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.gsw-pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.gsw-pagination-btn {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.gsw-pagination-btn:hover {
+    background: var(--color-slate);
+    color: white;
+    border-color: var(--color-slate);
+}
+
+.gsw-pagination-btn.active {
+    background: var(--color-navy);
+    color: var(--color-amber);
+    border-color: var(--color-navy);
+}
+
+.gsw-pagination-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.gsw-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.2rem;
+    background: var(--color-amber);
+    color: var(--color-navy);
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 0.6rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.12s;
+}
+
+.gsw-btn-primary:hover {
+    background: var(--color-copper);
+    transform: translateY(-1px);
+}
+
+.gsw-btn-primary:active {
+    transform: scale(0.98);
+}
+
+.gsw-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.gsw-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.2rem;
+    background: var(--color-surface);
+    color: var(--color-slate);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 0.6rem;
+    border: 1.5px solid var(--color-border);
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s;
+}
+
+.gsw-btn-secondary:hover {
+    background: var(--color-offwhite);
+    border-color: var(--color-slate);
+}
+
+.gsw-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.2rem;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 0.6rem;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+}
+
+.gsw-btn-ghost:hover {
+    background: var(--color-offwhite);
+    color: var(--color-text);
+}
