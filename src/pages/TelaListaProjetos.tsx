@@ -21,7 +21,10 @@ export interface Projeto {
     horasPrevistasTotal: number;
     horasRealizadasTotal: number;
     horasPendentesTotal?: number;
-    status_orcamento?: string; // Mapeado oficialmente no contrato da API
+    status_orcamento?: string;
+    // US12 — campos financeiros retornados pelo backend
+    valorOrcamento?: number;
+    custoRealTotal?: number;
 }
 
 export default function ListaProjetos() {
@@ -106,7 +109,7 @@ export default function ListaProjetos() {
         try {
             setLoading(true);
             setErro(false);
-            
+
             const response = await listarProjetosPorGestor(id!);
             const data = response?.data ?? response;
 
@@ -126,7 +129,7 @@ export default function ListaProjetos() {
         } catch (error) {
             console.error("Erro ao carregar projetos reais da API:", error);
             setErro(true);
-            setProjetos([]); 
+            setProjetos([]);
         } finally {
             setLoading(false);
         }
@@ -144,21 +147,17 @@ export default function ListaProjetos() {
     }, []);
 
     const getCor = (projeto: Projeto) => {
-        // 1. Visão Orçamentária/Financeira ativa
+        // Visão Financeira ativa
         if (filtros.visualizacaoFinanceira) {
             switch (projeto.status_orcamento) {
-                case "DENTRO_DO_ORCAMENTO":
-                    return "bg-green-500";
-                case "ATENCAO":
-                    return "bg-yellow-400";
-                case "EXCEDIDO":
-                    return "bg-red-500";
-                default:
-                    return "bg-base-300"; // Cor neutra (cinza) se o back-end retornar nulo
+                case "DENTRO_DO_ORCAMENTO": return "bg-green-500";
+                case "ATENCAO":             return "bg-yellow-400";
+                case "EXCEDIDO":            return "bg-red-500";
+                default:                    return "bg-base-300";
             }
         }
 
-        // 2. Visão Operacional ativa (Padrão)
+        // Visão Operacional (padrão)
         if (!projeto.horasPrevistasTotal) return "bg-base-300";
 
         const percentualConsumo =
@@ -167,6 +166,14 @@ export default function ListaProjetos() {
         if (percentualConsumo <= 75) return "bg-green-500";
         if (percentualConsumo <= 100) return "bg-yellow-400";
         return "bg-red-500";
+    };
+
+    // US12 Task 1 — só mostra valores monetários para o perfil Financeiro
+    const podeVerFinanceiro = temPermissao('FINANCEIRO');
+
+    const formatarMoeda = (valor?: number) => {
+        if (valor == null) return "—";
+        return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     };
 
     if (loading) {
@@ -184,8 +191,8 @@ export default function ListaProjetos() {
                 projetos={projetos}
                 onFilterChange={handleFilterChange}
             />
-            
-            {/* Exibe um alerta visual na tela caso a API de produção caia */}
+
+            {/* Alerta visual caso a API caia */}
             {erro && (
                 <div className="flex justify-center mb-4 px-10">
                     <div role="alert" className="alert alert-error max-w-xl text-sm p-3">
@@ -209,8 +216,12 @@ export default function ListaProjetos() {
                                 className="cursor-pointer"
                                 onClick={() => navigate(`/descricao-projeto/${projeto.id}`)}
                             >
-                                <div className="w-80 h-44 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
-                                    <div className={`w-3 ${cor}`} />
+                                {/*
+                                 * US12 Task 2 — card cresce quando há resumo financeiro
+                                 * para não cortar o conteúdo extra
+                                 */}
+                                <div className={`w-80 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px] ${filtros.visualizacaoFinanceira && podeVerFinanceiro ? "h-56" : "h-44"}`}>
+                                    <div className={`w-3 flex-shrink-0 ${cor}`} />
                                     <div className="p-4 flex flex-col justify-between w-full">
                                         <div className="flex justify-between items-start">
                                             <h2 className="text-lg font-semibold">
@@ -233,15 +244,30 @@ export default function ListaProjetos() {
                                         </div>
 
                                         <div className="text-sm space-y-1">
-                                            <p>
-                                                <b>Tipo:</b> {projeto.tipoProjeto}
-                                            </p>
-                                            <p>
-                                                <b>Cliente:</b> {projeto.nomeCliente}
-                                            </p>
-                                            <p>
-                                                <b>Status:</b> {projeto.status}
-                                            </p>
+                                            <p><b>Tipo:</b> {projeto.tipoProjeto}</p>
+                                            <p><b>Cliente:</b> {projeto.nomeCliente}</p>
+                                            <p><b>Status:</b> {projeto.status}</p>
+
+                                            {/* US12 Task 2 — resumo financeiro exclusivo para perfil Financeiro */}
+                                            {filtros.visualizacaoFinanceira && podeVerFinanceiro && (
+                                                <div className="pt-2 mt-1 border-t border-base-content/10 space-y-0.5">
+                                                    <p>
+                                                        <b>Gasto:</b>{" "}
+                                                        <span className={
+                                                            projeto.status_orcamento === "EXCEDIDO"
+                                                                ? "text-red-500 font-semibold"
+                                                                : projeto.status_orcamento === "ATENCAO"
+                                                                ? "text-yellow-500 font-semibold"
+                                                                : "text-green-600 font-semibold"
+                                                        }>
+                                                            {formatarMoeda(projeto.custoRealTotal)}
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        <b>Orçamento:</b> {formatarMoeda(projeto.valorOrcamento)}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -250,6 +276,7 @@ export default function ListaProjetos() {
                     })
                 )}
             </div>
+
             <ModalEditarProjeto
                 isOpen={!!projetoEditando}
                 onClose={() => setProjetoEditando(null)}
