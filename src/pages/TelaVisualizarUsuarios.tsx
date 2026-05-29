@@ -327,7 +327,7 @@ export default function ListagemUsuarios() {
               <thead>
                 <tr>
                   <th>Usuário</th>
-                  <th>Cargo</th>
+                  <th>Cargos</th>
                   <th>Email</th>
                   <th>Experiência</th>
                   <th>Valor/Hora</th>
