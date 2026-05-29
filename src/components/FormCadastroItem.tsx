@@ -127,28 +127,33 @@ export default function FormCadastroItem() {
 
 	return (
 		<>
-			<form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-10 w-full max-w-[700px] flex flex-col gap-10">
+			<form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-10 w-full max-w-175 flex flex-col gap-10">
 				<h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 text-center">Cadastro de Atividade</h1>
 
-
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-					<div className="flex flex-col gap-8">
+				<div className="grid grid-cols-1 md:grid-cols-2  gap-4 items-start">
+					<div className="flex flex-col gap-1">
+						<label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Projeto *</label>
 						<Dropdown
-							label="Projeto *"
 							value={projetoIdEstado}
 							onChange={(e) => setProjetoId(e.target.value)}
 							options={projetos.map((p) => ({ label: p.nomeProjeto, value: String(p.id) }))}
 							icon={<GoProject size={18} />}
 							required
 						/>
-						<Input label="Título do Item *" placeholder="Ex: Ajuste de Layout" value={titulo} onChange={(e) => setTitulo(e.target.value)} icon={<FiFileText size={18} />} maxLength={300} />
-						<Input label="Descrição do Item *" placeholder="Detalhes da task..." value={descricao} onChange={(e) => setDescricao(e.target.value)} icon={<FiFileText size={18} />} maxLength={300} />
+					</div>
+					<div className="flex flex-col gap-1">
+						<label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Título da Atividade *</label>
+						<Input placeholder="Ex: Ajuste de Layout" value={titulo} onChange={(e) => setTitulo(e.target.value)} icon={<FiFileText size={18} />} maxLength={300} />
+					</div>
+					<div className="flex flex-col gap-1">
+						<label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Descrição da Atividade *</label>
+						<Input placeholder="Detalhes da task..." value={descricao} onChange={(e) => setDescricao(e.target.value)} icon={<FiFileText size={18} />} maxLength={300} />
 					</div>
 
-					<div className="flex flex-col gap-8">
-						<div className="flex flex-col gap-2">
+					<div className="flex flex-col">
+						<div className="flex flex-col gap-1">
+							<label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Atribuir Profissionais *</label>
 							<Dropdown
-								label="Atribuir Profissionais *"
 								value={valorSelect}
 								onChange={(e) => handleSelectUsuario(e.target.value)}
 								options={[
@@ -158,21 +163,22 @@ export default function FormCadastroItem() {
 								icon={<FiUser size={18} />}
 								required={false}
 							/>
-
-							<div className="flex flex-wrap gap-2 mt-2 min-h-7.5">
-								{usuariosSelecionados.map((u) => (
-									<span key={u.id} className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
-										{u.nomeUsuario}
-										<button type="button" onClick={() => removerUsuario(u.id)} className="ml-1 hover:text-red-500 transition-colors">
-											<FiX size={14} />
-										</button>
-									</span>
-								))}
-							</div>
 						</div>
 
+						<div className="flex flex-wrap gap-[2px] mt-[2px] min-h-[20px]">
+							{usuariosSelecionados.map((u) => (
+								<span key={u.id} className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
+									{u.nomeUsuario}
+									<button type="button" onClick={() => removerUsuario(u.id)} className="ml-1 hover:text-red-500 transition-colors">
+										<FiX size={14} />
+									</button>
+								</span>
+							))}
+						</div>
+					</div>
+					<div className="flex flex-col gap-1">
+						<label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Papel/Atividade</label>
 						<Dropdown
-							label="Papel/Atividade"
 							value={nivelAtividade}
 							onChange={(e) => setNivelAtividade(e.target.value)}
 							options={[
@@ -183,7 +189,10 @@ export default function FormCadastroItem() {
 							icon={<FiUser size={18} />}
 						/>
 					</div>
-					<Input label="Previsão de horas" type="number" value={previsaoHoras} onChange={(e) => setPrevisaoHoras(e.target.value)} icon={<FiClock size={18} />} />
+					<div className="flex flex-col gap-1">
+						<label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Previsão de horas</label>
+						<Input type="number" value={previsaoHoras} onChange={(e) => setPrevisaoHoras(e.target.value)} icon={<FiClock size={18} />} />
+					</div>
 				</div>
 
 				<div className="flex flex-col items-center gap-6">

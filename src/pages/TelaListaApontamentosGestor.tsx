@@ -89,7 +89,7 @@ export default function ListaApontamentosGestor() {
     };
 
     return (
-        <>
+        <div className="min-h-screen flex flex-col dark:bg-gray-900">
             <Header />
             <div className="flex justify-center my-10 px-6">
                 <div className="w-full max-w-7xl bg-base-200 rounded-2xl p-4 md:p-6 lg:p-8 shadow-md">
@@ -137,6 +137,6 @@ export default function ListaApontamentosGestor() {
                 onConfirm={handleConfirmarReprovacao}
                 isLoading={isReprovando}
             />
-        </>
+        </div>
     );
 }

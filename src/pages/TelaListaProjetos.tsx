@@ -33,7 +33,7 @@ export default function ListaProjetos() {
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(false);
     const [filtros, setFiltros] = useState({
-        nome: "", // Adicionado
+        nome: "",
         progresso: "",
         status: "",
         tipoProjeto: "",

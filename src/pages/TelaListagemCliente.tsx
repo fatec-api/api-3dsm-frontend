@@ -119,12 +119,12 @@ export default function TelaListagemCliente() {
     }
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen">
 
             <Header />
 
-            <section className="flex justify-center px-6 pb-12 gsw-page">
-                <main className="w-full max-w-7xl rounded-2xl p-8 shadow-md bg-base-200">
+            <section className="flex justify-center px-6 pb-12">
+                <main className="w-full max-w-7xl rounded-2xl my-10 p-8 shadow-md bg-base-200">
 
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
 
@@ -158,7 +158,7 @@ export default function TelaListagemCliente() {
                         </section>
                     </div>
 
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto rounded-2xl">
                         <table className="table table-zebra w-full">
 
                             <thead>
@@ -176,11 +176,10 @@ export default function TelaListagemCliente() {
 
                                 {clientesPaginados.length === 0 ? (
                                     <tr>
-                                        <td
-                                            colSpan={6}
-                                            className="text-center py-8"
-                                        >
-                                            Nenhum cliente encontrado.
+                                        <td colSpan={6}>
+                                            <div role="alert" className="alert alert-info alert-soft flex items-center justify-around h-15">
+                                                <p className="text-lg">Nenhum apontamento encontrado.</p>
+                                            </div>
                                         </td>
                                     </tr>
                                 ) : (
@@ -351,6 +350,6 @@ export default function TelaListagemCliente() {
                     </form>
                 </dialog>
             )}
-        </>
+        </div>
     );
 }
