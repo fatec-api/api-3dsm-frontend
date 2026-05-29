@@ -215,7 +215,7 @@ export default function TelaLogProfissional() {
 															onClick={() => handleEditar(row.id)}
 															disabled={!isEditavel}
 														>
-															<FaPencilAlt size={14} />
+															<FaPencilAlt size={14} className="text-[#0D1B2A]" />
 														</button>
 													</div>
 												</td>
