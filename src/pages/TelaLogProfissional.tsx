@@ -16,6 +16,7 @@ type Log = {
 	inicio: string;
 	fim: string;
 	status: "PENDENTE" | "APROVADO" | "REPROVADO";
+	observacao?: string;
 	justificativa?: string;
 };
 
@@ -43,6 +44,11 @@ export default function TelaLogProfissional() {
 				listarProjetos(),
 				listarItensPorProfissional(id)
 			]);
+			console.log("=== DADOS BRUTOS DO BACKEND ===");
+			console.log("Apontamentos retornados:", apontamentos);
+			console.log("Resposta Projetos:", respostaProjetos);
+			console.log("Resposta Itens:", respostaItens);
+			console.log("=================================");
 
 			const projetos = Array.isArray(respostaProjetos)
 				? respostaProjetos
@@ -67,13 +73,14 @@ export default function TelaLogProfissional() {
 						projetoEncontrado?.nome_projeto ||
 						projetoEncontrado?.projeto?.nomeProjeto ||
 						"Sem projeto",
-					atividade: a.itemDescricao || a.observacao || item?.descricao || "Sem atividade",
+					atividade: a.itemDescricao || item?.descricao || "Sem atividade",
 					nivel: item?.nivelAtividade || a.nivel || "UNDEFINED",
 					data: a.dataApontamento || a.data || "",
 					inicio: a.horaInicio || a.inicio || "",
 					fim: a.horaFim || a.fim || "",
 					status: a.status_apontamento || a.status || "PENDENTE",
-					justificativa: a.justificativa_rejeicao || a.observacao || "-",
+					observacao: a.observacao || "-",
+					justificativa: a.justificativaReprovacao || "-",
 				};
 			});
 
@@ -135,6 +142,7 @@ export default function TelaLogProfissional() {
 										<th>Início</th>
 										<th>Fim</th>
 										<th>Status</th>
+										<th>Observação</th>
 										<th>Justificativa</th>
 										<th className="text-center">Editar</th>
 									</tr>
@@ -163,7 +171,7 @@ export default function TelaLogProfissional() {
 												</td>
 												<td className="align-middle">
 													{(() => {
-														const texto = justificativaLimpa(row.justificativa);
+														const texto = justificativaLimpa(row.observacao);
 														if (!texto) return <span className="text-gray-400">-</span>;
 
 														return (
@@ -176,6 +184,7 @@ export default function TelaLogProfissional() {
 														);
 													})()}
 												</td>
+												<td>{row.justificativa}</td>
 												<td className="text-center">
 													<div className="tooltip" data-tip={
 														isEditavel
@@ -219,7 +228,7 @@ export default function TelaLogProfissional() {
 					{justificativaSelecionada && (
 						<div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
 							<div className="bg-gray-100 p-6 rounded-lg max-w-md w-full shadow-lg">
-								<h2 className="text-lg font-semibold mb-4">Justificativa</h2>
+								<h2 className="text-lg font-semibold mb-4">Observação</h2>
 								<p className="mb-4 break-words">{justificativaSelecionada}</p>
 								<div className="flex justify-end">
 									<button

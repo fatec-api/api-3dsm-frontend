@@ -36,11 +36,16 @@ export default function Navbar() {
                                     <li>
                                         <Link to="/visualizar-usuarios">Funcionários</Link>
                                     </li>
-                                    <li>
-                                        <Link to="/log-profissional/:id">Apontamento de Horas</Link>
-                                    </li>
                                 </>
                             )}
+                            {temPermissao('PROFISSIONAL') && (
+                                <li>
+                                    <Link to={`/log-profissional/${usuario?.id}`}>
+                                        Apontamento de Horas
+                                    </Link>
+                                </li>
+                            )}
+
                             <li>
                                 <a>Criação</a>
                                 <ul className="p-2">
@@ -89,11 +94,20 @@ export default function Navbar() {
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
                         {temPermissao('GESTOR') && (
-                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/lista-projetos">Projetos</Link></li>
+                            <>
+                                <li>
+                                    <Link to="/visualizar-usuarios">Funcionários</Link>
+                                </li>
+                            </>
                         )}
-                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to={`/log-profissional/${usuario?.id}`}>Apontamento</Link></li>
-
-                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
+                        {temPermissao('PROFISSIONAL') && (
+                            <li>
+                                <Link to={`/log-profissional/${usuario?.id}`}>
+                                    Apontamento de Horas
+                                </Link>
+                            </li>
+                        )}
+                        <li>
                             <details>
                                 <summary>Criação</summary>
                                 <ul className="text-black p-2 bg-base-100 w-52 z-1">
