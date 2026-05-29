@@ -1,4 +1,4 @@
-import { useEffect, useState,useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import ApontamentosGestor from "../components/ApontamentosGestor";
 import DropdownProjetos from "../components/DropdownProjetos";
 import Header from "../shared/components/Header";
@@ -75,7 +75,7 @@ export default function ListaApontamentosGestor() {
         try {
             console.info(`[ACTION] Reprovando ID: ${itemParaReprovar.id} | Motivo: ${justificativa}`);
             await reprovarApontamento(itemParaReprovar.id, justificativa);
-            
+
             alert("Apontamento reprovado com sucesso!");
             setIsModalOpen(false);
             setSelectedItems([]);
@@ -89,50 +89,54 @@ export default function ListaApontamentosGestor() {
     };
 
     return (
-        <>
+        <div className="min-h-screen flex flex-col dark:bg-gray-900">
             <Header />
-            {}
-            <div className="flex justify-between items-center border rounded-xl p-3 my-5 mx-15 gap-3 bg-white shadow-sm overflow-hidden">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex-1 truncate min-w-0">
-                    APROVAÇÃO DOS APONTAMENTOS
-                </h1>
-                
-                <div className="flex gap-3 items-center shrink-0">
-                    <DropdownProjetos
-                        value={selectedProjeto}
-                        options={projetoOptions}
-                        onChange={(e) => setSelectedProjeto(e.target.value)}
-                        heightPx={38}
-                        required={false}
+            <div className="flex justify-center my-10 px-6">
+                <div className="w-full max-w-7xl bg-base-200 rounded-2xl p-4 md:p-6 lg:p-8 shadow-md">
+                    <div className="mb-8 bg-base-200 rounded-lg p-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                            <label className="text-xl md:text-2xl font-bold shrink-0">Aprovação dos Apontamentos</label>
+
+                            <div className="flex gap-3 items-center shrink-0">
+                                <DropdownProjetos
+                                    value={selectedProjeto}
+                                    options={projetoOptions}
+                                    onChange={(e) => setSelectedProjeto(e.target.value)}
+                                    heightPx={38}
+                                    required={false}
+                                />
+                                <button
+                                    onClick={handleAprovar}
+                                    className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                                    disabled={selectedItems.length === 0}
+                                >
+                                    Aprovar
+                                </button>
+                                <button
+                                    onClick={handleAbrirModalReprovar}
+                                    className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
+                                    disabled={selectedItems.length !== 1}
+                                >
+                                    Reprovar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ApontamentosGestor
+                        projetoFiltro={selectedProjeto}
+                        onSelectionChange={setSelectedItems}
                     />
-                    <button 
-                        onClick={handleAprovar}
-                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
-                        disabled={selectedItems.length === 0}
-                    >
-                        Aprovar
-                    </button>
-                    <button 
-                        onClick={handleAbrirModalReprovar}
-                        className="border border-black rounded-xl bg-white hover:bg-gray-100 p-3 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all whitespace-nowrap"
-                        disabled={selectedItems.length !== 1}
-                    >
-                        Reprovar
-                    </button>
+
                 </div>
+
             </div>
-
-            <ApontamentosGestor 
-                projetoFiltro={selectedProjeto} 
-                onSelectionChange={setSelectedItems}
-            />
-
-            <ModalReprovarApontamento 
+            <ModalReprovarApontamento
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onConfirm={handleConfirmarReprovacao}
                 isLoading={isReprovando}
             />
-        </>
+        </div>
     );
 }

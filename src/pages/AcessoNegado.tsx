@@ -4,7 +4,7 @@ export const AcessoNegado = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center">
         <div className="mb-6 flex justify-center">
           <div className="flex items-center justify-center w-32 h-32 rounded-full bg-red-100">

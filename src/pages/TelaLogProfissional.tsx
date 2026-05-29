@@ -112,9 +112,9 @@ export default function TelaLogProfissional() {
 		return t;
 	};
 	return (
-		<div className="min-h-screen bg-base-100">
+		<div className="min-h-screen">
 			<Header />
-			<div className="flex justify-center mt-24 px-6 pb-12">
+			<div className="flex justify-center my-10 px-6">
 				<div className="w-full max-w-7xl bg-base-200 rounded-2xl p-8 shadow-md">
 					<h1 className="text-center text-2xl font-semibold mb-8">
 						Meus Últimos Apontamentos
@@ -124,7 +124,7 @@ export default function TelaLogProfissional() {
 							<span className="loading loading-spinner loading-lg"></span>
 						</div>
 					) : (
-						<div>
+						<div className="overflow-x-auto rounded-xl">
 							<table className="table table-zebra">
 								<thead>
 									<tr>
@@ -149,7 +149,7 @@ export default function TelaLogProfissional() {
 													? "badge-success"
 													: "badge-error";
 										return (
-											<tr key={row.id} className="hover">
+											< tr key={row.id} className="hover" >
 												<td>{row.projeto}</td>
 												<td>{row.atividade}</td>
 												<td>{row.nivel}</td>
@@ -200,7 +200,7 @@ export default function TelaLogProfissional() {
 								</tbody>
 							</table>
 							{logs.length === 0 && !erro && (
-								<div className="alert text-center py-6 text-gray-500">
+								<div className="alert text-center py-6 justify-center text-gray-500">
 									Nenhum apontamento encontrado
 								</div>
 							)}
@@ -274,6 +274,6 @@ export default function TelaLogProfissional() {
 
 				</div>
 			</div>
-		</div>
+		</div >
 	);
 }

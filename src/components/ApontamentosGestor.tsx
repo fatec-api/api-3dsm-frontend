@@ -134,7 +134,7 @@ export default function ApontamentosGestor({
     };
 
     return (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl">
             <table className="table table-zebra table-lg">
                 <thead>
                     <tr>
@@ -154,8 +154,8 @@ export default function ApontamentosGestor({
                     {paginados.length === 0 ? (
                         <tr>
                             <td colSpan={9}>
-                                <div className="alert alert-info">
-                                    Nenhum apontamento encontrado
+                                <div role="alert" className="alert alert-info alert-soft flex items-center justify-around h-15">
+                                    <p className="text-lg">Nenhum apontamento encontrado.</p>
                                 </div>
                             </td>
                         </tr>
