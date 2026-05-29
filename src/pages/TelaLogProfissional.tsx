@@ -27,6 +27,7 @@ export default function TelaLogProfissional() {
 	const [sucesso, setSucesso] = useState<string | null>(null);
 	const { id } = useParams<{ id: string }>();
 	const [paginaAtual, setPaginaAtual] = useState(1);
+	const [observacaoSelecionada, setObservacaoSelecionada] = useState<string | null>(null);
 	const [justificativaSelecionada, setJustificativaSelecionada] = useState<string | null>(null);
 	const itensPorPagina = 15;
 	const [logSelecionado, setLogSelecionado] = useState<Log | null>(null);
@@ -44,11 +45,6 @@ export default function TelaLogProfissional() {
 				listarProjetos(),
 				listarItensPorProfissional(id)
 			]);
-			console.log("=== DADOS BRUTOS DO BACKEND ===");
-			console.log("Apontamentos retornados:", apontamentos);
-			console.log("Resposta Projetos:", respostaProjetos);
-			console.log("Resposta Itens:", respostaItens);
-			console.log("=================================");
 
 			const projetos = Array.isArray(respostaProjetos)
 				? respostaProjetos
@@ -112,6 +108,12 @@ export default function TelaLogProfissional() {
 	const fim = inicio + itensPorPagina;
 	const logsPaginamento = logs.slice(inicio, fim);
 	const totalPaginas = Math.ceil(logs.length / itensPorPagina);
+	const observacaoLimpa = (text?: string) => {
+		if (!text) return null;
+		const t = text.trim();
+		if (t === "-" || t === "--") return null;
+		return t;
+	};
 	const justificativaLimpa = (text?: string) => {
 		if (!text) return null;
 		const t = text.trim();
@@ -171,7 +173,22 @@ export default function TelaLogProfissional() {
 												</td>
 												<td className="align-middle">
 													{(() => {
-														const texto = justificativaLimpa(row.observacao);
+														const texto = observacaoLimpa(row.observacao);
+														if (!texto) return <span className="text-gray-400">-</span>;
+
+														return (
+															<span
+																className="cursor-pointer underline block"
+																onClick={() => setObservacaoSelecionada(texto)}
+															>
+																{texto.length > 20 ? texto.slice(0, 20) + "..." : texto}
+															</span>
+														);
+													})()}
+												</td>
+												<td className="align-middle">
+													{(() => {
+														const texto = justificativaLimpa(row.justificativa);
 														if (!texto) return <span className="text-gray-400">-</span>;
 
 														return (
@@ -184,7 +201,6 @@ export default function TelaLogProfissional() {
 														);
 													})()}
 												</td>
-												<td>{row.justificativa}</td>
 												<td className="text-center">
 													<div className="tooltip" data-tip={
 														isEditavel
@@ -225,22 +241,38 @@ export default function TelaLogProfissional() {
 							<span>{sucesso}</span>
 						</div>
 					)}
+					{observacaoSelecionada && (
+                        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                            <div className="bg-gray-100 p-6 rounded-lg max-w-md w-full shadow-lg">
+                                <h2 className="text-lg font-semibold mb-4">Observação</h2>
+                                <p className="mb-4 break-words">{observacaoSelecionada}</p>
+                                <div className="flex justify-end">
+                                    <button
+                                        className="btn btn-sm"
+                                        onClick={() => setObservacaoSelecionada(null)}
+                                    >
+                                        Fechar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 					{justificativaSelecionada && (
-						<div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-							<div className="bg-gray-100 p-6 rounded-lg max-w-md w-full shadow-lg">
-								<h2 className="text-lg font-semibold mb-4">Observação</h2>
-								<p className="mb-4 break-words">{justificativaSelecionada}</p>
-								<div className="flex justify-end">
-									<button
-										className="btn btn-sm"
-										onClick={() => setJustificativaSelecionada(null)}
-									>
-										Fechar
-									</button>
-								</div>
-							</div>
-						</div>
-					)}
+                        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+                            <div className="bg-gray-100 p-6 rounded-lg max-w-md w-full shadow-lg">
+                                <h2 className="text-lg font-semibold mb-4">Justificativa da Reprovação</h2>
+                                <p className="mb-4 break-words">{justificativaSelecionada}</p>
+                                <div className="flex justify-end">
+                                    <button
+                                        className="btn btn-sm"
+                                        onClick={() => setJustificativaSelecionada(null)}
+                                    >
+                                        Fechar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 					{modalAberto && logSelecionado && (
 						<ModalEditarApontamento
 							isOpen={modalAberto}
