@@ -37,7 +37,6 @@ const router = createBrowserRouter(
         <Route path='/cadastro-projeto' element={<CadastroProjeto/>}/>
         <Route path="/descricao-projeto/:id" element={<DescricaoProjeto />} />
         <Route path='/cadastro-item' element={<CadastroItem />} />  
-        <Route path='/telafuncionarios' element={<TelaFuncionarios/>}/>
         <Route path='/cadastro-cliente' element={<TelaCadastroCliente />}/>
         <Route path='/tela-historico' element={<Historico/>}/>
         <Route path='/listagem-clientes' element={<TelaListagemCliente />}/>

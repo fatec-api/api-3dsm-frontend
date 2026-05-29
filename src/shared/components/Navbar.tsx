@@ -28,18 +28,25 @@ export default function Navbar() {
                             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
 
                             {/* <li><Link to="/">Home</Link></li> */}
-                            {temPermissao('GESTOR') && (
+                            {temPermissao(['GESTOR', 'FINANCEIRO']) && (
                                 <li><Link to="/lista-projetos">Projetos</Link></li>
                             )}
-                            <li><Link to="/tela-funcionarios">Funcionários</Link></li>
-                            <li><Link to="/log-profissional">Apontamento de Horas</Link></li>
-
+                            {temPermissao('GESTOR') && (
+                                <>
+                                    <li>
+                                        <Link to="/visualizar-usuarios">Funcionários</Link>
+                                    </li>
+                                    <li>
+                                        <Link to="/log-profissional/:id">Apontamento de Horas</Link>
+                                    </li>
+                                </>
+                            )}
                             <li>
                                 <a>Criação</a>
                                 <ul className="p-2">
                                     {temPermissao('GESTOR') && (
                                         <>
-                                            <li><Link to="/cadastroprojeto">Cadastro de Projeto</Link></li>
+                                            <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
                                             <li>
                                                 <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
                                                     Cadastro de Usuário
@@ -60,10 +67,16 @@ export default function Navbar() {
 
                             <li>
                                 <a>Outros</a>
-                                <ul className="p-2">
-                                    <li><Link to="/descricao-projeto">Descrição do Projeto</Link></li>
-                                    <li><Link to="/teste-alocacao">Alocação Dev</Link></li>
-                                </ul>
+
+                                {temPermissao(['GESTOR', 'FINANCEIRO']) && (
+                                    <ul className="p-2">
+                                        <li>
+                                            <Link to="/descricao-projeto/1">
+                                                Descrição do Projeto
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                )}
                             </li>
 
                             <li><Link to="/tela-login">Login</Link></li>
@@ -76,11 +89,19 @@ export default function Navbar() {
                 <div className="navbar-center hidden lg:flex">
                     <ul className="menu menu-horizontal px-1">
                         {/* <li><Link to="/">Home</Link></li> */}
-                        {temPermissao('GESTOR') && (
+                        {temPermissao(['GESTOR', 'FINANCEIRO']) && (
                             <li><Link to="/lista-projetos">Projetos</Link></li>
                         )}
-                        <li><Link to={`/log-profissional/${usuario?.id}`}>Apontamento</Link></li>
-
+                        {temPermissao('GESTOR') && (
+                            <>
+                                <li>
+                                    <Link to="/visualizar-usuarios">Funcionários</Link>
+                                </li>
+                                <li>
+                                    <Link to="/log-profissional/:id">Apontamento de Horas</Link>
+                                </li>
+                            </>
+                        )}
                         <li>
                             <details>
                                 <summary>Criação</summary>
@@ -88,7 +109,7 @@ export default function Navbar() {
                                     {temPermissao('GESTOR') && (
                                         <>
                                             <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
-                                             <li>
+                                            <li>
                                                 <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
                                                     Cadastro de Usuário
                                                 </a>

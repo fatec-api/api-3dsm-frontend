@@ -25,24 +25,7 @@ export default function Header() {
 
                 </div>
                 <div className="flex gap-2">
-                    <div className="dropdown dropdown-end">
-                        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                            <FiUser className="w-6 h-6" />
-                        </div>
-                        <ul
-                            tabIndex={-1}
-                            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                            <li>
-                                <a className="justify-between">
-                                    Profile
-                                    <span className="badge">New</span>
-                                </a>
-                            </li>
-                            <li><a>Settings</a></li>
-                            <li onClick={logout}><a>Logout</a></li>
-                        </ul>
-
-                    </div>
+                    
                     {!autenticado ? (
                         <button className="w-10 btn btn-ghost" onClick={login} >Login
                         </button>
