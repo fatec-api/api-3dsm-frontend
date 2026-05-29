@@ -20,7 +20,7 @@ interface Projeto {
 interface Usuario {
   id: string;
   nomeUsuario: string;
-  cargo: Cargo;
+  cargos: Cargo[];
   email: string;
   nivelExperiencia: Experiencia;
   valorHora: number;
@@ -327,7 +327,7 @@ export default function ListagemUsuarios() {
               <thead>
                 <tr>
                   <th>Usuário</th>
-                  <th>Cargo</th>
+                  <th>Cargos</th>
                   <th>Email</th>
                   <th>Experiência</th>
                   <th>Valor/Hora</th>
@@ -350,7 +350,13 @@ export default function ListagemUsuarios() {
                     <tr key={usuario.id}>
                       <td className="font-medium">{usuario.nomeUsuario}</td>
 
-                      <td>{usuario.cargo}</td>
+                      <td>
+                        <ul>
+                          {usuario.cargos.map((cargo, index) => (
+                            <li key={index}>{cargo}</li>
+                          ))}
+                        </ul>
+                      </td>
 
                       <td>{usuario.email}</td>
 
