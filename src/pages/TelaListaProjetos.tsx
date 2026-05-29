@@ -21,6 +21,7 @@ export interface Projeto {
     horasPrevistasTotal: number;
     horasRealizadasTotal: number;
     horasPendentesTotal?: number;
+    status_orcamento?: string; // Mapeado oficialmente no contrato da API
 }
 
 export default function ListaProjetos() {
@@ -33,7 +34,7 @@ export default function ListaProjetos() {
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(false);
     const [filtros, setFiltros] = useState({
-        nome: "", // Adicionado
+        nome: "",
         progresso: "",
         status: "",
         tipoProjeto: "",
@@ -90,9 +91,7 @@ export default function ListaProjetos() {
         return true;
     });
 
-
     const handleFilterChange = useCallback((novosFiltros: any) => {
-        console.log("Filtros recebidos do componente:", novosFiltros);
         setFiltros({
             nome: novosFiltros.nome,
             progresso: novosFiltros.progresso,
@@ -103,128 +102,31 @@ export default function ListaProjetos() {
         });
     }, []);
 
-
     const loadData = useCallback(async () => {
-    try {
-        setLoading(true);
-        
-        // 💡 FORÇANDO MOCK: Descomente a linha abaixo para testar os dados fakes.
-        throw new Error("Forçando teste visual com dados Mockados");
+        try {
+            setLoading(true);
+            setErro(false);
+            
+            const response = await listarProjetosPorGestor(id!);
+            const data = response?.data ?? response;
 
-        const response = await listarProjetosPorGestor(id!);
-        const data = response?.data ?? response;
-
-        if (!Array.isArray(data)) {
-            setProjetos([]);
-            return;
-        }
-
-        const proyectosComHoras = await Promise.all(
-            data.map(async (proj: Projeto) => {
-                const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
-                return { ...proj, horasRealizadasTotal: horasRealizadas };
-            })
-        );
-
-        setProjetos(proyectosComHoras);
-        } catch (error) {
-            console.error("Erro ao carregar projetos, carregando Mock...", error);
-            setErro(true);
-
-            // --- MOCK CORRIGIDO COM O 'gestorId' REQUERIDO ---
-            const dadosMockados: (Projeto & { status_orcamento: string })[] = [
-                {
-                "id": 1,
-                "nomeProjeto": "API",
-                "gestorId": id || "1",
-                "tipoProjeto": "Alocacao",
-                "status": "Andamento",
-                "nomeCliente": "FATEC São José dos Campos",
-                "horasPrevistasTotal": 97,
-                "horasRealizadasTotal": 10.0,
-                "status_orcamento": "DENTRO_DO_ORCAMENTO" // Verde
-            },
-            {
-                "id": 2,
-                "nomeProjeto": "GSW2026",
-                "gestorId": id || "1",
-                "tipoProjeto": "Alocacao",
-                "status": "Andamento",
-                "nomeCliente": "Microsoft Corporation",
-                "horasPrevistasTotal": 119,
-                "horasRealizadasTotal": 0.0,
-                "status_orcamento": "ATENCAO" // Amarelo
-            },
-            {
-                "id": 3,
-                "nomeProjeto": "OAI2026",
-                "gestorId": id || "1",
-                "tipoProjeto": "Hora_Fechada",
-                "status": "Desenvolvimento",
-                "nomeCliente": "Google LLC",
-                "horasPrevistasTotal": 34,
-                "horasRealizadasTotal": 0.0,
-                "status_orcamento": "EXCEDIDO" // Vermelho
-            },
-            {
-                "id": 4,
-                "nomeProjeto": "AWS2026",
-                "gestorId": id || "1",
-                "tipoProjeto": "Alocacao",
-                "status": "Andamento",
-                "nomeCliente": "OpenAI",
-                "horasPrevistasTotal": 0,
-                "horasRealizadasTotal": 0.0,
-                "status_orcamento": "DENTRO_DO_ORCAMENTO"
-            },
-            {
-                "id": 5,
-                "nomeProjeto": "MTA2026",
-                "gestorId": id || "1",
-                "tipoProjeto": "Alocacao",
-                "status": "Andamento",
-                "nomeCliente": "Amazon Web Services (AWS)",
-                "horasPrevistasTotal": 0,
-                "horasRealizadasTotal": 0.0,
-                "status_orcamento": "ATENCAO"
-            },
-            {
-                "id": 6,
-                "nomeProjeto": "JTH2026",
-                "gestorId": id || "1",
-                "tipoProjeto": "Hora_Fechada",
-                "status": "Desenvolvimento",
-                "nomeCliente": "FATEC São José dos Campos",
-                "horasPrevistasTotal": 0,
-                "horasRealizadasTotal": 0.0,
-                "status_orcamento": "EXCEDIDO"
-            },
-            {
-                "id": 7,
-                "nomeProjeto": "IBM2026",
-                "gestorId": id || "1",
-                "tipoProjeto": "Alocacao",
-                "status": "Andamento",
-                "nomeCliente": "NVIDIA Corporation",
-                "horasPrevistasTotal": 0,
-                "horasRealizadasTotal": 0.0,
-                "status_orcamento": "DENTRO_DO_ORCAMENTO"
-            },
-            {
-                "id": 8,
-                "nomeProjeto": "ORC2026",
-                "gestorId": id || "1",
-                "tipoProjeto": "Alocacao",
-                "status": "Andamento",
-                "nomeCliente": "IBM (International Business Machines)",
-                "horasPrevistasTotal": 0,
-                "horasRealizadasTotal": 0.0,
-                "status_orcamento": "ATENCAO"
+            if (!Array.isArray(data)) {
+                setProjetos([]);
+                return;
             }
-        ];
 
-            setProjetos(dadosMockados);
+            const projetosComHoras = await Promise.all(
+                data.map(async (proj: Projeto) => {
+                    const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
+                    return { ...proj, horasRealizadasTotal: horasRealizadas };
+                })
+            );
 
+            setProjetos(projetosComHoras);
+        } catch (error) {
+            console.error("Erro ao carregar projetos reais da API:", error);
+            setErro(true);
+            setProjetos([]); 
         } finally {
             setLoading(false);
         }
@@ -241,10 +143,8 @@ export default function ListaProjetos() {
             .catch(err => console.error("Erro ao carregar profissionais:", err));
     }, []);
 
-    // Regra de cor da lateral do card baseada no modo e status do projeto
-    const getCor = (projeto: Projeto & { status_orcamento?: string }) => {
-        
-        // 1. Se o Switch Financeiro estiver ativo, segue o Enum de orçamento
+    const getCor = (projeto: Projeto) => {
+        // 1. Visão Orçamentária/Financeira ativa
         if (filtros.visualizacaoFinanceira) {
             switch (projeto.status_orcamento) {
                 case "DENTRO_DO_ORCAMENTO":
@@ -254,11 +154,11 @@ export default function ListaProjetos() {
                 case "EXCEDIDO":
                     return "bg-red-500";
                 default:
-                    return "bg-base-300";
+                    return "bg-base-300"; // Cor neutra (cinza) se o back-end retornar nulo
             }
         }
 
-        // 2. Se o Switch estiver desativado (Modo Projeto comum), segue a regra antiga por percentual de horas
+        // 2. Visão Operacional ativa (Padrão)
         if (!projeto.horasPrevistasTotal) return "bg-base-300";
 
         const percentualConsumo =
@@ -267,17 +167,14 @@ export default function ListaProjetos() {
         if (percentualConsumo <= 75) return "bg-green-500";
         if (percentualConsumo <= 100) return "bg-yellow-400";
         return "bg-red-500";
-};
+    };
+
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center">
                 <p className="text-lg">Carregando projetos...</p>
             </div>
         );
-    }
-
-    if (erro) {
-        console.warn("Exibindo dados mockados");
     }
 
     return (
@@ -287,6 +184,16 @@ export default function ListaProjetos() {
                 projetos={projetos}
                 onFilterChange={handleFilterChange}
             />
+            
+            {/* Exibe um alerta visual na tela caso a API de produção caia */}
+            {erro && (
+                <div className="flex justify-center mb-4 px-10">
+                    <div role="alert" className="alert alert-error max-w-xl text-sm p-3">
+                        <span>Não foi possível conectar ao servidor. Verifique sua conexão.</span>
+                    </div>
+                </div>
+            )}
+
             <div className="flex gap-6 w-full justify-center flex-wrap">
                 {projetosFiltrados.length === 0 ? (
                     <div role="alert" className="alert alert-info alert-soft h-15">
