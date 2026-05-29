@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import logo from "../../assets/gsw-logo-colorida.png";
 import { FiUser, FiLogOut } from "react-icons/fi";
@@ -14,18 +14,20 @@ export default function Header() {
         <>
             <div className="navbar sticky top-0 left-0 w-full z-50 bg-base-100 shadow-sm">
                 <div className="flex-1">
-                   <a className="btn btn-ghost text-xl">
-                      <img
-                        src={logo}
-                        alt="Logo GSW"
-                        className="h-8 w-auto"
+
+                    <Link to="/" className="btn btn-ghost text-xl">
+                        <img
+                            src={logo}
+                            alt="Logo GSW"
+                            className="h-8 w-auto"
                         />
-                   </a>
-               </div>
+                    </Link>
+
+                </div>
                 <div className="flex gap-2">
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                             <FiUser className="w-6 h-6" />
+                            <FiUser className="w-6 h-6" />
                         </div>
                         <ul
                             tabIndex={-1}
@@ -49,11 +51,11 @@ export default function Header() {
                             <span>Olá, {usuario?.nome}</span>
 
                             <button onClick={logout} className="w-10 btn btn-ghost btn-circle avatar">
-                        <FiLogOut className="w-6 h-6" />
+                                <FiLogOut className="w-6 h-6" />
                             </button>
                         </div>
                     )}
-                   
+
                 </div>
             </div>
 
