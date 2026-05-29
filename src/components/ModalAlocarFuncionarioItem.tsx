@@ -1,4 +1,5 @@
 import { X, Users } from 'lucide-react';
+import { useState } from 'react';
 import Botao from '../shared/components/Botao';
 
 export interface Profissional {
@@ -25,10 +26,17 @@ export default function ModalAlocarFuncionarioItem({
   selectedList, onSelect, onRemove, onSave, isLoading, message
 }: ModalAlocarFuncionarioItemProps) {
   if (!isOpen) return null;
+  const [search, setSearch] = useState('');
+  const [open, setOpen] = useState(false);
 
   // Apenas profissionais ainda não selecionados aparecem no dropdown
   const disponiveis = profissionais.filter(
     (p) => !selectedList.some((s) => s.id === p.id)
+  );
+
+  const disponiveisFiltrados = disponiveis.filter((p) =>
+    p.nomeUsuario.toLowerCase().includes(search.toLowerCase()) ||
+    p.email.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -49,18 +57,24 @@ export default function ModalAlocarFuncionarioItem({
 
           {/* Dropdown de seleção */}
           <div className="dropdown w-full">
-            <div tabIndex={0} className="select select-bordered w-full cursor-pointer text-gray-500">
-              {disponiveis.length > 0 ? 'Selecione um profissional...' : 'Nenhum profissional disponível'}
-            </div>
-            {disponiveis.length > 0 && (
-              <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full">
-                {disponiveis.map((p) => (
+            <input 
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar profissional por nome ou email..."
+              className="input input-bordered w-full cursor-pointer text-gray-500"
+            />
+             {search.length > 0 && disponiveisFiltrados.length > 0 && (
+              <ul className="dropdown-content z-[1] bg-base-100 rounded-box shadow w-full max-h-50 overflow-y-auto overflow-x-hidden border">
+                {disponiveisFiltrados.map((p) => (
                   <li key={p.id}>
                     <button
                       type="button"
+                      className="w-full flex flex-col items-start text-left p-2 hover:bg-base-200 rounded-lg"
                       onClick={(e) => {
                         e.stopPropagation();
                         onSelect(p);
+                        setSearch('');
                       }}
                     >
                       <div className="flex flex-col items-start">
@@ -72,7 +86,12 @@ export default function ModalAlocarFuncionarioItem({
                 ))}
               </ul>
             )}
-          </div>
+          {search.length > 0 && disponiveisFiltrados.length === 0 && (
+            <div className="absolute z-[10] mt-2 w-full bg-base-100 shadow rounded-box p-3 text-sm text-gray-400 border">
+              Nenhum profissional encontrado
+            </div>
+          )}
+        </div>
 
           {/* Tags dos selecionados */}
           <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300 min-h-[72px]">
