@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import instance from "../api/instance";
 import { listarUsuarios } from "../services/projectService";
+import { allocationService } from "../api/AllocationService";
 import { KeycloakContext } from "../contexts/KeycloakProvider";
 
 
@@ -188,12 +189,14 @@ function BadgeStatus({ status }: { status: StatusUsuario }) {
 
 
 
+
 export default function ListagemUsuarios() {
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("Todos");
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [carregando, setCarregando] = useState(true)
+  const [associacoes, setAssociacoes] = useState<any[]>([]);
 
   const { temPermissao } = useContext(KeycloakContext);
 
@@ -204,6 +207,9 @@ export default function ListagemUsuarios() {
       try {
         const data = await listarUsuarios()
         setUsuarios(data)
+
+        const assoc = await allocationService.getAssociacoes()
+        setAssociacoes(assoc)
       } catch (erro) {
         console.error("Erro ao buscar usuários:", erro)
       } finally {
@@ -276,16 +282,48 @@ export default function ListagemUsuarios() {
         ))}
 
         {extras.length > 0 && (
-          <span
-            className="badge badge-sm badge-neutral font-bold cursor-pointer"
-            title={extras.map((p) => p.nome).join(", ")}
-          >
-            +{extras.length}
-          </span>
+          <div className="relative group inline-block">
+            <span className="badge badge-sm badge-neutral font-bold cursor-pointer">
+              +{extras.length}
+            </span>
+
+            <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50">
+              <div className="bg-base-100 border rounded-md shadow-md p-2 min-w-40">
+                {extras.map((p) => (
+                  <div key={p.id} className="text-xs py-1 px-2 hover:bg-base-200 rounded">
+                    {p.nome}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     );
   }
+
+  function getProjetosDoUsuario(usuarioId: string): Projeto[] {
+    const map = new Map<number, Projeto>();
+
+    for (const a of associacoes) {
+      const pertenceUsuario =
+        a.usuarioId?.includes(usuarioId) ||
+        a.gestorId === usuarioId;
+
+      if (!pertenceUsuario) continue;
+
+      if (!map.has(a.projetoId)) {
+        map.set(a.projetoId, {
+          id: a.projetoId,
+          nome: a.projetoNome,
+          cor: "blue",
+        });
+      }
+    }
+
+    return Array.from(map.values());
+  }
+
   return (
     <>
       <Header />
@@ -371,7 +409,7 @@ export default function ListagemUsuarios() {
                       <td>{formatarData(usuario.criado_em)}</td>
 
                       <td>
-                        <BadgesProjetos projetos={usuario.projetos} />
+                        <BadgesProjetos projetos={getProjetosDoUsuario(usuario.id)} />
                       </td>
 
                       <td>
@@ -393,7 +431,7 @@ export default function ListagemUsuarios() {
                             );
                           }}
                         >
-                          <FiEdit className="h-4 w-4" />
+                          <FiEdit className="h-4 w-4 text-blue-500" />
                         </button>
                       </td>
                     </tr>
