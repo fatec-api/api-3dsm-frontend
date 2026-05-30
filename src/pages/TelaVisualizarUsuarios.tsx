@@ -431,7 +431,7 @@ export default function ListagemUsuarios() {
                             );
                           }}
                         >
-                          <FiEdit className="h-4 w-4 text-blue-500" />
+                          <FiEdit className="h-4 w-4 text-[#0D1B2A]" />
                         </button>
                       </td>
                     </tr>

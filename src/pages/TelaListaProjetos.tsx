@@ -1,10 +1,11 @@
+
 import { useCallback, useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
 import { listarProjetosPorGestor } from "../services/projectService";
 import { FaChevronRight, FaPencilAlt } from "react-icons/fa";
 import FiltrosListagemProjetos from "../components/FiltrosListagemProjetos";
-import { KeycloakContext } from '../contexts/KeycloakProvider';
+import { KeycloakContext } from "../contexts/KeycloakProvider";
 import { listarApontamentos } from "../services/apontamentoService";
 import { listarItens } from "../services/ItemService";
 import ModalEditarProjeto from "../components/ModalEditarProjeto";
@@ -22,7 +23,6 @@ export interface Projeto {
     horasRealizadasTotal: number;
     horasPendentesTotal?: number;
     status_orcamento?: string;
-    // US12 — campos financeiros retornados pelo backend
     valorOrcamento?: number;
     custoRealTotal?: number;
 }
@@ -31,6 +31,7 @@ export default function ListaProjetos() {
     const { getUsuario, temPermissao } = useContext(KeycloakContext);
     const usuario = getUsuario();
     const id = usuario?.id;
+
     const [projetos, setProjetos] = useState<Projeto[]>([]);
     const [projetoEditando, setProjetoEditando] = useState<Projeto | null>(null);
     const [todosProfissionais, setTodosProfissionais] = useState<Profissional[]>([]);
@@ -42,21 +43,23 @@ export default function ListaProjetos() {
         status: "",
         tipoProjeto: "",
         nomeCliente: "",
-        visualizacaoFinanceira: false
     });
+
+    const navigate = useNavigate();
 
     const calcularHorasRealizadasProjeto = async (projetoId: number) => {
         try {
             const [itens, apontamentos] = await Promise.all([
                 listarItens(projetoId),
-                listarApontamentos()
+                listarApontamentos(),
             ]);
 
             const itemIds = itens.map((item: any) => item.id);
 
             const horas = apontamentos
-                .filter((ap: any) =>
-                    itemIds.includes(ap.itemId) && ap.status === "APROVADO"
+                .filter(
+                    (ap: any) =>
+                        itemIds.includes(ap.itemId) && ap.status === "APROVADO"
                 )
                 .reduce((total: number, ap: any) => total + ap.horasLiquidas, 0);
 
@@ -66,8 +69,6 @@ export default function ListaProjetos() {
             return 0;
         }
     };
-
-    const navigate = useNavigate();
 
     const getProgresso = (projeto: Projeto): string => {
         if (!projeto.horasPrevistasTotal) return "Sem previsão";
@@ -80,16 +81,22 @@ export default function ListaProjetos() {
         return "Atrasado";
     };
 
-    const projetosFiltrados = projetos.filter(projeto => {
+    const projetosFiltrados = projetos.filter((projeto) => {
         const progressoProjeto = getProgresso(projeto);
 
-        if (filtros.nome && !projeto.nomeProjeto.toLowerCase().includes(filtros.nome.toLowerCase())) {
+        if (
+            filtros.nome &&
+            !projeto.nomeProjeto.toLowerCase().includes(filtros.nome.toLowerCase())
+        ) {
             return false;
         }
-        if (filtros.progresso && progressoProjeto !== filtros.progresso) return false;
+        if (filtros.progresso && progressoProjeto !== filtros.progresso)
+            return false;
         if (filtros.status && projeto.status !== filtros.status) return false;
-        if (filtros.tipoProjeto && projeto.tipoProjeto !== filtros.tipoProjeto) return false;
-        if (filtros.nomeCliente && projeto.nomeCliente !== filtros.nomeCliente) return false;
+        if (filtros.tipoProjeto && projeto.tipoProjeto !== filtros.tipoProjeto)
+            return false;
+        if (filtros.nomeCliente && projeto.nomeCliente !== filtros.nomeCliente)
+            return false;
 
         return true;
     });
@@ -101,7 +108,6 @@ export default function ListaProjetos() {
             status: novosFiltros.statusProjeto,
             tipoProjeto: novosFiltros.tipoProjeto,
             nomeCliente: novosFiltros.cliente,
-            visualizacaoFinanceira: novosFiltros.visualizacaoFinanceira
         });
     }, []);
 
@@ -120,7 +126,9 @@ export default function ListaProjetos() {
 
             const projetosComHoras = await Promise.all(
                 data.map(async (proj: Projeto) => {
-                    const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
+                    const horasRealizadas = await calcularHorasRealizadasProjeto(
+                        proj.id
+                    );
                     return { ...proj, horasRealizadasTotal: horasRealizadas };
                 })
             );
@@ -141,23 +149,15 @@ export default function ListaProjetos() {
     }, [id, loadData]);
 
     useEffect(() => {
-        allocationService.getProfessionalsByProject()
+        allocationService
+            .getProfessionalsByProject()
             .then(setTodosProfissionais)
-            .catch(err => console.error("Erro ao carregar profissionais:", err));
+            .catch((err) =>
+                console.error("Erro ao carregar profissionais:", err)
+            );
     }, []);
 
     const getCor = (projeto: Projeto) => {
-        // Visão Financeira ativa
-        if (filtros.visualizacaoFinanceira) {
-            switch (projeto.status_orcamento) {
-                case "DENTRO_DO_ORCAMENTO": return "bg-green-500";
-                case "ATENCAO":             return "bg-yellow-400";
-                case "EXCEDIDO":            return "bg-red-500";
-                default:                    return "bg-base-300";
-            }
-        }
-
-        // Visão Operacional (padrão)
         if (!projeto.horasPrevistasTotal) return "bg-base-300";
 
         const percentualConsumo =
@@ -166,14 +166,6 @@ export default function ListaProjetos() {
         if (percentualConsumo <= 75) return "bg-green-500";
         if (percentualConsumo <= 100) return "bg-yellow-400";
         return "bg-red-500";
-    };
-
-    // US12 Task 1 — só mostra valores monetários para o perfil Financeiro
-    const podeVerFinanceiro = temPermissao('FINANCEIRO');
-
-    const formatarMoeda = (valor?: number) => {
-        if (valor == null) return "—";
-        return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     };
 
     if (loading) {
@@ -187,16 +179,22 @@ export default function ListaProjetos() {
     return (
         <div className="flex flex-col h-screen">
             <Header />
+
             <FiltrosListagemProjetos
                 projetos={projetos}
                 onFilterChange={handleFilterChange}
             />
 
-            {/* Alerta visual caso a API caia */}
             {erro && (
                 <div className="flex justify-center mb-4 px-10">
-                    <div role="alert" className="alert alert-error max-w-xl text-sm p-3">
-                        <span>Não foi possível conectar ao servidor. Verifique sua conexão.</span>
+                    <div
+                        role="alert"
+                        className="alert alert-error max-w-xl text-sm p-3"
+                    >
+                        <span>
+                            Não foi possível conectar ao servidor. Verifique sua
+                            conexão.
+                        </span>
                     </div>
                 </div>
             )}
@@ -214,13 +212,11 @@ export default function ListaProjetos() {
                             <div
                                 key={projeto.id}
                                 className="cursor-pointer"
-                                onClick={() => navigate(`/descricao-projeto/${projeto.id}`)}
+                                onClick={() =>
+                                    navigate(`/descricao-projeto/${projeto.id}`)
+                                }
                             >
-                                {/*
-                                 * US12 Task 2 — card cresce quando há resumo financeiro
-                                 * para não cortar o conteúdo extra
-                                 */}
-                                <div className={`w-80 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px] ${filtros.visualizacaoFinanceira && podeVerFinanceiro ? "h-56" : "h-44"}`}>
+                                <div className="w-80 h-44 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
                                     <div className={`w-3 flex-shrink-0 ${cor}`} />
                                     <div className="p-4 flex flex-col justify-between w-full">
                                         <div className="flex justify-between items-start">
@@ -228,12 +224,14 @@ export default function ListaProjetos() {
                                                 {projeto.nomeProjeto}
                                             </h2>
                                             <div className="flex flex-row items-center gap-8">
-                                                {temPermissao('GESTOR') && (
+                                                {temPermissao("GESTOR") && (
                                                     <div
                                                         className="p-2 -m-2 cursor-pointer text-base-content/40 hover:text-base-content transition"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setProjetoEditando(projeto);
+                                                            setProjetoEditando(
+                                                                projeto
+                                                            );
                                                         }}
                                                     >
                                                         <FaPencilAlt size={14} />
@@ -244,30 +242,15 @@ export default function ListaProjetos() {
                                         </div>
 
                                         <div className="text-sm space-y-1">
-                                            <p><b>Tipo:</b> {projeto.tipoProjeto}</p>
-                                            <p><b>Cliente:</b> {projeto.nomeCliente}</p>
-                                            <p><b>Status:</b> {projeto.status}</p>
-
-                                            {/* US12 Task 2 — resumo financeiro exclusivo para perfil Financeiro */}
-                                            {filtros.visualizacaoFinanceira && podeVerFinanceiro && (
-                                                <div className="pt-2 mt-1 border-t border-base-content/10 space-y-0.5">
-                                                    <p>
-                                                        <b>Gasto:</b>{" "}
-                                                        <span className={
-                                                            projeto.status_orcamento === "EXCEDIDO"
-                                                                ? "text-red-500 font-semibold"
-                                                                : projeto.status_orcamento === "ATENCAO"
-                                                                ? "text-yellow-500 font-semibold"
-                                                                : "text-green-600 font-semibold"
-                                                        }>
-                                                            {formatarMoeda(projeto.custoRealTotal)}
-                                                        </span>
-                                                    </p>
-                                                    <p>
-                                                        <b>Orçamento:</b> {formatarMoeda(projeto.valorOrcamento)}
-                                                    </p>
-                                                </div>
-                                            )}
+                                            <p>
+                                                <b>Tipo:</b> {projeto.tipoProjeto}
+                                            </p>
+                                            <p>
+                                                <b>Cliente:</b> {projeto.nomeCliente}
+                                            </p>
+                                            <p>
+                                                <b>Status:</b> {projeto.status}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
