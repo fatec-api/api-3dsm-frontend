@@ -13,13 +13,13 @@ export default function Header() {
     return (
         <>
             <div className="navbar justify-between sticky top-0 left-0 w-full z-50 bg-base-100 shadow-sm">
-                <a className="cursor-pointer p-3 text-xl">
+                <Link to="/"  className="cursor-pointer p-3 text-xl">
                     <img
                         src={logo}
                         alt="Logo GSW"
                         className="h-8 w-auto"
                     />
-                </a>
+                </Link>
                 <div className="flex gap-2">
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
