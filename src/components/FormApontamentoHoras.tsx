@@ -5,12 +5,13 @@ import Botao from "../shared/components/Botao";
 import { listarItensPorProfissional } from "../services/ItemService";
 
 import { FiClock, FiCalendar } from "react-icons/fi";
-import { listarProjetos } from "../services/projectService";
+import { buscarUsuarioPorId } from "../services/usuarioService";
 import instance from "../api/instance";
 import { KeycloakContext } from "../contexts/KeycloakProvider";
 
 export default function FormularioApontamento() {
     const { getUsuario } = useContext(KeycloakContext);
+    const [nomeCompleto, setNomeCompleto] = useState("");
 
     const [projeto, setProjeto] = useState("");
     const [item, setItem] = useState("");
@@ -41,6 +42,10 @@ export default function FormularioApontamento() {
             const usuario = getUsuario();
             if (!usuario?.id) return;
             try {
+                // busca nome completo do banco
+                const dadosUsuario = await buscarUsuarioPorId(usuario.id);
+                setNomeCompleto(dadosUsuario.nomeUsuario)
+
                 const itensUsuario = await listarItensPorProfissional(usuario.id);
                 setItens(Array.isArray(itensUsuario) ? itensUsuario : []);
 
@@ -163,6 +168,7 @@ export default function FormularioApontamento() {
         const payload = {
             itemId: itemSelecionado?.id,
             usuarioId: usuario.id,
+            usuarioNome: nomeCompleto, 
             dataApontamento: formatarDataApontamento(data),
             horaInicio: formatarDataHora(horaInicio),
             horaFim: formatarDataHora(horaFim),
