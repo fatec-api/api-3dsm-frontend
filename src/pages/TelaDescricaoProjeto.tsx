@@ -179,7 +179,7 @@ export default function DescricaoProjeto() {
 
     const { temPermissao } = useContext(KeycloakContext);
 
-    const temAcessoFinanceiro = temPermissao("FINANCEIRO");
+    const temAcessoFinanceiro = temPermissao(["FINANCEIRO", "GESTOR"]);
     const [visualizacaoFinanceira, setVisualizacaoFinanceira] = useState(false);
 
     const projetoState = state?.projeto;
@@ -215,7 +215,7 @@ export default function DescricaoProjeto() {
             prof.nomeUsuario?.toLowerCase().includes(termo) ||
             prof.email?.toLowerCase().includes(termo) ||
             prof.nivelExperiencia?.toLowerCase().includes(termo) ||
-            prof.cargo?.toLowerCase().includes(termo) ||
+            prof.cargos?.toLowerCase().includes(termo) ||
             prof.valorHora?.toString().includes(termo)
         );
     });
@@ -405,54 +405,52 @@ export default function DescricaoProjeto() {
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {temAcessoFinanceiro && (
-                    <div className="flex justify-center">
-                        <div className="flex items-center gap-3">
-                            <span
-                                className={`text-sm font-medium transition-colors ${
-                                    !visualizacaoFinanceira
-                                        ? "text-base-content font-bold"
-                                        : "text-base-content/50"
-                                }`}
-                            >
-                                Projeto
-                            </span>
+                    <div className="flex px-6 border-t border-base-content/10 bg-base-200/20 py-3 flex justify-center items-center">
+                        {temAcessoFinanceiro && (
+                            <div className="flex justify-center">
+                                <div className="flex items-center gap-3">
+                                    <span
+                                        className={`text-sm font-medium transition-colors ${!visualizacaoFinanceira
+                                            ? "text-base-content font-bold"
+                                            : "text-base-content/50"
+                                            }`}
+                                    >
+                                        Projeto
+                                    </span>
 
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setVisualizacaoFinanceira((prev) => !prev)
-                                }
-                                className={`relative w-14 h-7 rounded-full transition-all duration-300 ${
-                                    visualizacaoFinanceira
-                                        ? "bg-primary"
-                                        : "bg-base-300"
-                                }`}
-                                aria-label="Alternar visão financeira"
-                            >
-                                <div
-                                    className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-300 ${
-                                        visualizacaoFinanceira
-                                            ? "translate-x-7"
-                                            : "translate-x-0"
-                                    }`}
-                                />
-                            </button>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setVisualizacaoFinanceira((prev) => !prev)
+                                        }
+                                        className={`relative w-14 h-7 rounded-full transition-all duration-300 ${visualizacaoFinanceira
+                                            ? "bg-primary"
+                                            : "bg-base-300"
+                                            }`}
+                                        aria-label="Alternar visão financeira"
+                                    >
+                                        <div
+                                            className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-300 ${visualizacaoFinanceira
+                                                ? "translate-x-7"
+                                                : "translate-x-0"
+                                                }`}
+                                        />
+                                    </button>
 
-                            <span
-                                className={`text-sm font-medium transition-colors ${
-                                    visualizacaoFinanceira
-                                        ? "text-base-content font-bold"
-                                        : "text-base-content/50"
-                                }`}
-                            >
-                                Financeiro
-                            </span>
-                        </div>
+                                    <span
+                                        className={`text-sm font-medium transition-colors ${visualizacaoFinanceira
+                                            ? "text-base-content font-bold"
+                                            : "text-base-content/50"
+                                            }`}
+                                    >
+                                        Financeiro
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
+                </div>
 
                 {temAcessoFinanceiro && visualizacaoFinanceira && (
                     <CardsFinanceiros projeto={projeto} />
@@ -528,14 +526,17 @@ export default function DescricaoProjeto() {
                                                     <td>{prof.nomeUsuario}</td>
                                                     <td>{prof.email}</td>
                                                     <td>{prof.nivelExperiencia}</td>
-                                                    <td>{prof.cargo}</td>
+                                                    <td>{Array.isArray(prof.cargos)
+                                                        ? prof.cargos.join(", ")
+                                                        : prof.cargos?.split(/[\s,;]+/).filter(Boolean).join(", ") || "-"}
+                                                    </td>
                                                     <td>
                                                         {prof.valorHora
                                                             ? `R$ ${Number(
-                                                                  prof.valorHora
-                                                              )
-                                                                  .toFixed(2)
-                                                                  .replace(".", ",")}`
+                                                                prof.valorHora
+                                                            )
+                                                                .toFixed(2)
+                                                                .replace(".", ",")}`
                                                             : "R$ 0,00"}
                                                     </td>
                                                 </tr>
@@ -645,8 +646,8 @@ export default function DescricaoProjeto() {
                                                         percentualAtiv={
                                                             dadoDoNivel
                                                                 ? Math.round(
-                                                                      dadoDoNivel.percentual
-                                                                  )
+                                                                    dadoDoNivel.percentual
+                                                                )
                                                                 : 0
                                                         }
                                                         horasPrevistas={
