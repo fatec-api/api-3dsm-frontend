@@ -9,14 +9,14 @@ import Botao from "../shared/components/Botao";
 import { atualizarCliente, cadastrarCliente } from "../services/clienteService";
 
 type Cliente = {
-  id: number;
-  nomeEmpresa: string;
-  telefoneEmpresa: string,
-  nomeResponsavel: string,
-  telefoneResponsavel: string,
-  email: string;
-  cnpj: string;
-  ativo: boolean;
+	id: number;
+	nomeEmpresa: string;
+	telefoneEmpresa: string,
+	nomeResponsavel: string,
+	telefoneResponsavel: string,
+	email: string;
+	cnpj: string;
+	ativo: boolean;
 };
 
 type Props = {
@@ -30,13 +30,13 @@ export default function FormCadastroCliente({
 	onClose,
 	onSuccess,
 }: Props) {
-  const [nomeEmpresa, setNomeEmpresa] = useState("");
-  const [telefoneEmpresa, setTelefoneEmpresa] = useState("")
-  const [nomeResponsavel, setNomeResponsavel] = useState("")
-  const [telefoneResponsavel, setTelefoneResponsavel] = useState("")
-  const [email, setEmail] = useState("");
-  const [cnpj, setCnpj] = useState("");
-  const [ativo, setAtivo] = useState(true);
+	const [nomeEmpresa, setNomeEmpresa] = useState("");
+	const [telefoneEmpresa, setTelefoneEmpresa] = useState("")
+	const [nomeResponsavel, setNomeResponsavel] = useState("")
+	const [telefoneResponsavel, setTelefoneResponsavel] = useState("")
+	const [email, setEmail] = useState("");
+	const [cnpj, setCnpj] = useState("");
+	const [ativo, setAtivo] = useState(true);
 
 	const [alerta, setAlerta] = useState("");
 	const [sucesso, setSucesso] = useState(false);
@@ -47,24 +47,26 @@ export default function FormCadastroCliente({
 	useEffect(() => {
 		if (cliente) {
 			const cnpjFormatado = formatarCNPJ(cliente.cnpj);
+			const telEmpresaFormatado = formatarTelefone(cliente.telefoneEmpresa);
+			const telResponsavelFormatado = formatarTelefone(cliente.telefoneResponsavel);
 
-      setNomeEmpresa(cliente.nomeEmpresa);
-      setTelefoneEmpresa(cliente.telefoneEmpresa)
-      setNomeResponsavel(cliente.nomeResponsavel)
-      setTelefoneResponsavel(cliente.telefoneResponsavel)
-      setEmail(cliente.email);
-      setCnpj(cnpjFormatado);
-      setAtivo(cliente.ativo);
-    } else {
-      setNomeEmpresa("");
-      setTelefoneEmpresa("")
-      setNomeResponsavel("")
-      setTelefoneResponsavel("")
-      setEmail("");
-      setCnpj("");
-      setAtivo(true);
-    }
-  }, [cliente]);
+			setNomeEmpresa(cliente.nomeEmpresa);
+			setTelefoneEmpresa(telEmpresaFormatado)
+			setNomeResponsavel(cliente.nomeResponsavel)
+			setTelefoneResponsavel(telResponsavelFormatado)
+			setEmail(cliente.email);
+			setCnpj(cnpjFormatado);
+			setAtivo(cliente.ativo);
+		} else {
+			setNomeEmpresa("");
+			setTelefoneEmpresa("")
+			setNomeResponsavel("")
+			setTelefoneResponsavel("")
+			setEmail("");
+			setCnpj("");
+			setAtivo(true);
+		}
+	}, [cliente]);
 
 	const validarCNPJ = (cnpj: string) => {
 		cnpj = cnpj.replace(/\D/g, "");
@@ -261,7 +263,7 @@ export default function FormCadastroCliente({
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="bg-base-100 shadow-xl rounded-2xl p-8 max-w-[550px] flex flex-col gap-8 max-h-[90vh] overflow-y-auto scrollbar-thin"
+			className="bg-base-100 shadow-xl rounded-2xl p-8  flex flex-col gap-8 max-h-[90vh] overflow-y-auto scrollbar-thin"
 		>
 			<h1 className="text-2xl font-bold text-center">
 				{modoEdicao
@@ -388,7 +390,7 @@ export default function FormCadastroCliente({
 				</div>
 
 				{modoEdicao && (
-					<div className="w-full flex items-center justify-between rounded-xl border border-base-300 px-4 py-4 bg-base-200">
+					<div className="w-full flex items-center justify-between rounded-xl border border-base-300 px-4 py-4 bg-base-200 md:col-span-2">
 
 						<div className="flex flex-col text-left">
 							<span className="font-semibold">

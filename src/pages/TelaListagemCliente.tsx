@@ -195,7 +195,7 @@ export default function TelaListagemCliente() {
 
                                 {clientesPaginados.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6}>
+                                        <td colSpan={9}>
                                             <div role="alert" className="alert alert-info alert-soft flex items-center justify-around h-15">
                                                 <p className="text-lg">Nenhum apontamento encontrado.</p>
                                             </div>
@@ -299,7 +299,7 @@ export default function TelaListagemCliente() {
                                                         }
                                                         className="btn btn-ghost btn-sm"
                                                     >
-                                                        <FiEdit />
+                                                        <FiEdit className="text-[var(--color-text)]" />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -352,7 +352,7 @@ export default function TelaListagemCliente() {
             {modalAberto && (
                 <dialog className="modal modal-open">
 
-                    <div className="modal-box bg-transparent shadow-none place-items-center">
+                    <div className="modal-box bg-transparent shadow-none p-0 max-w-none w-auto flex justify-center items-center overflow-visible">
 
                         <FormCadastroCliente
                             cliente={clienteSelecionado}
