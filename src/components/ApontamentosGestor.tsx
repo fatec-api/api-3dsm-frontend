@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { listarApontamentosPorProjeto } from "../services/apontamentoService";
-import { listarProjetos } from "../services/projectService";
-import { listarItensPorProfissional } from "../services/ItemService";
+import { listarApontamentosPendentesParaGestor } from "../services/apontamentoService";
 
 type Apontamento = {
     id: string;
+    usuarioId: string;
     usuario: string;
     projeto: string;
+    projetoId: string;
     item: string;
     nivel: string;
     data: string;
@@ -16,15 +16,16 @@ type Apontamento = {
 };
 
 type ApontamentosGestorProps = {
+    gestorId: string;
     projetoFiltro?: string;
     onSelectionChange?: (selectedItems: Apontamento[]) => void;
 };
 
 export default function ApontamentosGestor({
+    gestorId,
     projetoFiltro = "all",
     onSelectionChange
 }: ApontamentosGestorProps) {
-
     const [apontamentos, setApontamentos] = useState<Apontamento[]>([]);
     const [selectedApontamentos, setSelectedApontamentos] = useState<Set<string>>(new Set());
     const [paginaAtual, setPaginaAtual] = useState(1);
@@ -32,92 +33,44 @@ export default function ApontamentosGestor({
     const itensPorPagina = 15;
 
     useEffect(() => {
+        if (!gestorId) return;
+        setPaginaAtual(1);
+        setSelectedApontamentos(new Set());
+
         const fetchData = async () => {
             try {
-                const [apontamentosResp, projetosResp] = await Promise.all([
-                    listarApontamentosPorProjeto(projetoFiltro),
-                    listarProjetos()
-                ]);
-
-                const projetosArr = Array.isArray(projetosResp) ? projetosResp : [];
-                const apontamentosArr = Array.isArray(apontamentosResp) ? apontamentosResp : [];
-
-                const projetosMap = new Map(
-                    projetosArr.map((p: any) => [String(p.id), p])
-                );
-                const usuariosUnicos = Array.from(
-                    new Set(apontamentosArr.map((a: any) => a.usuarioId).filter(Boolean))
-                );
-                const itensPorUsuarioMap = new Map<string, any[]>();
-
-                await Promise.all(
-                    usuariosUnicos.map(async (userId) => {
-                        const itens = await listarItensPorProfissional(userId);
-                        itensPorUsuarioMap.set(userId, Array.isArray(itens) ? itens : []);
-                    })
-                );
-
-                const merged = apontamentosArr.map((a: any, index: number) => {
-
-                    const itensUsuario = itensPorUsuarioMap.get(a.usuarioId) || [];
-
-                    const item = itensUsuario.find((i: any) =>
-                        String(i.id) === String(a.itemId)
-                    );
-
-                    const projeto = projetosMap.get(
-                        String(item?.projetoId || a.projetoId)
-                    );
-
-                    return {
-                        id: String(a.id || index),
-
-                        usuario:
-                            item?.usuarioNomes?.[0] ||
-                            a.usuarioNome ||
-                            a.usuarioId ||
-                            "Desconhecido",
-                        projeto:
-                            item?.projetoNome ||
-                            projeto?.nomeProjeto ||
-                            "Projeto não identificado",
-                        item:
-                            item?.descricao ||
-                            a.itemDescricao ||
-                            "Sem descrição",
-                        nivel:
-                            item?.nivelAtividade ||
-                            a.nivel ||
-                            "N/A",
-
-                        data: a.dataApontamento?.split(" ")[0] || "",
-                        inicio: a.horaInicio || "",
-                        fim: a.horaFim || "",
-                        status: a.status || "PENDENTE"
-                    };
-                });
-
-                setApontamentos(merged);
-
+                const data = await listarApontamentosPendentesParaGestor(gestorId);
+                const mapped: Apontamento[] = data.map((a: any, index: number) => ({
+                    id: String(a.id ?? index),
+                    usuarioId: String(a.usuarioId ?? ""),
+                    usuario: a.usuarioNome || a.usuarioId || "Desconhecido",
+                    projetoId: String(a.projetoId ?? ""),
+                    projeto: a.projetoNome || "Projeto não identificado",
+                    item: a.itemDescricao || "Sem descrição",
+                    nivel: a.nivelAtividade || "N/A",
+                    data: a.dataApontamento?.split(" ")[0] ?? "",
+                    inicio: a.horaInicio ?? "",
+                    fim: a.horaFim ?? "",
+                    status: a.status ?? "PENDENTE",
+                }));
+                setApontamentos(mapped);
             } catch (error) {
-                console.error("Erro ao buscar dados:", error);
+                console.error("[ERROR] Falha ao buscar apontamentos:", error);
             }
         };
 
         fetchData();
-    }, [projetoFiltro]);
+    }, [gestorId]);
+
     useEffect(() => {
         if (onSelectionChange) {
-            onSelectionChange(
-                apontamentos.filter(a => selectedApontamentos.has(a.id))
-            );
+            onSelectionChange(apontamentos.filter(a => selectedApontamentos.has(a.id)));
         }
     }, [selectedApontamentos, apontamentos, onSelectionChange]);
 
     const filtered = useMemo(() => {
-        const pendentes = apontamentos.filter(a => a.status === "PENDENTE");
-        if (projetoFiltro === "all") return pendentes;
-        return pendentes.filter(a => a.projeto === projetoFiltro);
+        if (projetoFiltro === "all") return apontamentos;
+        return apontamentos.filter(a => a.projetoId === projetoFiltro);
     }, [apontamentos, projetoFiltro]);
 
     const inicio = (paginaAtual - 1) * itensPorPagina;
@@ -135,7 +88,7 @@ export default function ApontamentosGestor({
 
     return (
         <div className="overflow-x-auto rounded-2xl">
-            <table className="table table-zebra table-lg">
+            <table className="table table-zebra table-md">
                 <thead>
                     <tr>
                         <th></th>
@@ -149,7 +102,6 @@ export default function ApontamentosGestor({
                         <th>Status</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {paginados.length === 0 ? (
                         <tr>
@@ -167,9 +119,7 @@ export default function ApontamentosGestor({
                                         type="checkbox"
                                         className="checkbox"
                                         checked={selectedApontamentos.has(a.id)}
-                                        onChange={(e) =>
-                                            handleCheckboxChange(a.id, e.target.checked)
-                                        }
+                                        onChange={(e) => handleCheckboxChange(a.id, e.target.checked)}
                                     />
                                 </td>
                                 <td>{a.usuario}</td>
@@ -192,22 +142,14 @@ export default function ApontamentosGestor({
                         <button
                             className="join-item btn btn-sm"
                             onClick={() => setPaginaAtual(p => Math.max(p - 1, 1))}
-                        >
-                            «
-                        </button>
-
+                        >«</button>
                         <button className="join-item btn btn-sm">
                             {paginaAtual} / {totalPaginas}
                         </button>
-
                         <button
                             className="join-item btn btn-sm"
-                            onClick={() =>
-                                setPaginaAtual(p => Math.min(p + 1, totalPaginas))
-                            }
-                        >
-                            »
-                        </button>
+                            onClick={() => setPaginaAtual(p => Math.min(p + 1, totalPaginas))}
+                        >»</button>
                     </div>
                 </div>
             )}

@@ -25,12 +25,13 @@ export default function ListaApontamentosGestor() {
     const gestorIdLogado = usuario?.id;
 
     useEffect(() => {
+        if (!gestorIdLogado) return;
         const loadProjetos = async () => {
             try {
                 const lista = await listarProjetosPorGestor(gestorIdLogado);
                 const options = lista.map((projeto: any) => ({
                     label: projeto.nomeProjeto ?? projeto.nome ?? "Projeto",
-                    value: projeto.id ?? projeto.nomeProjeto ?? projeto.nome ?? "Projeto"
+                    value: String(projeto.id),
                 }));
                 setProjetoOptions([{ label: "Todos os projetos", value: TODOS_PROJETOS_VALUE }, ...options]);
             } catch (error) {
@@ -73,7 +74,6 @@ export default function ListaApontamentosGestor() {
 
         setIsReprovando(true);
         try {
-            console.info(`[ACTION] Reprovando ID: ${itemParaReprovar.id} | Motivo: ${justificativa}`);
             await reprovarApontamento(itemParaReprovar.id, justificativa);
 
             alert("Apontamento reprovado com sucesso!");
@@ -124,6 +124,7 @@ export default function ListaApontamentosGestor() {
                     </div>
 
                     <ApontamentosGestor
+                        gestorId={gestorIdLogado ?? ""}
                         projetoFiltro={selectedProjeto}
                         onSelectionChange={setSelectedItems}
                     />

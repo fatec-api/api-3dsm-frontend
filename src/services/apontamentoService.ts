@@ -118,3 +118,9 @@ export async function atualizarApontamento(id: string, dados: any) {
     // Retorno fake para não quebrar a Promise do componente
     return Promise.resolve({ message: "Mock success" });
 }
+
+
+export async function listarApontamentosPendentesParaGestor(gestorId: string) {
+    const response = await instance.get(`/apontamento/apontamentos/pendentes/gestor/${gestorId}`);
+    return Array.isArray(response.data) ? response.data : [];
+}
