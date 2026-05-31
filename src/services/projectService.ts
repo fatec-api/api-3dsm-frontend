@@ -130,3 +130,13 @@ export async function listarUsuarios() {
         throw error;
     }
 }
+
+export async function listarProjetoPorUsuarioLogado() {
+    try {
+        const response = await instance.get(`/gestao/projetos/projeto/usuario/${id}`)
+        return response.data
+    } catch (error) {
+        console.error({ event: "API-ERROR", action: "listarProjetoPorUsuarioLogado", error})
+        throw error
+    }
+}
