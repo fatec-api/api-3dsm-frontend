@@ -12,6 +12,7 @@ type Apontamento = {
     data: string;
     inicio: string;
     fim: string;
+    observacao:string;
     status: string;
 };
 
@@ -51,6 +52,7 @@ export default function ApontamentosGestor({
                     data: a.dataApontamento?.split(" ")[0] ?? "",
                     inicio: a.horaInicio ?? "",
                     fim: a.horaFim ?? "",
+                    observacao: a.observacao,
                     status: a.status ?? "PENDENTE",
                 }));
                 setApontamentos(mapped);
@@ -99,6 +101,7 @@ export default function ApontamentosGestor({
                         <th>Data</th>
                         <th>Início</th>
                         <th>Fim</th>
+                        <th>Observação</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -129,6 +132,7 @@ export default function ApontamentosGestor({
                                 <td>{a.data}</td>
                                 <td>{a.inicio}</td>
                                 <td>{a.fim}</td>
+                                <td>{a.observacao}</td>
                                 <td>{a.status}</td>
                             </tr>
                         ))
