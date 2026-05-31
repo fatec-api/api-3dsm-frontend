@@ -43,8 +43,10 @@ export default function FiltrosListagemProjetos({
 
     const getProgresso = (projeto: Projeto): string => {
         if (!projeto.horasPrevistasTotal) return "Sem previsão";
+
         const percentualConsumo =
             (projeto.horasRealizadasTotal / projeto.horasPrevistasTotal) * 100;
+
         if (percentualConsumo <= 75) return "Normal";
         if (percentualConsumo <= 100) return "Crítico";
         return "Atrasado";
@@ -55,6 +57,7 @@ export default function FiltrosListagemProjetos({
             ...p,
             progresso: getProgresso(p),
         }));
+
         return [...new Set(projetosComProgresso.map((p) => p.progresso))];
     }, [projetos]);
 
