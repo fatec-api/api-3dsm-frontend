@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
@@ -43,6 +42,7 @@ export default function ListaProjetos() {
         status: "",
         tipoProjeto: "",
         nomeCliente: "",
+        visualizacaoFinanceira: false,
     });
 
     const navigate = useNavigate();
@@ -90,8 +90,7 @@ export default function ListaProjetos() {
         ) {
             return false;
         }
-        if (filtros.progresso && progressoProjeto !== filtros.progresso)
-            return false;
+        if (filtros.progresso && progressoProjeto !== filtros.progresso) return false;
         if (filtros.status && projeto.status !== filtros.status) return false;
         if (filtros.tipoProjeto && projeto.tipoProjeto !== filtros.tipoProjeto)
             return false;
@@ -108,6 +107,7 @@ export default function ListaProjetos() {
             status: novosFiltros.statusProjeto,
             tipoProjeto: novosFiltros.tipoProjeto,
             nomeCliente: novosFiltros.cliente,
+            visualizacaoFinanceira: novosFiltros.visualizacaoFinanceira,
         });
     }, []);
 
@@ -157,7 +157,24 @@ export default function ListaProjetos() {
             );
     }, []);
 
+    const podeVerFinanceiro = temPermissao("FINANCEIRO") || temPermissao("GESTOR");
+    const visualizacaoFinanceiraAtiva =
+        podeVerFinanceiro && filtros.visualizacaoFinanceira;
+
     const getCor = (projeto: Projeto) => {
+        if (visualizacaoFinanceiraAtiva) {
+            switch (projeto.status_orcamento) {
+                case "DENTRO_DO_ORCAMENTO":
+                    return "bg-green-500";
+                case "ATENCAO":
+                    return "bg-yellow-400";
+                case "EXCEDIDO":
+                    return "bg-red-500";
+                default:
+                    return "bg-base-300";
+            }
+        }
+
         if (!projeto.horasPrevistasTotal) return "bg-base-300";
 
         const percentualConsumo =
@@ -166,6 +183,14 @@ export default function ListaProjetos() {
         if (percentualConsumo <= 75) return "bg-green-500";
         if (percentualConsumo <= 100) return "bg-yellow-400";
         return "bg-red-500";
+    };
+
+    const formatarMoeda = (valor?: number) => {
+        if (valor == null) return "—";
+        return valor.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        });
     };
 
     if (loading) {
@@ -216,7 +241,11 @@ export default function ListaProjetos() {
                                     navigate(`/descricao-projeto/${projeto.id}`)
                                 }
                             >
-                                <div className="w-80 h-44 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px]">
+                                <div
+                                    className={`w-80 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px] ${
+                                        visualizacaoFinanceiraAtiva ? "h-56" : "h-44"
+                                    }`}
+                                >
                                     <div className={`w-3 flex-shrink-0 ${cor}`} />
                                     <div className="p-4 flex flex-col justify-between w-full">
                                         <div className="flex justify-between items-start">
@@ -229,9 +258,7 @@ export default function ListaProjetos() {
                                                         className="p-2 -m-2 cursor-pointer text-base-content/40 hover:text-base-content transition"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setProjetoEditando(
-                                                                projeto
-                                                            );
+                                                            setProjetoEditando(projeto);
                                                         }}
                                                     >
                                                         <FaPencilAlt size={14} />
@@ -251,6 +278,35 @@ export default function ListaProjetos() {
                                             <p>
                                                 <b>Status:</b> {projeto.status}
                                             </p>
+
+                                            {visualizacaoFinanceiraAtiva && (
+                                                <div className="pt-2 mt-1 border-t border-base-content/10 space-y-0.5">
+                                                    <p>
+                                                        <b>Gasto:</b>{" "}
+                                                        <span
+                                                            className={
+                                                                projeto.status_orcamento ===
+                                                                "EXCEDIDO"
+                                                                    ? "text-red-500 font-semibold"
+                                                                    : projeto.status_orcamento ===
+                                                                      "ATENCAO"
+                                                                    ? "text-yellow-500 font-semibold"
+                                                                    : "text-green-600 font-semibold"
+                                                            }
+                                                        >
+                                                            {formatarMoeda(
+                                                                projeto.custoRealTotal
+                                                            )}
+                                                        </span>
+                                                    </p>
+                                                    <p>
+                                                        <b>Orçamento:</b>{" "}
+                                                        {formatarMoeda(
+                                                            projeto.valorOrcamento
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
