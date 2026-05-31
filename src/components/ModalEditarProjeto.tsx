@@ -6,7 +6,7 @@ import { listarGestores, type Usuario } from '../services/usuarioService';
 import { listarClientesAtivos, type Cliente } from '../services/clienteService';
 
 const TIPOS_PROJETO = ['Alocacao', 'Hora_Fechada'];
-const STATUS_PROJETO = ['Andamento', 'Desenvolvimento', 'Concluida'];
+const STATUS_PROJETO = ['Andamento', 'Planejamento', 'Concluida'];
 
 interface Profissional {
     id: string;

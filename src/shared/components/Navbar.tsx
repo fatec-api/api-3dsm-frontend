@@ -29,62 +29,124 @@ export default function Navbar() {
 
                             {/* <li><Link to="/">Home</Link></li> */}
                             {temPermissao(['GESTOR', 'FINANCEIRO']) && (
-                                <li><Link to="/lista-projetos">Projetos</Link></li>
+                                <li>
+                                    <a>Projetos</a>
+                                    <ul className="p-2">
+                                        {temPermissao('GESTOR') && (
+                                            <li>
+                                                <Link to="/cadastro-projeto">Cadastro de Projeto</Link>
+                                            </li>
+                                        )}
+
+                                        <li>
+                                            <Link to="/lista-projetos">Listagem de Projetos</Link>
+                                        </li>
+
+                                        {temPermissao('GESTOR') && (
+                                            <li>
+                                                <Link to="/cadastro-item">Cadastro de Atividade</Link>
+                                            </li>
+                                        )}
+                                    </ul>
+                                </li>
                             )}
+
                             {temPermissao('GESTOR') && (
-                                <>
-                                    <li>
-                                        <Link to="/visualizar-usuarios">Funcionários</Link>
-                                    </li>
-                                </>
+                                <li>
+                                    <a>Apontamentos</a>
+                                    <ul className="p-2">
+                                        <li>
+                                            <Link to="/apontamentos-gestor">
+                                                Aprovar e Reprovar
+                                            </Link>
+                                        </li>
+
+                                        {temPermissao('PROFISSIONAL') && (
+                                            <>
+                                                <li>
+                                                    <Link to={`/log-profissional/${usuario?.id}`}>
+                                                        Meus Apontamentos
+                                                    </Link>
+                                                </li>
+
+                                                <li>
+                                                    <Link to="/apontamento-horas">
+                                                        Efetuar Apontamento
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        )}
+                                    </ul>
+                                </li>
                             )}
-                            {temPermissao('PROFISSIONAL') && (
+
+                            {temPermissao('PROFISSIONAL') && !temPermissao('GESTOR') && (
                                 <li>
                                     <Link to={`/log-profissional/${usuario?.id}`}>
-                                        Apontamento de Horas
+                                        Meus Apontamentos
                                     </Link>
                                 </li>
                             )}
 
-                            <li>
-                                <a>Criação</a>
-                                <ul className="p-2">
-                                    {temPermissao('GESTOR') && (
-                                        <>
-                                            <li><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
+                            {temPermissao('PROFISSIONAL') && !temPermissao('GESTOR') && (
+                                <li>
+                                    <Link to="/apontamento-horas">
+                                        Efetuar Apontamento
+                                    </Link>
+                                </li>
+                            )}
+
+                            {temPermissao(['GESTOR', 'FINANCEIRO']) && (
+                                <li>
+                                    <a>Usuários</a>
+                                    <ul className="p-2">
+                                        {temPermissao('GESTOR') && (
                                             <li>
-                                                <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
+                                                <a
+                                                    href={KEYCLOAK_ADD_USER}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
                                                     Cadastro de Usuário
                                                 </a>
                                             </li>
-                                            <li><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
-                                            <li><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
+                                        )}
 
-                                        </>
-                                    )}
-                                    <li><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
-                                </ul>
-                            </li>
-                            {temPermissao('GESTOR') && (<>
-                                <li><Link to="/tela-historico">Histórico</Link></li>
-                                <li><Link to="/apontamentos-gestor">Gestão de Apontamentos</Link></li>
-                            </>)}
-
-                            <li>
-                                <a>Outros</a>
-
-                                {temPermissao(['GESTOR', 'FINANCEIRO']) && (
-                                    <ul className="p-2">
                                         <li>
-                                            <Link to="/descricao-projeto/1">
-                                                Descrição do Projeto
+                                            <Link to="/visualizar-usuarios">
+                                                Listagem de Usuários
                                             </Link>
                                         </li>
                                     </ul>
-                                )}
-                            </li>
+                                </li>
+                            )}
 
-                            <li><Link to="/tela-login">Login</Link></li>
+                            {temPermissao(['GESTOR', 'FINANCEIRO']) && (
+                                <li>
+                                    <a>Clientes</a>
+                                    <ul className="p-2">
+                                        {temPermissao('GESTOR') && (
+                                            <li>
+                                                <Link to="/cadastro-cliente">
+                                                    Cadastro de Cliente
+                                                </Link>
+                                            </li>
+                                        )}
+
+                                        <li>
+                                            <Link to="/listagem-clientes">
+                                                Lista dos Clientes
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                </li>
+                            )}
+
+                            {temPermissao('GESTOR') && (
+                                <li>
+                                    <Link to="/tela-historico">Histórico</Link>
+                                </li>
+                            )}
 
                         </ul>
                     </div>
@@ -92,57 +154,84 @@ export default function Navbar() {
 
                 {/* menu tela grande */}
                 <div className="navbar-center hidden lg:flex">
-                    <ul className="menu menu-horizontal px-1">
-                        {temPermissao('GESTOR') && (
-                            <>
-                                <li>
-                                    <Link to="/visualizar-usuarios" className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Funcionários</Link>
-                                </li>
-                            </>
-                        )}
-                        {temPermissao('PROFISSIONAL') && (
-                            <li>
-                                <Link to={`/log-profissional/${usuario?.id}` } className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
-                                    Apontamento de Horas
-                                </Link>
-                            </li>
-                        )}
-                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
-                            <details>
-                                <summary>Criação</summary>
+                    <ul className="menu menu-horizontal px-1 gap-x-6">
+                        {temPermissao(['GESTOR', 'FINANCEIRO']) && (
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
+                            <details name="menu">
+                                <summary>Projetos</summary>
                                 <ul className="text-black p-2 bg-base-100 w-52 z-1">
                                     {temPermissao('GESTOR') && (
-                                        <>
-                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
+                                        <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
+                                    )}
+                                    <li><Link to="/lista-projetos">Listagem de Projetos</Link></li>
+                                    {temPermissao('GESTOR') && (
+                                        <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
+                                    )}
+                                </ul>
+                            </details>
+                            </li>
+                        )}
+                        
+                        {temPermissao('GESTOR') && (
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
+                                <details name="menu">
+                                    <summary>Apontamentos</summary>
+                                    <ul className="text-black p-2 bg-base-100 w-52 z-1">
+                                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/apontamentos-gestor">Aprovar e Reprovar</Link></li>
+                                        {temPermissao('PROFISSIONAL') && (
+                                            <>
+                                            <li><Link to={`/log-profissional/${usuario?.id}` } className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Meus Apontamentos</Link></li>
+                                            <li><Link to="/apontamento-horas" className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Efetuar Apontamento</Link></li>
+                                            </>
+                                        )}
+                                    </ul>
+                                </details>
+                            </li>
+                        )}
+
+                        {temPermissao('PROFISSIONAL') && !temPermissao('GESTOR')  && (
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to={`/log-profissional/${usuario?.id}` } className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Meus Apontamentos</Link></li>
+                        )}
+                        {temPermissao('PROFISSIONAL') && !temPermissao('GESTOR')  && (
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/apontamento-horas" className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Efetuar Apontamento</Link></li>
+                        )}
+                        
+                        {temPermissao(['GESTOR', 'FINANCEIRO']) && (
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
+                                <details name="menu">
+                                    <summary>Usuários</summary>
+                                    <ul className="text-black p-2 bg-base-100 w-52 z-1">
+                                        {temPermissao('GESTOR') && (
                                             <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg">
                                                 <a href={KEYCLOAK_ADD_USER} target="_blank" rel="noopener noreferrer">
                                                     Cadastro de Usuário
                                                 </a>
                                             </li>
-                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
-                                            <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
-                                        </>
-                                    )}
-                                    <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/apontamento-horas">Apontamento de Horas</Link></li>
-                                </ul>
-                            </details>
-                        </li>
-                        {temPermissao('GESTOR') && (<>
-                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/tela-historico">Histórico</Link></li>
-                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/apontamentos-gestor">Gestão de apontamentos</Link></li>
-                        </>)}
-                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
-                            {temPermissao('GESTOR') && (
-                                <>
-                                    <details>
+                                        )}
+                                        <li>
+                                            <Link to="/visualizar-usuarios" className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Listagem de Usuários</Link>
+                                        </li>
+                                    </ul>
+                                </details>
+                            </li>
+                        )}     
+                            {temPermissao(['GESTOR', 'FINANCEIRO']) && (
+                                <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105">
+                                    <details name="menu">
                                         <summary>Clientes</summary>
                                         <ul className="text-black p-2 bg-base-100 w-52 z-1">
+                                            {temPermissao('GESTOR') && (
+                                                <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-cliente">Cadastro de Cliente</Link></li>
+                                            )}
                                             <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/listagem-clientes">Lista dos Clientes</Link></li>
                                         </ul>
                                     </details>
-                                </>
+                               </li>
                             )}
-                        </li>
+                        
+                        {temPermissao('GESTOR') && (
+                            <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/tela-historico">Histórico</Link></li>
+                        )}
                     </ul>
                 </div>
                 <div className="navbar-end"></div>
