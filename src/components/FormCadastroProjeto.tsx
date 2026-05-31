@@ -19,7 +19,12 @@ export default function FormCadastroProjeto() {
   const [statusProjeto, setStatusProjeto] = useState("");
   const [profissionalAlocado, setProfissionalAlocado] = useState<string[]>([]);
   const [gestorResponsavel, setGestorResponsavel] = useState("");
-  const [profissionais, setProfissionais] = useState<{ id: string; nomeUsuario: string; cargo: string }[]>([]);
+  // const [profissionais, setProfissionais] = useState<{ id: string; nomeUsuario: string; cargos: string }[]>([]);
+  // const [clientes, setClientes] = useState<{ label: string; value: string }[]>([]);
+  // const [gestores, setGestores] = useState<{ label: string; value: string }[]>([]);
+
+
+  const [profissionais, setProfissionais] = useState<{ id: string; nomeUsuario: string; cargos: string[] }[]>([]);
   const [clientes, setClientes] = useState<{ label: string; value: string }[]>([]);
   const [gestores, setGestores] = useState<{ label: string; value: string }[]>([]);
 
@@ -28,15 +33,18 @@ export default function FormCadastroProjeto() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const listaProfissionais = await listarProfissionaisAtivos();
-        setProfissionais(listaProfissionais);
         const listaUsuarios = await listarUsuariosAtivos();
-        setGestores(
-          listaUsuarios
-            .filter((p: any) => p.cargos && p.cargos.includes("GESTOR"))
-            .map((p: any) => ({ label: p.nomeUsuario, value: String(p.id) }))
-        )
-        
+
+        const filtradosProfissionais = listaUsuarios.filter((p: any) =>
+          p.cargos && p.cargos.some((cargo: string) => ["PROFISSIONAL", "FINANCEIRO"].includes(cargo))
+        );
+        setProfissionais(filtradosProfissionais);
+
+        const filtradosGestores = listaUsuarios
+          .filter((p: any) => p.cargos && p.cargos.some((cargo: string) => cargo === "GESTOR"))
+          .map((p: any) => ({ label: p.nomeUsuario, value: String(p.id) }));
+        setGestores(filtradosGestores);
+
         const listaClientes = await listarClientesAtivos()
         // const listaClientes = await listarClientes();
         setClientes(
@@ -88,7 +96,7 @@ export default function FormCadastroProjeto() {
         dataInicio,
         dataFim,
         status: statusProjeto,
-        profissionaisIds: profissionalAlocado,
+        profissionalAlocadoIds: profissionalAlocado,
         gestorId: gestorResponsavel,
         clienteId: cliente,
       };
@@ -141,7 +149,7 @@ export default function FormCadastroProjeto() {
                 required
               />
             </div>
-            
+
             <div className="flex flex-col gap-1">
               <label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Cliente</label>
               <Dropdown
@@ -151,7 +159,7 @@ export default function FormCadastroProjeto() {
                 required={false}
               />
             </div>
-            
+
             <div className="flex flex-col gap-1">
               <label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Valor do Orçamento</label>
               <Input
@@ -254,7 +262,7 @@ export default function FormCadastroProjeto() {
                   />
                   <div className="flex-1">
                     <h2 className="font-bold dark:text-gray-100">{profissional.nomeUsuario}</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{profissional.cargo}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{profissional.cargos ? profissional.cargos.join(", ") : ""}</p>
                   </div>
                 </li>
               ))
