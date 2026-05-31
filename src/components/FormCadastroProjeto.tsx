@@ -5,7 +5,7 @@ import Botao from "../shared/components/Botao";
 import { PiHandCoins } from "react-icons/pi";
 import { GoProject } from "react-icons/go";
 import { listarProfissionaisAtivos, criarProjeto, listarUsuariosAtivos } from "../services/projectService";
-import { listarClientes } from "../services/clienteService";
+import { listarClientesAtivos } from "../services/clienteService";
 
 export default function FormCadastroProjeto() {
   const [alerta, setAlerta] = useState("");
@@ -37,7 +37,7 @@ export default function FormCadastroProjeto() {
             .map((p: any) => ({ label: p.nomeUsuario, value: String(p.id) }))
         )
         
-        const listaClientes = await listarClientes()
+        const listaClientes = await listarClientesAtivos()
         // const listaClientes = await listarClientes();
         setClientes(
           listaClientes.map((c: any) => ({
@@ -141,15 +141,17 @@ export default function FormCadastroProjeto() {
                 required
               />
             </div>
+            
             <div className="flex flex-col gap-1">
               <label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Cliente</label>
               <Dropdown
                 value={cliente}
                 onChange={(e) => setCliente(e.target.value)}
-                options={clientes}
+                options={clientes.map((cliente) => ({ label: `${cliente.label}`.slice(0, 25) + (cliente.label.length > 25 ? "..." : ""), value: cliente.value }))}
                 required={false}
               />
             </div>
+            
             <div className="flex flex-col gap-1">
               <label className="ms-1 font-medium text-gray-700 dark:text-gray-300">Valor do Orçamento</label>
               <Input
