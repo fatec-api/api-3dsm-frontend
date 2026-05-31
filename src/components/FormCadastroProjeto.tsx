@@ -192,7 +192,7 @@ export default function FormCadastroProjeto() {
                 value={statusProjeto}
                 onChange={(e) => setStatusProjeto(e.target.value)}
                 options={[
-                  { label: "Desenvolvimento", value: "Desenvolvimento" },
+                  { label: "Planejamento", value: "Planejamento" },
                   { label: "Andamento", value: "Andamento" },
                   { label: "Concluído", value: "Concluida" }
                 ]}

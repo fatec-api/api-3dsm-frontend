@@ -133,7 +133,7 @@ export default function FiltrosListagemProjetos({
                 onChange={(e) => setStatusProjeto(e.target.value)}
             >
                 <option value="">Status</option>
-                <option value="Desenvolvimento">Desenvolvimento</option>
+                <option value="Planejamento">Planejamento</option>
                 <option value="Andamento">Andamento</option>
                 <option value="Concluida">Concluído</option>
             </select>
