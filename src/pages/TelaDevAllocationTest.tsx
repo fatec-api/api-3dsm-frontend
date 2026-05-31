@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { PopupAlocacao, type Professional } from '../shared/components/PopupAlocacao';
 import { allocationService } from '../api/AllocationService';
 import Botao from "../shared/components/Botao";
+import { listarUsuariosAtivos } from '../services/usuarioService';
 
 interface Props {
   projetoId: number;
@@ -17,12 +18,18 @@ export const PaginaAlocacao = ({ projetoId, projetoNome }: Props) => {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    if (isModalOpen) {
-      allocationService.getProfessionalsByProject()
-        .then(setDbProfessionals)
-        .catch(() => setMessage({ type: 'error', text: 'Erro ao carregar lista de profissionais.' }));
-    }
-  }, [isModalOpen]);
+  if (isModalOpen) {
+    listarUsuariosAtivos()
+      .then((usuarios: any[]) => {
+        const filtradosProfissionais = (usuarios ?? []).filter((p: any) =>
+          p.cargos && p.cargos.some((cargo: string) => ["PROFISSIONAL", "FINANCEIRO"].includes(cargo))
+        );
+        setDbProfessionals(filtradosProfissionais as unknown as Professional[]);
+      })
+      .catch(() => setMessage({ type: 'error', text: 'Erro ao carregar lista de profissionais.' }));
+  }
+}, [isModalOpen]);
+
 
   const filteredProfessionals = useMemo(() => {
     if (!searchTerm) return [];
