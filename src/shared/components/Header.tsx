@@ -21,21 +21,19 @@ export default function Header() {
                     />
                 </Link>
                 <div className="flex gap-2">
-                    <div className="dropdown dropdown-end">
+                    <div className="dropdown dropdown-end content-center">
                         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                             <FiUser className="w-6 h-6" />
                         </div>
-                        <ul
-                            tabIndex={-1}
-                            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                        <ul tabIndex={-1}
+                            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow text-[#0D1B2A] fixed left-1/4 -translate-x-1/2 lg:left-auto lg:right-auto lg:translate-x-0">
                             <li>
-                                <a className="justify-between">
-                                    Profile
-                                    <span className="badge">New</span>
+                                <a href="http://localhost:8081/realms/java-the-hutt/account" target="_blank" rel="noopener noreferrer"
+                                    className="justify-between">
+                                    Perfil
                                 </a>
                             </li>
-                            <li><a>Settings</a></li>
-                            <li onClick={logout}><a>Logout</a></li>
+                            <li><a href="http://localhost:8081/admin/java-the-hutt/console/#/java-the-hutt" target="_blank" rel="noopener noreferrer">Keycloak</a></li>
                         </ul>
 
                     </div>
