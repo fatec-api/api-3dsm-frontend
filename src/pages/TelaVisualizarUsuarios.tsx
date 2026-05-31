@@ -6,8 +6,6 @@ import { listarUsuarios } from "../services/projectService";
 import { allocationService } from "../api/AllocationService";
 import { KeycloakContext } from "../contexts/KeycloakProvider";
 
-
-
 type Experiencia = "Júnior" | "Pleno" | "Sênior";
 type StatusUsuario = "Ativo" | "Inativo";
 type Cargo = "Gestor" | "Profissional" | "Financeiro";
@@ -38,95 +36,6 @@ const formatarData = (dataString: string) => {
   return new Intl.DateTimeFormat('pt-BR').format(data);
 };
 
-
-// const usuarios: Usuario[] = [
-//   {
-//     id: 1,
-//     nome: "Carlos",
-//     cargo: "Gestor",
-//     email: "Carlos@gmail.com",
-//     experiencia: "Sênior",
-//     valorHora: 40.0,
-//     criadoEm: "09/04/2026",
-//     projetos: [
-//       { id: 1, nome: "Projeto1", cor: "green" },
-//       { id: 2, nome: "Projeto2", cor: "orange" },
-//       { id: 3, nome: "Projeto3", cor: "blue" },
-//       { id: 4, nome: "Projeto4", cor: "purple" },
-//     ],
-//     status: "Ativo",
-//   },
-//   {
-//     id: 2,
-//     nome: "Marcos",
-//     cargo: "Profissional",
-//     email: "Marcos@gmail.com",
-//     experiencia: "Júnior",
-//     valorHora: 20.0,
-//     criadoEm: "10/04/2026",
-//     projetos: [{ id: 1, nome: "Projeto1", cor: "green" }],
-//     status: "Ativo",
-//   },
-//   {
-//     id: 3,
-//     nome: "Jonas",
-//     cargo: "Financeiro",
-//     email: "Jonas@gmail.com",
-//     experiencia: "Pleno",
-//     valorHora: 30.0,
-//     criadoEm: "10/04/2026",
-//     projetos: [],
-//     status: "Inativo",
-//   },
-//   {
-//     id: 4,
-//     nome: "User X",
-//     cargo: "Gestor",
-//     email: "UserX@gmail.com",
-//     experiencia: "Sênior",
-//     valorHora: 40.0,
-//     criadoEm: "09/04/2026",
-//     projetos: [
-//       { id: 5, nome: "Projeto5", cor: "orange" },
-//       { id: 2, nome: "Projeto2", cor: "orange" },
-//       { id: 6, nome: "Projeto6", cor: "red" },
-//     ],
-//     status: "Ativo",
-//   },
-//   {
-//     id: 5,
-//     nome: "User Y",
-//     cargo: "Profissional",
-//     email: "UserY@gmail.com",
-//     experiencia: "Júnior",
-//     valorHora: 20.0,
-//     criadoEm: "10/04/2026",
-//     projetos: [
-//       { id: 1, nome: "Projeto1", cor: "green" },
-//       { id: 7, nome: "ProjetoK", cor: "purple" },
-//       { id: 8, nome: "Projeto8", cor: "blue" },
-//       { id: 9, nome: "Projeto9", cor: "red" },
-//       { id: 10, nome: "Projeto10", cor: "orange" },
-//     ],
-//     status: "Ativo",
-//   },
-//   {
-//     id: 6,
-//     nome: "User Z",
-//     cargo: "Financeiro",
-//     email: "UserZ@gmail.com",
-//     experiencia: "Pleno",
-//     valorHora: 30.0,
-//     criadoEm: "10/04/2026",
-//     projetos: [
-//       { id: 1, nome: "Projeto1", cor: "green" },
-//       { id: 11, nome: "Projeto11", cor: "orange" },
-//     ],
-//     status: "Ativo",
-//   },
-// ];
-
-
 export async function usuarios() {
   try {
     const response = await instance.get("/gestao/usuarios/ativos");
@@ -148,10 +57,11 @@ const corBadge: Record<Projeto["cor"], string> = {
 };
 
 function BadgesProjetos({ projetos }: { projetos: Projeto[] }) {
-  const visiveis = projetos.slice(0, MAX_BADGES_VISIVEIS);
-  const extras = projetos.length - MAX_BADGES_VISIVEIS;
+  const listaProjetos = projetos || [];
+  const visiveis = listaProjetos.slice(0, MAX_BADGES_VISIVEIS);
+  const extras = listaProjetos.slice(MAX_BADGES_VISIVEIS);
 
-  if (projetos.length === 0) {
+  if (listaProjetos.length === 0) {
     return (
       <span className="badge badge-ghost badge-sm font-semibold">N/A</span>
     );
@@ -160,17 +70,25 @@ function BadgesProjetos({ projetos }: { projetos: Projeto[] }) {
   return (
     <div className="flex flex-wrap gap-1 items-center">
       {visiveis.map((p) => (
-        <span
-          key={p.id}
-          className={`badge badge-sm font-semibold ${corBadge[p.cor]}`}
-        >
+        <span key={p.id} className={`badge badge-sm font-semibold ${corBadge[p.cor]}`}>
           {p.nome}
         </span>
       ))}
-      {extras > 0 && (
-        <span className="badge badge-sm badge-neutral font-bold">
-          +{extras}
-        </span>
+      {extras.length > 0 && (
+        <div className="relative group inline-block">
+          <span className="badge badge-sm badge-neutral font-bold cursor-pointer">
+            +{extras.length}
+          </span>
+          <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50">
+            <div className="bg-base-100 border rounded-md shadow-md p-2 min-w-40">
+              {extras.map((p) => (
+                <div key={p.id} className="text-xs py-1 px-2 hover:bg-base-200 rounded">
+                  {p.nome}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -186,8 +104,6 @@ function BadgeStatus({ status }: { status: StatusUsuario }) {
     </span>
   );
 }
-
-
 
 
 export default function ListagemUsuarios() {
@@ -419,21 +335,22 @@ export default function ListagemUsuarios() {
                         </span>
                       </td>
 
-
-                      <td>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          aria-label={`Editar ${usuario.nomeUsuario}`}
-                          onClick={() => {
-                            window.open(
-                              `http://localhost:8081/admin/java-the-hutt/console/#/java-the-hutt/users/${usuario.id}/settings`,
-                              "_blank"
-                            );
-                          }}
-                        >
-                          <FiEdit className="h-4 w-4 text-[#0D1B2A]" />
-                        </button>
-                      </td>
+                        <td>
+                          {PermissaoGestor && (
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              aria-label={`Editar ${usuario.nomeUsuario}`}
+                              onClick={() => {
+                                window.open(
+                                  `http://localhost:8081/admin/java-the-hutt/console/#/java-the-hutt/users/${usuario.id}/settings`,
+                                  "_blank"
+                                );
+                              }}
+                            >
+                              <FiEdit className="h-4 w-4 text-[#0D1B2A]" />
+                            </button>
+                          )}
+                        </td>
                     </tr>
                   ))
                 ) : (

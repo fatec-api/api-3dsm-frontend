@@ -131,7 +131,7 @@ export async function listarUsuarios() {
     }
 }
 
-export async function listarProjetoPorUsuarioLogado() {
+export async function listarProjetoPorUsuarioLogado(id: string) {
     try {
         const response = await instance.get(`/gestao/projetos/projeto/usuario/${id}`)
         return response.data

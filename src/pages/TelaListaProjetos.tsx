@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../shared/components/Header";
-import { listarProjetosPorGestor } from "../services/projectService";
+import { listarProjetoPorUsuarioLogado, listarProjetosPorGestor } from "../services/projectService";
 import { FaChevronRight, FaPencilAlt } from "react-icons/fa";
 import FiltrosListagemProjetos from "../components/FiltrosListagemProjetos";
 import { KeycloakContext } from "../contexts/KeycloakProvider";
@@ -116,7 +116,11 @@ export default function ListaProjetos() {
             setLoading(true);
             setErro(false);
 
-            const response = await listarProjetosPorGestor(id!);
+            const isFinanceiro = temPermissao("FINANCEIRO") && !temPermissao("GESTOR");
+            const response = isFinanceiro
+                ? await listarProjetoPorUsuarioLogado(id!)
+                : await listarProjetosPorGestor(id!);
+
             const data = response?.data ?? response;
 
             if (!Array.isArray(data)) {
@@ -126,9 +130,7 @@ export default function ListaProjetos() {
 
             const projetosComHoras = await Promise.all(
                 data.map(async (proj: Projeto) => {
-                    const horasRealizadas = await calcularHorasRealizadasProjeto(
-                        proj.id
-                    );
+                    const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
                     return { ...proj, horasRealizadasTotal: horasRealizadas };
                 })
             );
@@ -242,9 +244,8 @@ export default function ListaProjetos() {
                                 }
                             >
                                 <div
-                                    className={`w-80 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px] ${
-                                        visualizacaoFinanceiraAtiva ? "h-56" : "h-44"
-                                    }`}
+                                    className={`w-80 bg-base-100 rounded-2xl shadow-md border border-base-content/10 flex overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-[2px] ${visualizacaoFinanceiraAtiva ? "h-56" : "h-44"
+                                        }`}
                                 >
                                     <div className={`w-3 flex-shrink-0 ${cor}`} />
                                     <div className="p-4 flex flex-col justify-between w-full">
@@ -253,7 +254,7 @@ export default function ListaProjetos() {
                                                 {projeto.nomeProjeto}
                                             </h2>
                                             <div className="flex flex-row items-center gap-8">
-                                                {temPermissao("GESTOR") && (
+                                                {temPermissao("GESTOR") && !temPermissao("FINANCEIRO") && (
                                                     <div
                                                         className="p-2 -m-2 cursor-pointer text-base-content/40 hover:text-base-content transition"
                                                         onClick={(e) => {
@@ -286,12 +287,12 @@ export default function ListaProjetos() {
                                                         <span
                                                             className={
                                                                 projeto.statusOrcamento ===
-                                                                "EXCEDIDO"
+                                                                    "EXCEDIDO"
                                                                     ? "text-red-500 font-semibold"
                                                                     : projeto.statusOrcamento ===
-                                                                      "ATENCAO"
-                                                                    ? "text-yellow-500 font-semibold"
-                                                                    : "text-green-600 font-semibold"
+                                                                        "ATENCAO"
+                                                                        ? "text-yellow-500 font-semibold"
+                                                                        : "text-green-600 font-semibold"
                                                             }
                                                         >
                                                             {formatarMoeda(
