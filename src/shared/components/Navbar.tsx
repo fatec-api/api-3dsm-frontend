@@ -163,7 +163,7 @@ export default function Navbar() {
                                     {temPermissao('GESTOR') && (
                                         <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-projeto">Cadastro de Projeto</Link></li>
                                     )}
-                                    <li><Link to="/lista-projetos">Listagem de Projetos</Link></li>
+                                    <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/lista-projetos">Listagem de Projetos</Link></li>
                                     {temPermissao('GESTOR') && (
                                         <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/cadastro-item">Cadastro de Atividade</Link></li>
                                     )}
@@ -177,11 +177,11 @@ export default function Navbar() {
                                 <details name="menu">
                                     <summary>Apontamentos</summary>
                                     <ul className="text-black p-2 bg-base-100 w-52 z-1">
-                                        <li className="hover:rounded-lg hover:transform transition-transform hover:scale-105"><Link to="/apontamentos-gestor">Aprovar e Reprovar</Link></li>
+                                        <li className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg"><Link to="/apontamentos-gestor">Aprovar e Reprovar</Link></li>
                                         {temPermissao('PROFISSIONAL') && (
                                             <>
-                                            <li><Link to={`/log-profissional/${usuario?.id}` } className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Meus Apontamentos</Link></li>
-                                            <li><Link to="/apontamento-horas" className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Efetuar Apontamento</Link></li>
+                                            <li><Link to={`/log-profissional/${usuario?.id}` } className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg">Meus Apontamentos</Link></li>
+                                            <li><Link to="/apontamento-horas" className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg">Efetuar Apontamento</Link></li>
                                             </>
                                         )}
                                     </ul>
@@ -209,7 +209,7 @@ export default function Navbar() {
                                             </li>
                                         )}
                                         <li>
-                                            <Link to="/visualizar-usuarios" className="hover:rounded-lg hover:transform transition-transform hover:scale-105">Listagem de Usuários</Link>
+                                            <Link to="/visualizar-usuarios" className="hover:bg-[#1E3859] hover:text-white hover:rounded-lg">Listagem de Usuários</Link>
                                         </li>
                                     </ul>
                                 </details>
