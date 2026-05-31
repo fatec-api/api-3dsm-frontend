@@ -97,7 +97,7 @@ export default function ListaApontamentosGestor() {
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                             <label className="text-xl md:text-2xl font-bold shrink-0">Aprovação dos Apontamentos</label>
 
-                            <div className="flex gap-3 items-center shrink-0">
+                            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center shrink-0 w-full sm:w-auto">
                                 <DropdownProjetos
                                     value={selectedProjeto}
                                     options={projetoOptions}

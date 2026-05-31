@@ -459,7 +459,7 @@ export default function DescricaoProjeto() {
                 {mostrarConteudoOperacional && (
                     <>
                         <div className="flex flex-col gap-3">
-                            <div className="flex flex-row justify-between items-center gap-4">
+                            <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 w-full">
                                 <h2 className="text-lg font-semibold whitespace-nowrap">
                                     Profissionais Alocados
                                 </h2>
@@ -548,7 +548,7 @@ export default function DescricaoProjeto() {
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <div className="flex flex-row justify-between items-center gap-4">
+                            <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 w-full">
                                 <h2 className="text-lg font-semibold whitespace-nowrap">
                                     Atividades
                                 </h2>
