@@ -21,7 +21,7 @@ export interface Projeto {
     horasPrevistasTotal: number;
     horasRealizadasTotal: number;
     horasPendentesTotal?: number;
-    status_orcamento?: string;
+    statusOrcamento?: string;
     valorOrcamento?: number;
     custoRealTotal?: number;
 }
@@ -163,7 +163,7 @@ export default function ListaProjetos() {
 
     const getCor = (projeto: Projeto) => {
         if (visualizacaoFinanceiraAtiva) {
-            switch (projeto.status_orcamento) {
+            switch (projeto.statusOrcamento) {
                 case "DENTRO_DO_ORCAMENTO":
                     return "bg-green-500";
                 case "ATENCAO":
@@ -285,10 +285,10 @@ export default function ListaProjetos() {
                                                         <b>Gasto:</b>{" "}
                                                         <span
                                                             className={
-                                                                projeto.status_orcamento ===
+                                                                projeto.statusOrcamento ===
                                                                 "EXCEDIDO"
                                                                     ? "text-red-500 font-semibold"
-                                                                    : projeto.status_orcamento ===
+                                                                    : projeto.statusOrcamento ===
                                                                       "ATENCAO"
                                                                     ? "text-yellow-500 font-semibold"
                                                                     : "text-green-600 font-semibold"

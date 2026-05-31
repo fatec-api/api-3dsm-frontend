@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Input from "../shared/components/Input";
 import Dropdown from "../shared/components/Dropdown";
 import Botao from "../shared/components/Botao";
@@ -6,6 +6,8 @@ import { GoProject } from "react-icons/go";
 import { FiFileText, FiClock, FiUser, FiX } from "react-icons/fi";
 import { useParams } from "react-router-dom";
 import instance from "../api/instance";
+import { listarProjetoPorUsuarioLogado, listarProjetosPorGestor } from "../services/projectService";
+import { KeycloakContext } from "../contexts/KeycloakProvider";
 
 type Profissional = { id: string; nomeUsuario: string };
 type Projeto = { id: number; nomeProjeto: string };
@@ -33,16 +35,19 @@ export default function FormCadastroItem() {
 	const [erro, setErro] = useState("");
 	const [mostrarPopup, setMostrarPopup] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const { getUsuario } = useContext(KeycloakContext);
 
 	const { projetoId: idDaUrl } = useParams<{ projetoId: string }>();
 
 	useEffect(() => { if (idDaUrl) setProjetoId(idDaUrl); }, [idDaUrl]);
 
+	// useEffect de carregarProjetos atualizado
 	useEffect(() => {
 		async function carregarProjetos() {
 			try {
-				const res = await instance.get("/gestao/projetos/listar");
-				setProjetos(res.data);
+				const usuario = getUsuario();
+				const projetos = await listarProjetosPorGestor(usuario?.id);
+				setProjetos(projetos);
 			} catch {
 				setErro("Não foi possível carregar os projetos.");
 			}
