@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { X, Search, Users, CheckCircle2 } from 'lucide-react';
 import Botao from '../shared/components/Botao';
-import { editarProjeto } from '../services/projectService';
+import { editarProjeto, listarEquipeProjeto } from '../services/projectService';
 import { listarGestores, type Usuario } from '../services/usuarioService';
 import { listarClientesAtivos, type Cliente } from '../services/clienteService';
-import instance from '../api/instance';
 
 const TIPOS_PROJETO = ['Alocacao', 'Hora_Fechada'];
 const STATUS_PROJETO = ['Andamento', 'Desenvolvimento', 'Concluida'];
@@ -31,6 +30,54 @@ interface ModalEditarProjetoProps {
     };
     todosProfissionais: Profissional[];
     onSucesso?: () => void;
+}
+
+const CHAVES_ANINHADAS = ['usuario', 'profissional', 'profissionalAlocado', 'colaborador', 'user'] as const;
+
+// Retorna o primeiro valor "preenchido" (não undefined/null/'') entre as chaves possíveis.
+function pegarPrimeiro(obj: any, chaves: string[]): any {
+    for (const chave of chaves) {
+        const v = obj?.[chave];
+        if (v !== undefined && v !== null && v !== '') return v;
+    }
+    return undefined;
+}
+
+
+function extrairArray(resp: any): any[] {
+    if (Array.isArray(resp)) return resp;
+    if (Array.isArray(resp?.data)) return resp.data;
+    if (Array.isArray(resp?.content)) return resp.content; // Spring Page
+    if (Array.isArray(resp?.items)) return resp.items;
+    if (Array.isArray(resp?.alocacoes)) return resp.alocacoes;
+    return [];
+}
+
+function extrairProfissional(item: any): Profissional | null {
+    if (!item || typeof item !== 'object') return null;
+
+    // 1. Procura o objeto do profissional aninhado (padrão de tabela pivô).
+    let aninhado: any = null;
+    for (const chave of CHAVES_ANINHADAS) {
+        if (item[chave] && typeof item[chave] === 'object') {
+            aninhado = item[chave];
+            break;
+        }
+    }
+
+    const fonte = aninhado ?? item;
+
+    const idBruto = aninhado
+        ? pegarPrimeiro(aninhado, ['id', 'usuarioId', 'profissionalId'])
+        : pegarPrimeiro(item, ['usuarioId', 'profissionalId', 'id']);
+
+    if (idBruto === undefined || idBruto === null) return null;
+
+    return {
+        id: String(idBruto), 
+        nomeUsuario: String(pegarPrimeiro(fonte, ['nomeUsuario', 'nome', 'name', 'nomeCompleto']) ?? ''),
+        email: String(pegarPrimeiro(fonte, ['email', 'mail']) ?? ''),
+    };
 }
 
 export default function ModalEditarProjeto({
@@ -72,12 +119,22 @@ export default function ModalEditarProjeto({
         const carregarDados = async () => {
             try {
                 setIsLoadingAlocados(true);
-                const [alocados, gestoresData, clientesData] = await Promise.all([
-                    instance.get(`/gestao/alocacoes/projeto/${projetoId}`).then(r => r.data ?? []),
+                const [equipeData, gestoresData, clientesData] = await Promise.all([
+                    listarEquipeProjeto(projetoId),
                     listarGestores(),
                     listarClientesAtivos(),
                 ]);
-                setSelectedProfissionais(alocados);
+
+                const equipeFormatada = extrairArray(equipeData)
+                    .map(extrairProfissional)
+                    .filter((p): p is Profissional => p !== null);
+
+                // Dedupe defensivo (caso a API repita registros do mesmo profissional).
+                const equipeUnica = Array.from(
+                    new Map(equipeFormatada.map(p => [p.id, p])).values()
+                );
+
+                setSelectedProfissionais(equipeUnica);
                 setGestores(gestoresData);
                 setClientes(clientesData);
             } catch (error) {
@@ -92,19 +149,21 @@ export default function ModalEditarProjeto({
 
     if (!isOpen) return null;
 
+    // Comparação defensiva utilizando String() para evitar erros se um id for string e outro number.
     const profissionaisDisponiveis = todosProfissionais.filter(p =>
         (p.nomeUsuario.toLowerCase().includes(searchTerm.toLowerCase()) ||
             p.email?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        !selectedProfissionais.some(s => s.id === p.id)
+        !selectedProfissionais.some(s => String(s.id) === String(p.id))
     );
 
     const handleSelectProfissional = (p: Profissional) => {
-        setSelectedProfissionais(prev => [...prev, p]);
+        // Normaliza o id ao selecionar também, garantindo consistência no estado.
+        setSelectedProfissionais(prev => [...prev, { ...p, id: String(p.id) }]);
         setSearchTerm('');
     };
 
     const handleRemoveProfissional = (id: string) => {
-        setSelectedProfissionais(prev => prev.filter(p => p.id !== id));
+        setSelectedProfissionais(prev => prev.filter(p => String(p.id) !== String(id)));
     };
 
     const erroOrcamento =
@@ -135,6 +194,8 @@ export default function ModalEditarProjeto({
             if (status) payload.status = status;
             if (gestorId) payload.gestorId = gestorId;
             if (clienteId) payload.clienteId = parseInt(clienteId);
+
+            // Enviamos os IDs mapeados (já normalizados como string).
             payload.profissionalAlocadoIds = selectedProfissionais.map(p => p.id);
 
             await editarProjeto(projetoId, payload);
