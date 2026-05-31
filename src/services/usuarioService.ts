@@ -4,7 +4,7 @@ export interface Usuario {
     id: string;
     nomeUsuario: string;
     email: string;
-    cargo: String[];
+    cargo: string[];
     nivelExperiencia?: string;
     valorHora?: number;
     ativo: boolean;
@@ -22,7 +22,8 @@ export async function listarUsuariosAtivos(): Promise<Usuario[]> {
 
 export async function listarGestores(): Promise<Usuario[]> {
     const usuarios = await listarUsuariosAtivos();
-    return usuarios.filter(u => u.cargo.includes("GESTOR"));
+
+    return (usuarios ?? []).filter(u => Array.isArray(u?.cargo) && u.cargo.includes("GESTOR"));
 }
 
 export async function buscarUsuarioPorId(id: string): Promise<Usuario> {
