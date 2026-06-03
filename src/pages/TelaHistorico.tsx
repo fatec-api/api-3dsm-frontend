@@ -3,12 +3,12 @@ import Header from "../shared/components/Header";
 import { FaDownload, FaArrowDown, FaArrowUp } from "react-icons/fa";
 import Botao from "../shared/components/Botao";
 import Input from "../shared/components/Input";
-import { listarHistorico, type Log } from "../services/historicoService";
+import { listarHistorico, enriquecerLogsParaExport, type Log } from "../services/historicoService";
 
 export default function Historico() {
 	const [logs, setLogs] = useState<Log[]>([]);
 	const [loadingInicial, setLoadingInicial] = useState(true);
-	const [loading, setLoading] = useState(true);
+	const [exportando, setExportando] = useState(false);
 	const [erro, setErro] = useState<string | null>(null);
 	const [paginaAtual, setPaginaAtual] = useState(1);
 	const [busca, setBusca] = useState("");
@@ -61,19 +61,30 @@ export default function Historico() {
 		});
 	}, [logsFiltrados, ordemDescendente]);
 
-	const handleExportarCSV = () => {
+	const handleExportarCSV = async () => {
+		setExportando(true);
 		// Exportação sempre do mais novo para o mais antigo para o arquivo
-		const dadosParaExportar = [...logsFiltrados].sort((a, b) =>
+		const ordenados = [...logsFiltrados].sort((a, b) =>
 			new Date(b.data).getTime() - new Date(a.data).getTime()
 		);
 
+		const dadosParaExportar = await enriquecerLogsParaExport(ordenados);
+
 		const rows = [
-			["Usuário", "Data", "Hora", "Ação", "Justificativa"],
+			["Usuário", "Projeto", "Atividade", "Data", "Hora", "Ação", "Item ID", "Data Apontamento", "Hora Início", "Hora Fim", "Horas Líquidas", "Observação", "Justificativa"],
 			...dadosParaExportar.map((log) => [
 				log.usuario,
+				log.projetoNome || "-",
+				log.itemDescricao || "-",
 				`'${log.data}`, // Aspa simples resolve o bug dos sustenidos (####) no Excel
 				log.hora,
 				log.acao,
+				log.itemId ?? "-",
+				log.dataApontamento ? `'${String(log.dataApontamento).split("T")[0]}` : "-",
+				log.horaInicio ? String(log.horaInicio).replace("T", " ").substring(0, 19) : "-",
+				log.horaFim ? String(log.horaFim).replace("T", " ").substring(0, 19) : "-",
+				log.horasLiquidas ?? "-",
+				log.observacao || "-",
 				log.justificativa || "-",
 			]),
 		];
@@ -100,6 +111,7 @@ export default function Historico() {
 		link.click();
 		document.body.removeChild(link);
 		window.URL.revokeObjectURL(url);
+		setExportando(false);
 	};
 
 	const inicio = (paginaAtual - 1) * itensPorPagina;
@@ -132,10 +144,10 @@ export default function Historico() {
 							/>
 
 							<div className="hover:transform hover:scale-105 transition-transform">
-								<Botao onClick={handleExportarCSV}>
+								<Botao onClick={handleExportarCSV} disabled={exportando}>
 									<span className="flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
-										<FaDownload />
-										Exportar CSV
+										{exportando ? <span className="loading loading-spinner loading-xs" /> : <FaDownload />}
+										{exportando ? "Exportando..." : "Exportar CSV"}
 									</span>
 								</Botao>
 							</div>

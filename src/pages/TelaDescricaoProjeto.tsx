@@ -16,7 +16,7 @@ import {
     listarProjetoId,
 } from "../services/projectService";
 import {
-    listarApontamentos,
+    getApontamentosAprovadosPorProjeto,
     type MetricasAtividade,
 } from "../services/apontamentoService";
 import IndicadorProgresso from "../components/IndicadorProgresso";
@@ -38,66 +38,47 @@ function formatarMoeda(valor: number): string {
     });
 }
 
-function getStatusSaldo(percentualSaldo: number) {
-    if (percentualSaldo > 20) {
-        return {
-            cor: "#22c55e",
-            borda: "border-green-500",
-            texto: "text-green-600",
-        };
-    }
+type StatusOrcamento = "DENTRO_DO_ORCAMENTO" | "ATENCAO" | "EXCEDIDO" | null | undefined;
 
-    if (percentualSaldo >= 1) {
-        return {
-            cor: "#eab308",
-            borda: "border-yellow-400",
-            texto: "text-yellow-500",
-        };
+function getStatusOrcamento(statusOrcamento: StatusOrcamento) {
+    switch (statusOrcamento) {
+        case "ATENCAO":
+            return { cor: "#eab308", borda: "border-yellow-400", texto: "text-yellow-500" };
+        case "EXCEDIDO":
+            return { cor: "#ef4444", borda: "border-red-500", texto: "text-red-500" };
+        case "DENTRO_DO_ORCAMENTO":
+        default:
+            return { cor: "#22c55e", borda: "border-green-500", texto: "text-green-600" };
     }
-
-    return {
-        cor: "#ef4444",
-        borda: "border-red-500",
-        texto: "text-red-500",
-    };
 }
 
 function CircularProgressFinanceiro({
-    percentualSaldo,
+    percentualConsumo,
+    statusOrcamento,
 }: {
-    percentualSaldo: number;
+    percentualConsumo: number;
+    statusOrcamento: StatusOrcamento;
 }) {
     const raio = 28;
     const circunferencia = 2 * Math.PI * raio;
-    const percentualVisual = Math.min(Math.max(percentualSaldo, 0), 100);
+    const percentualVisual = Math.min(Math.max(percentualConsumo, 0), 100);
     const offset = circunferencia - (percentualVisual / 100) * circunferencia;
-    const status = getStatusSaldo(percentualSaldo);
+    const status = getStatusOrcamento(statusOrcamento);
 
     return (
         <div className="relative flex items-center justify-center w-16 h-16">
             <svg width="64" height="64" viewBox="0 0 64 64" className="-rotate-90">
+                <circle cx="32" cy="32" r={raio} fill="none" stroke="#e5e7eb" strokeWidth="6" />
                 <circle
-                    cx="32"
-                    cy="32"
-                    r={raio}
-                    fill="none"
-                    stroke="#e5e7eb"
-                    strokeWidth="6"
-                />
-                <circle
-                    cx="32"
-                    cy="32"
-                    r={raio}
-                    fill="none"
-                    stroke={status.cor}
-                    strokeWidth="6"
+                    cx="32" cy="32" r={raio} fill="none"
+                    stroke={status.cor} strokeWidth="6"
                     strokeDasharray={circunferencia}
                     strokeDashoffset={offset}
                     strokeLinecap="round"
                 />
             </svg>
             <span className="absolute text-xs font-semibold" style={{ color: status.cor }}>
-                {Math.round(percentualSaldo)}%
+                {Math.round(percentualConsumo)}%
             </span>
         </div>
     );
@@ -105,15 +86,15 @@ function CircularProgressFinanceiro({
 
 function CardsFinanceiros({ projeto }: { projeto: any }) {
     const orcamentoPrevisto: number = projeto?.valorOrcamento ?? 0;
-    const custoRealAcumulado: number =
-        projeto?.custoRealAcumulado ?? projeto?.custoRealTotal ?? 0;
-
+    const custoRealAcumulado: number = projeto?.custoRealTotal ?? 0;
     const saldoDisponivel = orcamentoPrevisto - custoRealAcumulado;
-    const percentualSaldo = orcamentoPrevisto
-        ? (saldoDisponivel / orcamentoPrevisto) * 100
+    const statusOrcamento: StatusOrcamento = projeto?.statusOrcamento;
+
+    const percentualConsumo = orcamentoPrevisto > 0
+        ? (custoRealAcumulado / orcamentoPrevisto) * 100
         : 0;
 
-    const status = getStatusSaldo(percentualSaldo);
+    const status = getStatusOrcamento(statusOrcamento);
 
     return (
         <div className="flex gap-6 flex-wrap">
@@ -137,7 +118,7 @@ function CardsFinanceiros({ projeto }: { projeto: any }) {
                         <p className="text-sm text-base-content/50 font-medium leading-tight">
                             Total do Custo Real <br /> Acumulado
                         </p>
-                        <p className="text-lg font-bold mt-1">
+                        <p className={`text-lg font-bold mt-1 ${status.texto}`}>
                             {formatarMoeda(custoRealAcumulado)}
                         </p>
                     </div>
@@ -145,17 +126,7 @@ function CardsFinanceiros({ projeto }: { projeto: any }) {
                 </div>
             </div>
 
-            <div
-                className={`
-                    flex-1
-                    min-w-[200px]
-                    card
-                    bg-base-100
-                    border-2
-                    ${status.borda}
-                    shadow-sm
-                `}
-            >
+            <div className={`flex-1 min-w-[200px] card bg-base-100 border-2 ${status.borda} shadow-sm`}>
                 <div className="card-body flex flex-row justify-between items-center py-4 px-5">
                     <div>
                         <p className="text-sm text-base-content/50 font-medium leading-tight">
@@ -165,7 +136,10 @@ function CardsFinanceiros({ projeto }: { projeto: any }) {
                             {formatarMoeda(saldoDisponivel)}
                         </p>
                     </div>
-                    <CircularProgressFinanceiro percentualSaldo={percentualSaldo} />
+                    <CircularProgressFinanceiro
+                        percentualConsumo={percentualConsumo}
+                        statusOrcamento={statusOrcamento}
+                    />
                 </div>
             </div>
         </div>
@@ -181,6 +155,7 @@ export default function DescricaoProjeto() {
 
     const temAcessoFinanceiro = temPermissao(["FINANCEIRO", "GESTOR"]);
     const [visualizacaoFinanceira, setVisualizacaoFinanceira] = useState(false);
+    const [modoHoras, setModoHoras] = useState<"aprovadas" | "total">("aprovadas");
 
     const projetoState = state?.projeto;
     const [projeto, setProjeto] = useState<any>(projetoState);
@@ -220,44 +195,6 @@ export default function DescricaoProjeto() {
         );
     });
 
-    const calcularMetricas = async (projetoId: number) => {
-        const [itens, apontamentos] = await Promise.all([
-            listarItens(projetoId),
-            listarApontamentos(),
-        ]);
-
-        const resultado: Record<string, any> = {};
-
-        itens.forEach((item: any) => {
-            const nivel = item.nivelAtividade.toUpperCase();
-
-            if (!resultado[nivel]) {
-                resultado[nivel] = {
-                    nivelAtividade: nivel,
-                    horasPrevistasAtiv: 0,
-                    horasRealizadasAtiv: 0,
-                };
-            }
-
-            resultado[nivel].horasPrevistasAtiv += item.previsaoHoras;
-
-            const horasItem = apontamentos
-                .filter(
-                    (ap: any) => ap.itemId === item.id && ap.status === "APROVADO"
-                )
-                .reduce((sum: number, ap: any) => sum + ap.horasLiquidas, 0);
-
-            resultado[nivel].horasRealizadasAtiv += horasItem;
-        });
-
-        return Object.values(resultado).map((m: any) => ({
-            ...m,
-            percentual: m.horasPrevistasAtiv
-                ? (m.horasRealizadasAtiv / m.horasPrevistasAtiv) * 100
-                : 0,
-        }));
-    };
-
     const itensFiltrados = itens.filter((item) => {
         const termo = buscaItem.toLowerCase();
         return (
@@ -283,7 +220,7 @@ export default function DescricaoProjeto() {
             setListaDeProfissionais([...listaEquipe]);
 
             setLoadingMetricas(true);
-            const dadosMetricas = await calcularMetricas(Number(id));
+            const dadosMetricas = await getApontamentosAprovadosPorProjeto(Number(id));
             setMetricas([...dadosMetricas]);
         } catch (error) {
             console.error("Erro ao carregar dados do projeto", error);
@@ -598,30 +535,55 @@ export default function DescricaoProjeto() {
                                         </span>
                                     </div>
                                 ) : (
-                                    itensFiltrados.map((item, index) => (
-                                        <Card
-                                            key={index}
-                                            title={item.codigo}
-                                            type={item.descricao}
-                                            status={item.nivelAtividade}
-                                            responsavel={item.usuarioNomes?.join(", ")}
-                                            showResponsavel={true}
-                                            isGestor={isGestor}
-                                            onClick={
-                                                isGestor
-                                                    ? () => setPopupItem(item)
-                                                    : undefined
-                                            }
-                                        />
-                                    ))
+                                    itensFiltrados.map((item, index) => {
+                                        const metricaDoNivel = metricas.find(
+                                            m => m.nivelAtividade.toUpperCase() === item.nivelAtividade?.toUpperCase()
+                                        );
+                                        const estourado = metricaDoNivel ? metricaDoNivel.percentual > 100 : false;
+                                        return (
+                                            <Card
+                                                key={index}
+                                                title={item.codigo}
+                                                type={item.descricao}
+                                                status={item.nivelAtividade}
+                                                responsavel={item.usuarioNomes?.join(", ")}
+                                                showResponsavel={true}
+                                                isGestor={isGestor}
+                                                estourado={estourado}
+                                                onClick={
+                                                    isGestor
+                                                        ? () => setPopupItem(item)
+                                                        : undefined
+                                                }
+                                            />
+                                        );
+                                    })
                                 )}
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-4 mt-8">
-                            <h2 className="text-lg font-semibold mb-2">
-                                Progresso por nível de atividade
-                            </h2>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
+                                <h2 className="text-lg font-semibold">
+                                    Progresso por nível de atividade
+                                </h2>
+                                <div className="flex items-center gap-3">
+                                    <span className={`text-sm font-medium transition-colors ${modoHoras === "aprovadas" ? "text-base-content font-bold" : "text-base-content/50"}`}>
+                                        Apenas Aprovadas
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setModoHoras(m => m === "aprovadas" ? "total" : "aprovadas")}
+                                        className={`relative w-14 h-7 rounded-full transition-all duration-300 ${modoHoras === "total" ? "bg-primary" : "bg-base-300"}`}
+                                        aria-label="Alternar modo de horas"
+                                    >
+                                        <div className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-300 ${modoHoras === "total" ? "translate-x-7" : "translate-x-0"}`} />
+                                    </button>
+                                    <span className={`text-sm font-medium transition-colors ${modoHoras === "total" ? "text-base-content font-bold" : "text-base-content/50"}`}>
+                                        Total Acumulado
+                                    </span>
+                                </div>
+                            </div>
                             {loadingMetricas ? (
                                 <div className="flex justify-center p-8 bg-base-100 rounded-box">
                                     <span className="loading loading-spinner text-primary loading-lg"></span>
@@ -632,6 +594,15 @@ export default function DescricaoProjeto() {
                                         const dadoDoNivel = metricas.find(
                                             (m) => m.nivelAtividade.toUpperCase() === nivel
                                         );
+                                        const horasAprovadas = dadoDoNivel?.horasRealizadasAtiv || 0;
+                                        const horasPendentes = modoHoras === "total"
+                                            ? (projeto?.horasPendentesTotal || 0) / NIVEIS_BASE.length
+                                            : 0;
+                                        const horasExibidas = horasAprovadas + horasPendentes;
+                                        const previstas = dadoDoNivel?.horasPrevistasAtiv || 0;
+                                        const percentual = previstas > 0
+                                            ? Math.round((horasExibidas / previstas) * 100)
+                                            : 0;
 
                                         return (
                                             <div
@@ -643,21 +614,9 @@ export default function DescricaoProjeto() {
                                                         {NOMES_ATIVIDADES[nivel]}
                                                     </h3>
                                                     <IndicadorProgresso
-                                                        percentualAtiv={
-                                                            dadoDoNivel
-                                                                ? Math.round(
-                                                                    dadoDoNivel.percentual
-                                                                )
-                                                                : 0
-                                                        }
-                                                        horasPrevistas={
-                                                            dadoDoNivel?.horasPrevistasAtiv ||
-                                                            0
-                                                        }
-                                                        horasRealizadas={
-                                                            dadoDoNivel?.horasRealizadasAtiv ||
-                                                            0
-                                                        }
+                                                        percentualAtiv={percentual}
+                                                        horasPrevistas={previstas}
+                                                        horasRealizadas={Math.round(horasExibidas * 10) / 10}
                                                     />
                                                 </div>
                                             </div>

@@ -178,7 +178,7 @@ export default function ListagemUsuarios() {
 
     if (!PermissaoGestor) {
       return (
-        <div className="flex h-screen items-center justify-center">
+        <div className="flex items-center justify-center">
           <p className="text-lg font-semibold text-red-500">
             Acesso negado.
           </p>

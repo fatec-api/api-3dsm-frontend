@@ -20,6 +20,7 @@ export default function ListaApontamentosGestor() {
     const [selectedItems, setSelectedItems] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isReprovando, setIsReprovando] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     const { getUsuario } = useContext(KeycloakContext);
     const usuario = getUsuario();
     const gestorIdLogado = usuario?.id;
@@ -49,7 +50,7 @@ export default function ListaApontamentosGestor() {
             await aprovarApontamentos(ids);
             alert("Apontamentos aprovados com sucesso!");
             setSelectedItems([]);
-            window.location.reload();
+            setRefreshKey(k => k + 1);
         } catch (error) {
             console.error("[ERROR] Falha na aprovação:", error);
             alert("Erro ao aprovar apontamentos.");
@@ -79,7 +80,7 @@ export default function ListaApontamentosGestor() {
             alert("Apontamento reprovado com sucesso!");
             setIsModalOpen(false);
             setSelectedItems([]);
-            window.location.reload();
+            setRefreshKey(k => k + 1);
         } catch (error) {
             console.error("[ERROR] Erro ao reprovar apontamento:", error);
             alert("Erro ao enviar a reprovação.");
@@ -127,6 +128,7 @@ export default function ListaApontamentosGestor() {
                         gestorId={gestorIdLogado ?? ""}
                         projetoFiltro={selectedProjeto}
                         onSelectionChange={setSelectedItems}
+                        refreshKey={refreshKey}
                     />
 
                 </div>

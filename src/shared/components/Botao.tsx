@@ -3,7 +3,7 @@ type Props = {
   type?: "button" | "submit";
   variant?: "primary" | "secondary" | "ghost";
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: () => void | Promise<void>;
   className?: string;
 };
 

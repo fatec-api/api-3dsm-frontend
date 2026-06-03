@@ -9,11 +9,12 @@ interface CardProps {
     isGestor?: boolean
     showResponsavel: boolean
     onClick?: React.MouseEventHandler<HTMLButtonElement>
+    estourado?: boolean
 }
 
-export default function Card({ title, type, status, responsavel, buttonText, onClick, isGestor, showResponsavel = false }: CardProps) {
+export default function Card({ title, type, status, responsavel, buttonText, onClick, isGestor, showResponsavel = false, estourado = false }: CardProps) {
     return (
-        <div className="flex flex-col justify-between border border-base-content/10 bg-base-100 hover:shadow-lg hover:scale-105 transition duration-300 p-6 rounded-2xl w-64">
+        <div className={`flex flex-col justify-between border-2 bg-base-100 hover:shadow-lg hover:scale-105 transition duration-300 p-6 rounded-2xl w-64 ${estourado ? "border-red-400" : "border-base-content/10"}`}>
 
     <div className="flex flex-row justify-between items-start">
         <h2 className="text-xl font-bold mb-2 break-words">{title}</h2>

@@ -5,8 +5,6 @@ import { listarProjetoPorUsuarioLogado, listarProjetosPorGestor } from "../servi
 import { FaChevronRight, FaPencilAlt } from "react-icons/fa";
 import FiltrosListagemProjetos from "../components/FiltrosListagemProjetos";
 import { KeycloakContext } from "../contexts/KeycloakProvider";
-import { listarApontamentos } from "../services/apontamentoService";
-import { listarItens } from "../services/ItemService";
 import ModalEditarProjeto from "../components/ModalEditarProjeto";
 import type { Profissional } from "../components/ModalAlocarFuncionarioItem";
 import { allocationService } from "../api/AllocationService";
@@ -47,29 +45,6 @@ export default function ListaProjetos() {
 
     const navigate = useNavigate();
 
-    const calcularHorasRealizadasProjeto = async (projetoId: number) => {
-        try {
-            const [itens, apontamentos] = await Promise.all([
-                listarItens(projetoId),
-                listarApontamentos(),
-            ]);
-
-            const itemIds = itens.map((item: any) => item.id);
-
-            const horas = apontamentos
-                .filter(
-                    (ap: any) =>
-                        itemIds.includes(ap.itemId) && ap.status === "APROVADO"
-                )
-                .reduce((total: number, ap: any) => total + ap.horasLiquidas, 0);
-
-            return horas;
-        } catch (error) {
-            console.error("Erro ao calcular horas:", error);
-            return 0;
-        }
-    };
-
     const getProgresso = (projeto: Projeto): string => {
         if (!projeto.horasPrevistasTotal) return "Sem previsão";
 
@@ -94,7 +69,7 @@ export default function ListaProjetos() {
         if (filtros.status && projeto.status !== filtros.status) return false;
         if (filtros.tipoProjeto && projeto.tipoProjeto !== filtros.tipoProjeto)
             return false;
-        if (filtros.nomeCliente && projeto.nomeCliente !== filtros.nomeCliente)
+        if (filtros.nomeCliente && (projeto.nomeCliente ?? "") !== filtros.nomeCliente)
             return false;
 
         return true;
@@ -128,14 +103,7 @@ export default function ListaProjetos() {
                 return;
             }
 
-            const projetosComHoras = await Promise.all(
-                data.map(async (proj: Projeto) => {
-                    const horasRealizadas = await calcularHorasRealizadasProjeto(proj.id);
-                    return { ...proj, horasRealizadasTotal: horasRealizadas };
-                })
-            );
-
-            setProjetos(projetosComHoras);
+            setProjetos(data);
         } catch (error) {
             console.error("Erro ao carregar projetos reais da API:", error);
             setErro(true);
@@ -164,27 +132,16 @@ export default function ListaProjetos() {
         podeVerFinanceiro && filtros.visualizacaoFinanceira;
 
     const getCor = (projeto: Projeto) => {
-        if (visualizacaoFinanceiraAtiva) {
-            switch (projeto.statusOrcamento) {
-                case "DENTRO_DO_ORCAMENTO":
-                    return "bg-green-500";
-                case "ATENCAO":
-                    return "bg-yellow-400";
-                case "EXCEDIDO":
-                    return "bg-red-500";
-                default:
-                    return "bg-base-300";
-            }
+        switch (projeto.statusOrcamento) {
+            case "DENTRO_DO_ORCAMENTO":
+                return "bg-green-500";
+            case "ATENCAO":
+                return "bg-yellow-400";
+            case "EXCEDIDO":
+                return "bg-red-500";
+            default:
+                return "bg-base-300";
         }
-
-        if (!projeto.horasPrevistasTotal) return "bg-base-300";
-
-        const percentualConsumo =
-            (projeto.horasRealizadasTotal / projeto.horasPrevistasTotal) * 100;
-
-        if (percentualConsumo <= 75) return "bg-green-500";
-        if (percentualConsumo <= 100) return "bg-yellow-400";
-        return "bg-red-500";
     };
 
     const formatarMoeda = (valor?: number) => {

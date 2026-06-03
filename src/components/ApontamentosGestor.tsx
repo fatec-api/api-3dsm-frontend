@@ -20,12 +20,14 @@ type ApontamentosGestorProps = {
     gestorId: string;
     projetoFiltro?: string;
     onSelectionChange?: (selectedItems: Apontamento[]) => void;
+    refreshKey?: number;
 };
 
 export default function ApontamentosGestor({
     gestorId,
     projetoFiltro = "all",
-    onSelectionChange
+    onSelectionChange,
+    refreshKey,
 }: ApontamentosGestorProps) {
     const [apontamentos, setApontamentos] = useState<Apontamento[]>([]);
     const [selectedApontamentos, setSelectedApontamentos] = useState<Set<string>>(new Set());
@@ -62,7 +64,7 @@ export default function ApontamentosGestor({
         };
 
         fetchData();
-    }, [gestorId]);
+    }, [gestorId, refreshKey]);
 
     useEffect(() => {
         if (onSelectionChange) {
